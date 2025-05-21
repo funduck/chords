@@ -1,0 +1,7 @@
+body {
+    background-color: #6a6a6a;
+}
+
+.hidden {
+    opacity: 0;
+}

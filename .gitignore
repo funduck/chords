@@ -1,0 +1,12 @@
+.idea
+.env
+.env.dev
+coverage
+dist
+node_modules
+var
+generated-entities
+temp
+data
+.cache
+google-service-key.json
