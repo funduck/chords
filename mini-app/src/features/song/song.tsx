@@ -1,49 +1,39 @@
 import { SongDto, SongService } from "@src/services/song.service";
 import { useEffect, useState } from "react";
-import { Cell, Divider, List, Section, Switch, Title } from "@telegram-apps/telegram-ui";
+import { Accordion, Divider, List, Section, Title } from "@telegram-apps/telegram-ui";
 import { Signals } from "@src/signals-registry";
 import { useParams } from "react-router";
 import { useSignal } from "@telegram-apps/sdk-react";
 import SongLine from "./song-line";
-import { SettingsService } from "@src/services/settings.service";
-import { SongSettings } from "./settings";
+import SongSettingsControl from "./song-settings";
 
 function Song() {
+  // GET SONG
   const { songId: paramsSongId } = useParams();
   const songId = useSignal(Signals.selectedSongId);
   if (paramsSongId && paramsSongId !== songId) {
     Signals.selectedSongId.set(paramsSongId);
   }
-
-  const settings = useSignal(Signals.settingsSong);
-  useEffect(() => {
-    if (!settings) {
-      SettingsService.load(SongSettings).then((loadedSettings) => {
-        if (loadedSettings) {
-          console.log("Song settings loaded");
-          Signals.settingsSong.set(loadedSettings);
-        } else {
-          const newSettings = new SongSettings();
-          Signals.settingsSong.set(newSettings);
-          SettingsService.save(newSettings).then(() => console.log("Song settings created"));
-        }
-      });
-    }
-  }, [settings]);
-  function setShowChords(value: boolean) {
-    if (settings) {
-      const newSettings = settings.cloneWith({ showChords: value });
-      Signals.settingsSong.set(newSettings);
-      SettingsService.save(newSettings).then(() => console.log("Song settings updated"));
-    }
-  }
-
   const [song, setSong] = useState<SongDto | null>(null);
   useEffect(() => {
     if (songId) {
       SongService.getSong(songId).then(setSong);
     }
   }, [songId]);
+
+  // SETTINGS
+  const [settingsExpanded, setSettingsExpanded] = useState(true);
+
+  // AUTO SCROLL
+  const settings = useSignal(Signals.settingsSong);
+  useEffect(() => {
+    if (settings?.autoScroll) {
+      const interval = setInterval(() => {
+        window.scrollBy({ top: 1, behavior: "smooth" });
+      }, 100);
+      return () => clearInterval(interval);
+    }
+  }, [settings?.autoScroll]);
 
   if (!song) {
     return <div>Loading...</div>;
@@ -62,26 +52,22 @@ function Song() {
 
       <List
         style={{
-          background: "var(--tgui--secondary_bg_color)",
+          background: "var(--tg-bg-color)",
         }}
       >
-        <Section header="Settings">
-          <Cell
-            after={
-              <Switch
-                disabled={!settings}
-                checked={settings?.showChords}
-                onChange={(e) => {
-                  setShowChords(e.target.checked);
-                }}
-              ></Switch>
-            }
-          >
-            Show chords
-          </Cell>
-        </Section>
+        <Accordion
+          onChange={(e) => {
+            setSettingsExpanded(e);
+          }}
+          expanded={settingsExpanded}
+        >
+          <Accordion.Summary>Settings</Accordion.Summary>
+          <Accordion.Content>
+            <SongSettingsControl />
+          </Accordion.Content>
+        </Accordion>
 
-        <Section header="Song">
+        <Section>
           {song.lines.map((line, index) => (
             <SongLine key={index} line={line} />
           ))}
