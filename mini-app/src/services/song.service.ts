@@ -85,6 +85,33 @@ const mockData: SongDto[] = [
           { name: "C", position: 5 },
         ],
       },
+      {
+        words: ["Let", "it", "be"],
+        chords: [
+          { name: "F", position: 2 },
+          { name: "C/E", position: 3 },
+          { name: "Dm7", position: 4 },
+          { name: "C", position: 5 },
+        ],
+      },
+      {
+        words: ["Let", "it", "be"],
+        chords: [
+          { name: "F", position: 2 },
+          { name: "C/E", position: 3 },
+          { name: "Dm7", position: 4 },
+          { name: "C", position: 5 },
+        ],
+      },
+      {
+        words: ["Let", "it", "be"],
+        chords: [
+          { name: "F", position: 2 },
+          { name: "C/E", position: 3 },
+          { name: "Dm7", position: 4 },
+          { name: "C", position: 5 },
+        ],
+      },
     ],
   },
 ];

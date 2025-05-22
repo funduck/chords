@@ -1,4 +1,4 @@
-import { Cell, Switch } from "@telegram-apps/telegram-ui";
+import { Cell, Section, Slider, Switch } from "@telegram-apps/telegram-ui";
 import { useSignal } from "@telegram-apps/sdk-react";
 import { useEffect } from "react";
 import { Signals } from "@src/signals-registry";
@@ -39,13 +39,21 @@ function SongSettingsControl() {
     }
   }
 
+  function setAutoScrollSpeed(speed: number, interval: number) {
+    if (settings) {
+      const newSettings = settings.cloneWith({ autoScrollSpeed: speed, autoScrollInterval: interval });
+      Signals.settingsSong.set(newSettings);
+      SettingsService.save(newSettings).then(() => console.log("Song settings updated"));
+    }
+  }
+
   return (
     <>
       <Cell
         after={
           <Switch
             disabled={!settings}
-            checked={settings?.showChords}
+            checked={settings?.showChords ?? false}
             onChange={(e) => {
               setShowChords(e.target.checked);
             }}
@@ -56,17 +64,28 @@ function SongSettingsControl() {
       </Cell>
       <Cell
         after={
-          <Switch
-            disabled={!settings}
-            checked={settings?.autoScroll}
-            onChange={(e) => {
-              setAutoScroll(e.target.checked);
-            }}
-          ></Switch>
+          <>
+            <Switch
+              disabled={!settings}
+              checked={settings?.autoScroll ?? false}
+              onChange={(e) => {
+                setAutoScroll(e.target.checked);
+              }}
+            ></Switch>
+          </>
         }
       >
         Auto scroll
       </Cell>
+      <Section header="Auto scroll speed">
+        <Slider
+          onChange={(e) => {
+            const speed = 1 + e / 50;
+            const interval = 50 * 1.01 ** (speed - 1);
+            setAutoScrollSpeed(speed, interval);
+          }}
+        />
+      </Section>
     </>
   );
 }

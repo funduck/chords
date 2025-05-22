@@ -1,5 +1,5 @@
 import { SongDto, SongService } from "@src/services/song.service";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Accordion, Divider, List, Section, Title } from "@telegram-apps/telegram-ui";
 import { Signals } from "@src/signals-registry";
 import { useParams } from "react-router";
@@ -26,14 +26,15 @@ function Song() {
 
   // AUTO SCROLL
   const settings = useSignal(Signals.settingsSong);
+  const songContainerRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    if (settings?.autoScroll) {
+    if (settings?.autoScroll && songContainerRef.current) {
       const interval = setInterval(() => {
-        window.scrollBy({ top: 1, behavior: "smooth" });
-      }, 100);
+        songContainerRef.current?.scrollBy({ top: settings?.autoScrollSpeed ?? 1, behavior: "smooth" });
+      }, settings?.autoScrollInterval ?? 100);
       return () => clearInterval(interval);
     }
-  }, [settings?.autoScroll]);
+  }, [settings?.autoScroll, settings?.autoScrollSpeed]);
 
   if (!song) {
     return <div>Loading...</div>;
@@ -67,11 +68,13 @@ function Song() {
           </Accordion.Content>
         </Accordion>
 
-        <Section>
-          {song.lines.map((line, index) => (
-            <SongLine key={index} line={line} />
-          ))}
-        </Section>
+        <div ref={songContainerRef} style={{ overflowY: "auto", maxHeight: "70vh" }}>
+          <Section>
+            {song.lines.map((line, index) => (
+              <SongLine key={index} line={line} />
+            ))}
+          </Section>
+        </div>
       </List>
     </>
   );
