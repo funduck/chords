@@ -1,4 +1,5 @@
 import { signal } from "@telegram-apps/signals";
+import { SongSettings } from "./features/song/settings";
 
 export class Signals {
   static wsEventsConnected = signal(false);
@@ -6,4 +7,5 @@ export class Signals {
   static language = signal<string | null>(null);
   static selectedTabId = signal<string | null>(null);
   static selectedSongId = signal<string | null>(null);
+  static settingsSong = signal<SongSettings | null>(null);
 }

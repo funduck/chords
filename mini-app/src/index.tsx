@@ -12,11 +12,7 @@ import { init } from "./init.ts";
 // Mock the environment in case, we are outside Telegram.
 import "./mock-env.ts";
 
-import { OpenAPI } from "./services/openapi";
-
 export const isDev = webConfig().isDev;
-OpenAPI.BASE = webConfig().apiHttpUrl;
-OpenAPI.TOKEN = localStorage.getItem("token") || "";
 
 import { webConfig } from "./config.ts";
 import { initI18Next } from "./services/locale.service.ts";
