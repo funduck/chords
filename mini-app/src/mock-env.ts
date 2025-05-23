@@ -16,6 +16,7 @@ if (import.meta.env.DEV) {
     let lp: LaunchParams | undefined;
     try {
       lp = retrieveLaunchParams();
+      throw new Error("Want to test the app in the Telegram Web environment");
     } catch (e) {
       const initDataRaw = new URLSearchParams([
         [
@@ -38,20 +39,37 @@ if (import.meta.env.DEV) {
       ]).toString();
 
       lp = {
+        // DARK
+        // themeParams: {
+        //   accentTextColor: "#6ab2f2",
+        //   bgColor: "#17212b",
+        //   buttonColor: "#5288c1",
+        //   buttonTextColor: "#ffffff",
+        //   destructiveTextColor: "#ec3942",
+        //   headerBgColor: "#17212b",
+        //   hintColor: "#708499",
+        //   linkColor: "#6ab3f3",
+        //   secondaryBgColor: "#232e3c",
+        //   sectionBgColor: "#17212b",
+        //   sectionHeaderTextColor: "#6ab3f3",
+        //   subtitleTextColor: "#708499",
+        //   textColor: "#f5f5f5",
+        // },
+        // LIGHT
         themeParams: {
           accentTextColor: "#6ab2f2",
-          bgColor: "#17212b",
+          bgColor: "#ffffff",
           buttonColor: "#5288c1",
           buttonTextColor: "#ffffff",
           destructiveTextColor: "#ec3942",
-          headerBgColor: "#17212b",
+          headerBgColor: "#ffffff",
           hintColor: "#708499",
           linkColor: "#6ab3f3",
-          secondaryBgColor: "#232e3c",
-          sectionBgColor: "#17212b",
+          secondaryBgColor: "#f5f5f5",
+          sectionBgColor: "#ffffff",
           sectionHeaderTextColor: "#6ab3f3",
           subtitleTextColor: "#708499",
-          textColor: "#f5f5f5",
+          textColor: "#000000",
         },
         initData: parseInitData(initDataRaw),
         initDataRaw,

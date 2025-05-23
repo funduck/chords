@@ -1,8 +1,3 @@
-body {
-    /* background-color: #6a6a6a; */
-    background: var(--tg-bg-color),
-}
-
 .hidden {
     opacity: 0;
 }

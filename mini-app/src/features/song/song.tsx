@@ -1,6 +1,6 @@
 import { SongDto, SongService } from "@src/services/song.service";
 import { useEffect, useState, useRef } from "react";
-import { Accordion, Divider, List, Section, Title } from "@telegram-apps/telegram-ui";
+import { Accordion, Cell, Divider, Headline, LargeTitle, List, Section, Title } from "@telegram-apps/telegram-ui";
 import { Signals } from "@src/signals-registry";
 import { useParams } from "react-router";
 import { useSignal } from "@telegram-apps/sdk-react";
@@ -36,45 +36,53 @@ function Song() {
     }
   }, [settings?.autoScroll, settings?.autoScrollSpeed]);
 
+  const [sectionHeight, setSectionHeight] = useState<string>("20vh");
+  const adjustSectionHeight = () => {
+    const tabBarHeight = 50; // Adjust this value based on your tab bar's height
+    // Get start of songContainerRef
+    const songContainerStart = songContainerRef.current?.getBoundingClientRect().top ?? 0;
+    const availableHeight = window.innerHeight - songContainerStart - tabBarHeight;
+    setSectionHeight(`${availableHeight}px`);
+  };
+
   if (!song) {
     return <div>Loading...</div>;
   }
 
   return (
     <>
-      <Title
-        style={{
-          background: "var(--tg-bg-color)",
-        }}
-      >
-        {song.title} ({song.artist})
+      <Title>
+        <b>{song.title}</b> ({song.artist})
       </Title>
-      <Divider />
 
-      <List
-        style={{
-          background: "var(--tg-bg-color)",
-        }}
-      >
-        <Accordion
-          onChange={(e) => {
-            setSettingsExpanded(e);
-          }}
-          expanded={settingsExpanded}
-        >
-          <Accordion.Summary>Settings</Accordion.Summary>
-          <Accordion.Content>
-            <SongSettingsControl />
-          </Accordion.Content>
-        </Accordion>
+      <List>
+        <Section>
+          <Accordion
+            onChange={(e) => {
+              setSettingsExpanded(e);
+              setTimeout(() => {
+                adjustSectionHeight();
+              }, 100);
+              setTimeout(() => {
+                adjustSectionHeight();
+              }, 500);
+            }}
+            expanded={settingsExpanded}
+          >
+            <Accordion.Summary>Settings</Accordion.Summary>
+            <Accordion.Content>
+              <SongSettingsControl />
+            </Accordion.Content>
+          </Accordion>
+        </Section>
 
-        <div ref={songContainerRef} style={{ overflowY: "auto", maxHeight: "70vh" }}>
-          <Section>
+        <Section>
+          <div ref={songContainerRef} style={{ overflowY: "scroll", maxHeight: sectionHeight }}>
             {song.lines.map((line, index) => (
               <SongLine key={index} line={line} />
             ))}
-          </Section>
-        </div>
+          </div>
+        </Section>
       </List>
     </>
   );
