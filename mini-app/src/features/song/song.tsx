@@ -1,6 +1,6 @@
 import { SongDto, SongService } from "@src/services/song.service";
 import { useEffect, useState, useRef } from "react";
-import { Accordion, Cell, Divider, Headline, LargeTitle, List, Section, Title } from "@telegram-apps/telegram-ui";
+import { Accordion, List, Section, Title } from "@telegram-apps/telegram-ui";
 import { Signals } from "@src/signals-registry";
 import { useParams } from "react-router";
 import { useSignal } from "@telegram-apps/sdk-react";
@@ -24,7 +24,7 @@ function Song() {
   // SETTINGS
   const [settingsExpanded, setSettingsExpanded] = useState(false);
 
-  // AUTO SCROLL
+  // AUTO SCROLL SECTION WITH SONG LINES
   const settings = useSignal(Signals.settingsSong);
   const songContainerRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -36,14 +36,25 @@ function Song() {
     }
   }, [settings?.autoScroll, settings?.autoScrollSpeed]);
 
+  // ADJUST HEIGHT OF SECTION WITH SONG LINES
   const [sectionHeight, setSectionHeight] = useState<string>("20vh");
-  const adjustSectionHeight = () => {
-    const tabBarHeight = 50; // Adjust this value based on your tab bar's height
-    // Get start of songContainerRef
+  const tabBarHeight = 50; // Adjust this value based on your tab bar's height
+  const adjustSectionHeightNow = () => {
     const songContainerStart = songContainerRef.current?.getBoundingClientRect().top ?? 0;
     const availableHeight = window.innerHeight - songContainerStart - tabBarHeight;
     setSectionHeight(`${availableHeight}px`);
   };
+  const adjustSectionHeight = () => {
+    setTimeout(() => {
+      adjustSectionHeightNow();
+    }, 100);
+    setTimeout(() => {
+      adjustSectionHeightNow();
+    }, 500);
+  };
+  useEffect(() => {
+    adjustSectionHeight();
+  }, []);
 
   if (!song) {
     return <div>Loading...</div>;
@@ -60,12 +71,7 @@ function Song() {
           <Accordion
             onChange={(e) => {
               setSettingsExpanded(e);
-              setTimeout(() => {
-                adjustSectionHeight();
-              }, 100);
-              setTimeout(() => {
-                adjustSectionHeight();
-              }, 500);
+              adjustSectionHeight();
             }}
             expanded={settingsExpanded}
           >
