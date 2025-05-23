@@ -22,7 +22,7 @@ function Song() {
   }, [songId]);
 
   // SETTINGS
-  const [settingsExpanded, setSettingsExpanded] = useState(true);
+  const [settingsExpanded, setSettingsExpanded] = useState(false);
 
   // AUTO SCROLL
   const settings = useSignal(Signals.settingsSong);
