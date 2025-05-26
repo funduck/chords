@@ -6,3 +6,6 @@ caddy-dev:
 
 mini-app-dev:
 	cd mini-app && yarn run dev
+
+api-dev:
+	cd api && make dev

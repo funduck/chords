@@ -1,0 +1,44 @@
+package app
+
+import (
+	"net/http"
+
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
+	httpSwagger "github.com/swaggo/http-swagger/v2"
+)
+
+func NewRouter(a *App) *chi.Mux {
+	r := chi.NewRouter()
+
+	r.Get("/health", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("ok"))
+	})
+
+	r.Get("/swagger/*", func(w http.ResponseWriter, r *http.Request) {
+		protocol := "http"
+		if r.TLS != nil {
+			protocol = "https"
+		}
+		httpSwagger.Handler(
+			httpSwagger.URL(protocol+"://"+r.Host+"/swagger/doc.json"),
+		).ServeHTTP(w, r)
+	})
+
+	r.Group(func(r chi.Router) {
+		r.Use(middleware.RequestID)
+		r.Use(middleware.RealIP)
+		r.Use(middleware.Logger)
+		r.Use(middleware.Recoverer)
+
+		r.Route("/api", func(r chi.Router) {
+			// r.Use(customMiddleware.AuthMiddleware)
+			// r.Use(customMiddleware.OrmMiddleware)
+
+			r.Get("/test", a.TestHandler)
+		})
+	})
+
+	return r
+}
