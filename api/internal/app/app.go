@@ -1,11 +1,19 @@
 package app
 
-import "net/http"
+import (
+	"net/http"
 
-type App struct{}
+	"gorm.io/gorm"
+)
 
-func New() *App {
-	return &App{}
+type App struct {
+	gormdb *gorm.DB
+}
+
+func New(gormdb *gorm.DB) *App {
+	return &App{
+		gormdb: gormdb,
+	}
 }
 
 func RespondText(w http.ResponseWriter, r *http.Request, result string) {
