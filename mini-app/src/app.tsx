@@ -41,7 +41,7 @@ function App() {
   return (
     <>
       <Tabbar>
-        {tabs.map(({ id, text, Icon, link }) => (
+        {tabs.map(({ id, Icon, link }) => (
           <Tabbar.Item
             key={id}
             // text={text}

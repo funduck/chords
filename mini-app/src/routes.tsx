@@ -1,4 +1,4 @@
-import { Route, Routes, useNavigate } from "react-router";
+import { Route, Routes } from "react-router";
 import Search from "./features/search/search";
 import About from "./features/about/about";
 import Settings from "./features/settings/settings";
