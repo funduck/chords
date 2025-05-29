@@ -12,9 +12,6 @@ import { init } from "./init.ts";
 // Mock the environment in case, we are outside Telegram.
 import "./mock-env.ts";
 
-export const isDev = webConfig().isDev;
-
-import { webConfig } from "./config.ts";
 import { initI18Next } from "./services/locale.service.ts";
 import { Signals } from "./signals-registry.ts";
 import { initTimeAgo } from "./services/timeago.service.ts";
@@ -22,20 +19,24 @@ import { AppRoot } from "@telegram-apps/telegram-ui";
 import { BrowserRouter } from "react-router";
 import AppRoutes from "./routes.tsx";
 import App from "./app.tsx";
+import { IsDev } from "./config.ts";
+import { initApi } from "./services/api.service.ts";
 
 const root = ReactDOM.createRoot(document.getElementById("root")!);
 
 try {
   // Configure all application dependencies.
-  init(retrieveLaunchParams().startParam === "debug" || isDev);
+  init(retrieveLaunchParams().startParam === "debug" || IsDev);
 
   // Set the language.
   const lang = retrieveLaunchParams().initData?.user?.languageCode || "en";
   Signals.language.set(lang);
 
-  initI18Next({ isDev, languageCode: lang });
+  initI18Next({ languageCode: lang });
 
   initTimeAgo(lang);
+
+  initApi();
 
   root.render(
     <StrictMode>

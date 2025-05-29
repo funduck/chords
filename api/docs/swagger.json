@@ -3,5 +3,43 @@
     "info": {
         "contact": {}
     },
-    "paths": {}
+    "paths": {
+        "/api/auth/anonymous": {
+            "post": {
+                "description": "Create an anonymous access token",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Anonymous Log In",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/app.LoginResponse"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "app.LoginResponse": {
+            "type": "object",
+            "properties": {
+                "access_token": {
+                    "type": "string"
+                },
+                "refresh_token": {
+                    "description": "Optional, can be empty",
+                    "type": "string"
+                }
+            }
+        }
+    }
 }

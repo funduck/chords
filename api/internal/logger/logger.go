@@ -10,7 +10,7 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
-type LoggerType = *zap.SugaredLogger
+type Logger = *zap.SugaredLogger
 
 var instanceRefs map[string]*zap.SugaredLogger = make(map[string]*zap.SugaredLogger)
 
@@ -80,13 +80,13 @@ type loggerKeyType string
 
 const loggerKey loggerKeyType = "logger"
 
-func SetLogger(ctx context.Context, logger LoggerType) context.Context {
+func SetLogger(ctx context.Context, logger Logger) context.Context {
 	return context.WithValue(ctx, loggerKey, logger)
 }
 
-func GetLogger(ctx context.Context) LoggerType {
+func GetLogger(ctx context.Context) Logger {
 	if loggerDto := ctx.Value(loggerKey); loggerDto != nil {
-		return loggerDto.(LoggerType)
+		return loggerDto.(Logger)
 	}
 	return New()
 }

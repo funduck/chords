@@ -4,6 +4,7 @@ import { Signals } from "./signals-registry";
 import TabLink from "./components/tab-link";
 import { RoutesEnum } from "./routes";
 import { useNavigate } from "react-router";
+import AnonymousAuth from "./features/auth/anonymous";
 
 function App() {
   const navigate = useNavigate();
@@ -40,6 +41,7 @@ function App() {
 
   return (
     <>
+      <AnonymousAuth />
       <Tabbar>
         {tabs.map(({ id, Icon, link }) => (
           <Tabbar.Item

@@ -7,5 +7,8 @@ caddy-dev:
 mini-app-dev:
 	cd mini-app && yarn run dev
 
+mini-app-codegen:
+	cd mini-app && bash -c './codegen.sh'
+
 api-dev:
 	cd api && make dev

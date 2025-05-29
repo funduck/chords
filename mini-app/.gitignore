@@ -25,3 +25,5 @@ docs
 *.njsproj
 *.sln
 *.sw?
+
+src/generated
