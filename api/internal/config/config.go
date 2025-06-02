@@ -22,3 +22,19 @@ func New() *Config {
 	}
 	return config
 }
+
+func InitForTest() *Config {
+	if config != nil {
+		return config
+	}
+	config = &Config{
+		Port:                        "8080",
+		SQLiteFile:                  ":memory:",
+		Secret:                      "test_secret",
+		AccessTokenExpiresInSeconds: 3600,
+		LoggerEnv:                   "test",
+		LoggerLevel:                 "debug",
+		LoggerLevels:                map[string]string{},
+	}
+	return config
+}

@@ -1,4 +1,9 @@
 definitions:
+  app.JoinRoomRequest:
+    properties:
+      room_code:
+        type: string
+    type: object
   app.LoginResponse:
     properties:
       access_token:
@@ -6,6 +11,30 @@ definitions:
       refresh_token:
         description: Optional, can be empty
         type: string
+    type: object
+  entity.Room:
+    properties:
+      code:
+        type: string
+      created_at:
+        description: Timestamp when the room was created
+        type: string
+      deleted_at:
+        description: Soft delete timestamp
+        type: string
+      id:
+        type: string
+      owner_id:
+        description: User ID of the room owner
+        type: string
+      updated_at:
+        description: Timestamp when the room was last updated
+        type: string
+      user_ids:
+        description: Array of user IDs in the room
+        items:
+          type: string
+        type: array
     type: object
 info:
   contact: {}
@@ -25,4 +54,106 @@ paths:
       summary: Anonymous Log In
       tags:
       - auth
+  /api/rooms:
+    post:
+      consumes:
+      - application/json
+      description: Create a new room with a unique code and add the user to it.
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Room created successfully
+          schema:
+            $ref: '#/definitions/entity.Room'
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Create a new room
+      tags:
+      - rooms
+  /api/rooms/{id}/leave:
+    post:
+      consumes:
+      - application/json
+      description: Leave a room using the room ID.
+      parameters:
+      - description: Room ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Room left successfully
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "404":
+          description: Room Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Leave a room
+      tags:
+      - rooms
+  /api/rooms/join:
+    post:
+      consumes:
+      - application/json
+      description: Join a room using the room code.
+      parameters:
+      - description: Join Room Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/app.JoinRoomRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Room joined successfully
+          schema:
+            $ref: '#/definitions/entity.Room'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "404":
+          description: Room Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Join a room
+      tags:
+      - rooms
 swagger: "2.0"

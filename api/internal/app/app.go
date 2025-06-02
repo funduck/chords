@@ -2,17 +2,17 @@ package app
 
 import (
 	"chords.com/api/internal/logger"
-	"gorm.io/gorm"
+	"chords.com/api/internal/service"
 )
 
 type App struct {
-	gormdb *gorm.DB
-	logger logger.Logger
+	logger      logger.Logger
+	roomService *service.RoomService
 }
 
-func New(gormdb *gorm.DB) *App {
+func NewApp() *App {
 	return &App{
-		gormdb: gormdb,
-		logger: logger.NewLogger("app"),
+		logger:      logger.NewLogger("app"),
+		roomService: service.NewRoomService(),
 	}
 }

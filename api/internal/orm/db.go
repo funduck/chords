@@ -23,14 +23,22 @@ var gormInstance *gorm.DB
 //	func SetSQLInstance(db *sql.DB) {
 //		sqlInstance = db
 //	}
-func SetGORMInstance(db *gorm.DB) {
+func SetDBInstance(db *gorm.DB) {
 	gormInstance = db
+}
+
+func GetDBInstance() *gorm.DB {
+	if gormInstance == nil {
+		InitSQLite()
+	}
+
+	return gormInstance
 }
 
 //	func SetSQLDb(ctx context.Context, db *sql.DB) context.Context {
 //		return context.WithValue(ctx, sqldbKey, db)
 //	}
-func SetGORMDb(ctx context.Context, db *gorm.DB) context.Context {
+func SetDB(ctx context.Context, db *gorm.DB) context.Context {
 	return context.WithValue(ctx, gormdbKey, db)
 }
 
@@ -40,7 +48,7 @@ func SetGORMDb(ctx context.Context, db *gorm.DB) context.Context {
 //		}
 //		return sqlInstance
 //	}
-func GetGORMDb(ctx context.Context) *gorm.DB {
+func GetDB(ctx context.Context) *gorm.DB {
 	if dto := ctx.Value(gormdbKey); dto != nil {
 		return dto.(*gorm.DB)
 	}
@@ -53,7 +61,7 @@ func InitSQLite() (*gorm.DB, *sql.DB) {
 	if err != nil {
 		panic(err)
 	}
-	SetGORMInstance(gormdb)
+	SetDBInstance(gormdb)
 
 	db, err := gormdb.DB()
 	if err != nil {
@@ -69,4 +77,20 @@ func InitSQLite() (*gorm.DB, *sql.DB) {
 	log.Info("Auto-migrated entities")
 
 	return gormdb, db
+}
+
+func Close() {
+	if gormInstance != nil {
+		log := logger.NewForModule("db")
+		sqlDB, err := gormInstance.DB()
+		if err != nil {
+			log.Error("Failed to get SQL DB from GORM instance: ", err)
+			return
+		}
+		if err := sqlDB.Close(); err != nil {
+			log.Error("Failed to close SQL DB: ", err)
+		} else {
+			log.Info("Closed database connection")
+		}
+	}
 }

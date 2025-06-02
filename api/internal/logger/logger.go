@@ -34,7 +34,8 @@ func NewLogger(packageName string) *zap.SugaredLogger {
 			if levelStr, ok = conf.LoggerLevels[strings.ToLower(packageName)]; ok {
 				fmt.Printf("Logger level for %s not found, using global %s level\n", packageName, levelStr)
 			} else {
-				fmt.Printf("Logger level for %s %s level\n", packageName, levelStr)
+				levelStr = conf.LoggerLevel
+				fmt.Printf("Logger level for %s: %s\n", packageName, levelStr)
 			}
 		}
 		levelStr = strings.ToLower(levelStr)

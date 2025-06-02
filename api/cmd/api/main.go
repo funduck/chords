@@ -12,9 +12,9 @@ import (
 func main() {
 	log := logger.New()
 	c := config.New()
-	gormdb, _ := orm.InitSQLite()
-	a := app.New(gormdb)
-	r := app.NewRouter(a)
+	orm.InitSQLite()
+	a := app.NewApp()
+	r := app.NewHttpRouter(a)
 
 	log.Infof("Server is starting on port %s", c.Port)
 	if err := http.ListenAndServe(":"+c.Port, r); err != nil {

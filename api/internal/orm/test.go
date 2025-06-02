@@ -4,11 +4,12 @@ import (
 	"database/sql"
 	"fmt"
 
+	"chords.com/api/internal/entity"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
 
-func InitSQLiteForTest() (*gorm.DB, *sql.DB) {
+func InitForTest() (*gorm.DB, *sql.DB) {
 	gormdb, err := gorm.Open(sqlite.Open("file::memory:?cache=shared"), &gorm.Config{})
 	if err != nil {
 		panic(err)
@@ -17,11 +18,11 @@ func InitSQLiteForTest() (*gorm.DB, *sql.DB) {
 	if err != nil {
 		panic(err)
 	}
-	// if err := gormdb.AutoMigrate(entity.User{}, entity.Token{}, entity.UserSocial{}, entity.Social{}); err != nil {
-	// 	panic(err)
-	// }
+	if err := gormdb.AutoMigrate(entity.Room{}); err != nil {
+		panic(err)
+	}
 
-	SetGORMInstance(gormdb)
+	SetDBInstance(gormdb)
 
 	fmt.Println("Connected to SQLite in-memory database")
 
