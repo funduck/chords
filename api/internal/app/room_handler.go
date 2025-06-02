@@ -7,6 +7,7 @@ import (
 	"github.com/go-chi/chi/v5"
 
 	"chords.com/api/internal/auth"
+	_ "chords.com/api/internal/entity"
 )
 
 // CreateRoom godoc

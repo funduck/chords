@@ -71,7 +71,7 @@ func InitSQLite() (*gorm.DB, *sql.DB) {
 	log := logger.NewForModule("db")
 	log.Info("Connected to SQLite database ", file)
 
-	if err := gormdb.AutoMigrate(entity.Room{}); err != nil {
+	if err := gormdb.AutoMigrate(entity.Room{}, entity.User{}); err != nil {
 		panic(err)
 	}
 	log.Info("Auto-migrated entities")

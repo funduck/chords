@@ -1,40 +1,62 @@
 definitions:
-  app.JoinRoomRequest:
+  chords_com_api_internal_entity.Room:
+    properties:
+      code:
+        type: string
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      id:
+        type: integer
+      ownerID:
+        type: integer
+      updatedAt:
+        type: string
+      users:
+        items:
+          $ref: '#/definitions/chords_com_api_internal_entity.User'
+        type: array
+    type: object
+  chords_com_api_internal_entity.User:
+    properties:
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      id:
+        type: integer
+      myRooms:
+        items:
+          $ref: '#/definitions/chords_com_api_internal_entity.Room'
+        type: array
+      rooms:
+        items:
+          $ref: '#/definitions/chords_com_api_internal_entity.Room'
+        type: array
+      updatedAt:
+        type: string
+    type: object
+  gorm.DeletedAt:
+    properties:
+      time:
+        type: string
+      valid:
+        description: Valid is true if Time is not NULL
+        type: boolean
+    type: object
+  internal_app.JoinRoomRequest:
     properties:
       room_code:
         type: string
     type: object
-  app.LoginResponse:
+  internal_app.LoginResponse:
     properties:
       access_token:
         type: string
       refresh_token:
         description: Optional, can be empty
         type: string
-    type: object
-  entity.Room:
-    properties:
-      code:
-        type: string
-      created_at:
-        description: Timestamp when the room was created
-        type: string
-      deleted_at:
-        description: Soft delete timestamp
-        type: string
-      id:
-        type: string
-      owner_id:
-        description: User ID of the room owner
-        type: string
-      updated_at:
-        description: Timestamp when the room was last updated
-        type: string
-      user_ids:
-        description: Array of user IDs in the room
-        items:
-          type: string
-        type: array
     type: object
 info:
   contact: {}
@@ -50,7 +72,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/app.LoginResponse'
+            $ref: '#/definitions/internal_app.LoginResponse'
       summary: Anonymous Log In
       tags:
       - auth
@@ -65,7 +87,7 @@ paths:
         "201":
           description: Room created successfully
           schema:
-            $ref: '#/definitions/entity.Room'
+            $ref: '#/definitions/chords_com_api_internal_entity.Room'
         "401":
           description: Unauthorized
           schema:
@@ -127,14 +149,14 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/app.JoinRoomRequest'
+          $ref: '#/definitions/internal_app.JoinRoomRequest'
       produces:
       - application/json
       responses:
         "200":
           description: Room joined successfully
           schema:
-            $ref: '#/definitions/entity.Room'
+            $ref: '#/definitions/chords_com_api_internal_entity.Room'
         "400":
           description: Bad Request
           schema:

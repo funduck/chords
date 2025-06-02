@@ -32,7 +32,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/app.LoginResponse"
+                            "$ref": "#/definitions/internal_app.LoginResponse"
                         }
                     }
                 }
@@ -60,7 +60,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Room created successfully",
                         "schema": {
-                            "$ref": "#/definitions/entity.Room"
+                            "$ref": "#/definitions/chords_com_api_internal_entity.Room"
                         }
                     },
                     "401": {
@@ -103,7 +103,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/app.JoinRoomRequest"
+                            "$ref": "#/definitions/internal_app.JoinRoomRequest"
                         }
                     }
                 ],
@@ -111,7 +111,7 @@ const docTemplate = `{
                     "200": {
                         "description": "Room joined successfully",
                         "schema": {
-                            "$ref": "#/definitions/entity.Room"
+                            "$ref": "#/definitions/chords_com_api_internal_entity.Room"
                         }
                     },
                     "400": {
@@ -201,7 +201,77 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "app.JoinRoomRequest": {
+        "chords_com_api_internal_entity.Room": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "deletedAt": {
+                    "$ref": "#/definitions/gorm.DeletedAt"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "ownerID": {
+                    "type": "integer"
+                },
+                "updatedAt": {
+                    "type": "string"
+                },
+                "users": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/chords_com_api_internal_entity.User"
+                    }
+                }
+            }
+        },
+        "chords_com_api_internal_entity.User": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "deletedAt": {
+                    "$ref": "#/definitions/gorm.DeletedAt"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "myRooms": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/chords_com_api_internal_entity.Room"
+                    }
+                },
+                "rooms": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/chords_com_api_internal_entity.Room"
+                    }
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "gorm.DeletedAt": {
+            "type": "object",
+            "properties": {
+                "time": {
+                    "type": "string"
+                },
+                "valid": {
+                    "description": "Valid is true if Time is not NULL",
+                    "type": "boolean"
+                }
+            }
+        },
+        "internal_app.JoinRoomRequest": {
             "type": "object",
             "properties": {
                 "room_code": {
@@ -209,7 +279,7 @@ const docTemplate = `{
                 }
             }
         },
-        "app.LoginResponse": {
+        "internal_app.LoginResponse": {
             "type": "object",
             "properties": {
                 "access_token": {
@@ -218,40 +288,6 @@ const docTemplate = `{
                 "refresh_token": {
                     "description": "Optional, can be empty",
                     "type": "string"
-                }
-            }
-        },
-        "entity.Room": {
-            "type": "object",
-            "properties": {
-                "code": {
-                    "type": "string"
-                },
-                "created_at": {
-                    "description": "Timestamp when the room was created",
-                    "type": "string"
-                },
-                "deleted_at": {
-                    "description": "Soft delete timestamp",
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "owner_id": {
-                    "description": "User ID of the room owner",
-                    "type": "string"
-                },
-                "updated_at": {
-                    "description": "Timestamp when the room was last updated",
-                    "type": "string"
-                },
-                "user_ids": {
-                    "description": "Array of user IDs in the room",
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
                 }
             }
         }
