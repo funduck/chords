@@ -3,6 +3,8 @@ package auth
 import (
 	"context"
 	"errors"
+	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
@@ -11,7 +13,7 @@ import (
 var issuer = "chords.com"
 
 type AccessToken struct {
-	UserID      string
+	UserID      uint
 	IsAnonymous bool
 }
 
@@ -36,7 +38,11 @@ func (at *AccessToken) Decode(tokenString string, secretKey string) error {
 		return errors.New("invalid token")
 	}
 
-	at.UserID = claims.Subject
+	userID, err := strconv.ParseUint(claims.Subject, 10, 64)
+	if err != nil {
+		return errors.New("invalid user ID in token")
+	}
+	at.UserID = uint(userID)
 	at.IsAnonymous = claims.IsAnonymous
 
 	return nil
@@ -46,7 +52,7 @@ func (at *AccessToken) Encode(secretKey string, expiresInSeconds int64) (string,
 	claims := Claims{
 		RegisteredClaims: jwt.RegisteredClaims{
 			Issuer:    issuer,
-			Subject:   at.UserID,
+			Subject:   fmt.Sprint(at.UserID),
 			ExpiresAt: jwt.NewNumericDate(jwt.TimeFunc().Add(time.Duration(expiresInSeconds) * time.Second)),
 		},
 		IsAnonymous: at.IsAnonymous,

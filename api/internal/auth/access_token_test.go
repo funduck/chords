@@ -9,7 +9,7 @@ import (
 func TestAccessTokenEncodeDecode(t *testing.T) {
 	// Create an access token
 	token := AccessToken{
-		UserID:      "12345",
+		UserID:      12345,
 		IsAnonymous: false,
 	}
 

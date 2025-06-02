@@ -1,14 +1,13 @@
 package app
 
 import (
-	"crypto/rand"
 	"fmt"
-	"math/big"
 	"net/http"
-	"time"
 
 	"chords.com/api/internal/auth"
 	"chords.com/api/internal/config"
+	"chords.com/api/internal/entity"
+	"chords.com/api/internal/orm"
 )
 
 type LoginResponse struct {
@@ -25,15 +24,15 @@ type LoginResponse struct {
 // @Success      200  {object}  LoginResponse
 // @Router	     /api/auth/anonymous [post]
 func (a *App) AnonymousLogIn(w http.ResponseWriter, r *http.Request) {
-	// Create an anonymous access token with random user ID
-	now := time.Now().Unix()
-	random, err := rand.Int(rand.Reader, big.NewInt(1000))
-	if err != nil {
-		a.respondError(w, http.StatusInternalServerError, fmt.Errorf("failed to generate random user ID: %w", err))
+	tx := orm.GetDB(r.Context())
+	user := entity.User{}
+	if err := tx.Create(&user).Error; err != nil {
+		a.respondError(w, http.StatusInternalServerError, fmt.Errorf("failed to create anonymous user: %w", err))
 		return
 	}
+
 	token := &auth.AccessToken{
-		UserID:      fmt.Sprintf("anonymous-%d-%d", now, random),
+		UserID:      user.ID,
 		IsAnonymous: true,
 	}
 

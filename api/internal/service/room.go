@@ -7,14 +7,18 @@ import (
 
 	"chords.com/api/internal/auth"
 	"chords.com/api/internal/entity"
+	"chords.com/api/internal/logger"
 	"chords.com/api/internal/orm"
 )
 
 type RoomService struct {
+	log logger.Logger
 }
 
 func NewRoomService() *RoomService {
-	return &RoomService{}
+	return &RoomService{
+		log: logger.NewForModule("RoomService"),
+	}
 }
 
 // generateRoomCode generates a random 6-character alphanumeric string.
@@ -34,82 +38,83 @@ func generateRoomCode() (string, error) {
 
 // CreateRoom creates a new room with a unique code and adds the user to it.
 func (s *RoomService) CreateRoom(ctx context.Context, accessToken *auth.AccessToken) (*entity.Room, error) {
+	tx := orm.GetDB(ctx)
+
+	var err error
 	room := &entity.Room{}
 	room.OwnerID = accessToken.UserID
-
-	code, err := generateRoomCode()
-	if err != nil {
+	if room.Code, err = generateRoomCode(); err != nil {
 		return nil, err
 	}
-	room.Code = code
 
-	gormdb := orm.GetDB(ctx)
-	tx := gormdb.Save(room)
-	if tx.Error != nil {
-		return nil, tx.Error
+	if err = tx.Save(room).Error; err != nil {
+		return nil, err
 	}
+	s.log.Infof("Room created with code: %s by user: %s", room.Code, accessToken.UserID)
 
 	return room, nil
 }
 
 func (s *RoomService) JoinRoom(ctx context.Context, roomCode string, accessToken *auth.AccessToken) (*entity.Room, error) {
-	gormdb := orm.GetDB(ctx)
+	tx := orm.GetDB(ctx)
 
 	// Find the room by code
-	room := &entity.Room{}
-	tx := gormdb.Where("code = ?", roomCode).First(room)
-	if tx.Error != nil {
-		return nil, tx.Error
+	room := entity.Room{}
+	if err := tx.Where("code = ?", roomCode).First(&room).Error; err != nil {
+		return nil, err
+	}
+	s.log.Infof("User %s is trying to join room with code: %s", accessToken.UserID, roomCode)
+
+	// Find user
+	user := entity.User{}
+	if err := tx.First(&user, accessToken.UserID).Error; err != nil {
+		return nil, err
 	}
 
-	// Check if the user is already in the room
-	for _, userID := range room.UserIDs {
-		if userID == accessToken.UserID {
-			return room, nil // User is already in the room
-		}
+	// Add user to the room
+	if err := tx.Model(&room).Association("Users").Append(&user); err != nil {
+		return nil, err
 	}
 
-	// Add the user to the room
-	room.UserIDs = append(room.UserIDs, accessToken.UserID)
-	tx = gormdb.Save(room)
-	if tx.Error != nil {
-		return nil, tx.Error
-	}
+	s.log.Infof("User %s joined room with code: %s", accessToken.UserID, roomCode)
 
-	return room, nil
+	return &room, nil
 }
 
 func (s *RoomService) LeaveRoom(ctx context.Context, roomID string, accessToken *auth.AccessToken) error {
-	gormdb := orm.GetDB(ctx)
+	tx := orm.GetDB(ctx)
 
 	// Find the room by code
-	room := &entity.Room{}
-	tx := gormdb.Where("id = ?", roomID).First(room)
-	if tx.Error != nil {
+	room := entity.Room{}
+	if err := tx.First(&room, roomID).Error; err != nil {
 		return tx.Error
 	}
 
-	// Remove the user from the room
-	for i, userID := range room.UserIDs {
-		if userID == accessToken.UserID {
-			room.UserIDs = append(room.UserIDs[:i], room.UserIDs[i+1:]...)
-			break
-		}
+	// Find user
+	user := entity.User{}
+	if err := tx.First(&user, accessToken.UserID).Error; err != nil {
+		return tx.Error
+	}
+
+	s.log.Infof("User %s is trying to leave room with ID: %s", accessToken.UserID, roomID)
+
+	if err := tx.Model(&room).Association("Users").Delete(&user); err != nil {
+		return err
 	}
 
 	if accessToken.UserID == room.OwnerID {
+		s.log.Infof("User %s is the owner of room with ID: %s, deleting room", accessToken.UserID, roomID)
 		// If the user is the owner, we can delete the room
-		tx = gormdb.Delete(room)
-		if tx.Error != nil {
-			return tx.Error
+		if err := tx.Delete(&room).Error; err != nil {
+			return err
 		}
 		return nil
 	}
 
-	tx = gormdb.Save(room)
-	if tx.Error != nil {
-		return tx.Error
+	if err := tx.Save(room).Error; err != nil {
+		return err
 	}
+	s.log.Infof("User %s left room with ID: %s", accessToken.UserID, roomID)
 
 	return nil
 }

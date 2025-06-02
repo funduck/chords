@@ -38,13 +38,11 @@ func NewHttpRouter(a *App) *chi.Mux {
 		r.Use(middleware.Recoverer)
 
 		r.Route("/api", func(r chi.Router) {
-			// r.Use(customMiddleware.AuthMiddleware)
-			// r.Use(customMiddleware.OrmMiddleware)
+			r.Use(orm.Middleware)
 
 			r.Post("/auth/anonymous", a.AnonymousLogIn)
 
 			r.Group(func(r chi.Router) {
-				r.Use(orm.Middleware)
 				r.Use(auth.Middleware)
 
 				r.Post("/rooms", a.CreateRoom)
