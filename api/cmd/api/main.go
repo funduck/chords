@@ -16,8 +16,10 @@ func main() {
 	a := app.NewApp()
 	r := app.NewHttpRouter(a)
 
-	log.Infof("Server is starting on port %s", c.Port)
+	log.Infof("HTTP server is starting on port %s", c.Port)
+
 	if err := http.ListenAndServe(":"+c.Port, r); err != nil {
 		log.Fatalf("Server error: %v", err)
 	}
+
 }

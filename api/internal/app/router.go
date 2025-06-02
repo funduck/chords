@@ -50,7 +50,10 @@ func NewHttpRouter(a *App) *chi.Mux {
 				r.Post("/rooms/{id}/leave", a.LeaveRoom)
 			})
 		})
+
 	})
+
+	r.Handle("/ws", a.NewWSHandler())
 
 	return r
 }
