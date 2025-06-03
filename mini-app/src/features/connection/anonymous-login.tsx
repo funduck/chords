@@ -3,7 +3,7 @@ import { authAPI, setAccessToken } from "@src/services/api.service";
 import { Signals } from "@src/signals-registry";
 import { useEffect } from "react";
 
-function AnonymousAuth() {
+function AnonymousLogin() {
   function handleTokens(response: InternalAppLoginResponse) {
     if (response.access_token) {
       // Store in local storage
@@ -44,4 +44,4 @@ function AnonymousAuth() {
   return <></>;
 }
 
-export default AnonymousAuth;
+export default AnonymousLogin;

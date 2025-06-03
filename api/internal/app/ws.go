@@ -18,15 +18,14 @@ func (a *App) NewWSHandler() http.HandlerFunc {
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
-		conn, err := upgrader.Upgrade(w, r, nil)
+		accessTokenStr := r.URL.Query().Get("state")
+		accessToken, err := auth.ParseAccessToken(w, accessTokenStr)
 		if err != nil {
 			return
 		}
 
-		accessToken, err := auth.GetAccessToken(r.Context())
+		conn, err := upgrader.Upgrade(w, r, nil)
 		if err != nil {
-			conn.WriteMessage(websocket.TextMessage, []byte("Unauthorized"))
-			conn.Close()
 			return
 		}
 

@@ -37,14 +37,11 @@ func NewHttpRouter(a *App) *chi.Mux {
 		r.Use(middleware.Logger)
 		r.Use(middleware.Recoverer)
 
-		r.Group(func(r chi.Router) {
-			r.Use(auth.Middleware)
-			r.Handle("/ws", a.NewWSHandler())
-			r.Post("/ws", a.PostWSHandler)
-		})
-
 		r.Route("/api", func(r chi.Router) {
 			r.Use(orm.Middleware)
+
+			r.Handle("/ws", a.NewWSHandler())
+			r.Post("/ws", a.PostWSHandler)
 
 			r.Post("/auth/anonymous", a.AnonymousLogIn)
 			r.Post("/auth/refresh-token", a.RefreshToken)

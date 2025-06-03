@@ -36,22 +36,32 @@ func Middleware(next http.Handler) http.Handler {
 			w.Write([]byte(msg))
 			return
 		}
-		accessTokenStr := parts[1]
-		accessToken := AccessToken{}
-		conf := config.New()
-		err := accessToken.Decode(accessTokenStr, conf.Secret)
+
+		accessToken, err := ParseAccessToken(w, parts[1])
 		if err != nil {
-			msg := fmt.Sprintf("Failed to decode access token: %v", err)
-			log.Error(msg)
-			w.WriteHeader(http.StatusUnauthorized)
-			w.Write([]byte(msg))
+			// Error message already logged in ParseAccessToken
 			return
 		}
 
-		ctx := SetAccessToken(r.Context(), &accessToken)
+		ctx := SetAccessToken(r.Context(), accessToken)
 
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 
 	return f
+}
+
+func ParseAccessToken(w http.ResponseWriter, accessTokenStr string) (*AccessToken, error) {
+	accessToken := AccessToken{}
+	conf := config.New()
+	err := accessToken.Decode(accessTokenStr, conf.Secret)
+	if err != nil {
+		msg := fmt.Sprintf("Failed to decode access token: %v", err)
+		log.Error(msg)
+		w.WriteHeader(http.StatusUnauthorized)
+		w.Write([]byte(msg))
+		return nil, err
+	}
+
+	return &accessToken, nil
 }
