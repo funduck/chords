@@ -37,6 +37,11 @@ func NewHttpRouter(a *App) *chi.Mux {
 		r.Use(middleware.Logger)
 		r.Use(middleware.Recoverer)
 
+		r.Group(func(r chi.Router) {
+			r.Use(auth.Middleware)
+			r.Handle("/ws", a.NewWSHandler())
+		})
+
 		r.Route("/api", func(r chi.Router) {
 			r.Use(orm.Middleware)
 
@@ -50,10 +55,7 @@ func NewHttpRouter(a *App) *chi.Mux {
 				r.Post("/rooms/{id}/leave", a.LeaveRoom)
 			})
 		})
-
 	})
-
-	r.Handle("/ws", a.NewWSHandler())
 
 	return r
 }
