@@ -38,6 +38,37 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/auth/refresh-token": {
+            "post": {
+                "description": "Refresh an access token using a refresh token",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Refresh Access Token",
+                "parameters": [
+                    {
+                        "description": "Refresh Token Request",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/internal_app.RefreshTokenRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/internal_app.LoginResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/rooms": {
             "post": {
                 "security": [
@@ -198,6 +229,45 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/ws": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "This is a placeholder - only for OpenAPI documentation purposes.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "WebSocket"
+                ],
+                "summary": "Post WebSocket Handler",
+                "parameters": [
+                    {
+                        "description": "Request body",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/chords_com_api_internal_event_bus.Event"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "WebSocket event",
+                        "schema": {
+                            "$ref": "#/definitions/chords_com_api_internal_event_bus.Event"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -242,6 +312,9 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
+                "isAnonymous": {
+                    "type": "boolean"
+                },
                 "myRooms": {
                     "type": "array",
                     "items": {
@@ -255,6 +328,18 @@ const docTemplate = `{
                     }
                 },
                 "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "chords_com_api_internal_event_bus.Event": {
+            "type": "object",
+            "properties": {
+                "data": {},
+                "origin": {
+                    "type": "integer"
+                },
+                "type": {
                     "type": "string"
                 }
             }
@@ -287,6 +372,14 @@ const docTemplate = `{
                 },
                 "refresh_token": {
                     "description": "Optional, can be empty",
+                    "type": "string"
+                }
+            }
+        },
+        "internal_app.RefreshTokenRequest": {
+            "type": "object",
+            "properties": {
+                "refresh_token": {
                     "type": "string"
                 }
             }

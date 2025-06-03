@@ -26,6 +26,8 @@ definitions:
         $ref: '#/definitions/gorm.DeletedAt'
       id:
         type: integer
+      isAnonymous:
+        type: boolean
       myRooms:
         items:
           $ref: '#/definitions/chords_com_api_internal_entity.Room'
@@ -35,6 +37,14 @@ definitions:
           $ref: '#/definitions/chords_com_api_internal_entity.Room'
         type: array
       updatedAt:
+        type: string
+    type: object
+  chords_com_api_internal_event_bus.Event:
+    properties:
+      data: {}
+      origin:
+        type: integer
+      type:
         type: string
     type: object
   gorm.DeletedAt:
@@ -58,6 +68,11 @@ definitions:
         description: Optional, can be empty
         type: string
     type: object
+  internal_app.RefreshTokenRequest:
+    properties:
+      refresh_token:
+        type: string
+    type: object
 info:
   contact: {}
 paths:
@@ -74,6 +89,26 @@ paths:
           schema:
             $ref: '#/definitions/internal_app.LoginResponse'
       summary: Anonymous Log In
+      tags:
+      - auth
+  /api/auth/refresh-token:
+    post:
+      description: Refresh an access token using a refresh token
+      parameters:
+      - description: Refresh Token Request
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/internal_app.RefreshTokenRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_app.LoginResponse'
+      summary: Refresh Access Token
       tags:
       - auth
   /api/rooms:
@@ -178,4 +213,28 @@ paths:
       summary: Join a room
       tags:
       - rooms
+  /ws:
+    post:
+      consumes:
+      - application/json
+      description: This is a placeholder - only for OpenAPI documentation purposes.
+      parameters:
+      - description: Request body
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/chords_com_api_internal_event_bus.Event'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: WebSocket event
+          schema:
+            $ref: '#/definitions/chords_com_api_internal_event_bus.Event'
+      security:
+      - BearerAuth: []
+      summary: Post WebSocket Handler
+      tags:
+      - WebSocket
 swagger: "2.0"

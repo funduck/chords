@@ -1,6 +1,7 @@
 package app
 
 import (
+	"encoding/json"
 	"net/http"
 
 	"chords.com/api/internal/auth"
@@ -10,9 +11,9 @@ import (
 )
 
 func (a *App) NewWSHandler() http.HandlerFunc {
-	log := logger.NewForModule("ws")
+	var log = logger.NewForModule("ws")
 
-	upgrader := websocket.Upgrader{
+	var upgrader = websocket.Upgrader{
 		CheckOrigin: func(r *http.Request) bool { return true },
 	}
 
@@ -34,10 +35,12 @@ func (a *App) NewWSHandler() http.HandlerFunc {
 			"isAnonymous", accessToken.IsAnonymous,
 		)
 
-		client := eventbus.NewClient(eventbus.ClientIDFromUint(accessToken.UserID))
-		a.eventBus.Register(client)
+		bus := eventbus.GetEventBus()
+
+		client := eventbus.NewClient(accessToken.UserID)
+		bus.Register(client)
 		defer func() {
-			a.eventBus.Unregister(client)
+			bus.Unregister(client)
 			conn.Close()
 		}()
 
@@ -65,6 +68,23 @@ func (a *App) NewWSHandler() http.HandlerFunc {
 				"messageType", messageType,
 				"message", string(bytes),
 			)
+
+			event := eventbus.Event{}
+			if err := json.Unmarshal(bytes, &event); err != nil {
+				log.Errorw("Failed to unmarshal event",
+					"userID", accessToken.UserID,
+					"error", err,
+				)
+				continue
+			} else {
+				log.Debugw("Processing event",
+					"userID", accessToken.UserID,
+					"eventType", event.Type,
+					"eventData", event.Data,
+				)
+				bus.OnClientEvent(accessToken.UserID, &event)
+			}
+
 		}
 		close(client.SendChan)
 
@@ -73,4 +93,18 @@ func (a *App) NewWSHandler() http.HandlerFunc {
 			"reason", "client disconnected",
 		)
 	}
+}
+
+// PostWSHandler godoc
+// @Summary Post WebSocket Handler
+// @Description This is a placeholder - only for OpenAPI documentation purposes.
+// @Tags WebSocket
+// @Accept json
+// @Produce json
+// @Param data body eventbus.Event true "Request body"
+// @Success 200 {object} eventbus.Event "WebSocket event"
+// @Router /ws [post]
+// @Security BearerAuth
+func (a *App) PostWSHandler(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusOK)
 }

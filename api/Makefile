@@ -5,3 +5,5 @@ dev:
 	make gen-openapi
 	air
 
+test:
+	go test -v ./...
