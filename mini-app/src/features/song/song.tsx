@@ -28,13 +28,13 @@ function Song() {
   const settings = useSignal(Signals.settingsSong);
   const songContainerRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    if (settings?.autoScroll && songContainerRef.current) {
+    if (settings?.auto_scroll && songContainerRef.current) {
       const interval = setInterval(() => {
-        songContainerRef.current?.scrollBy({ top: settings?.autoScrollSpeed ?? 1, behavior: "smooth" });
-      }, settings?.autoScrollInterval ?? 100);
+        songContainerRef.current?.scrollBy({ top: settings?.auto_scroll_speed ?? 1, behavior: "smooth" });
+      }, settings?.auto_scroll_interval ?? 100);
       return () => clearInterval(interval);
     }
-  }, [settings?.autoScroll, settings?.autoScrollSpeed]);
+  }, [settings?.auto_scroll, settings?.auto_scroll_speed]);
 
   // ADJUST HEIGHT OF SECTION WITH SONG LINES
   const [sectionHeight, setSectionHeight] = useState<string>("20vh");

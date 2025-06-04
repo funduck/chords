@@ -1,8 +1,8 @@
 import { BaseSettings } from "@src/services/settings.service";
 
 export class SongSettings extends BaseSettings {
-  showChords: boolean = true;
-  autoScroll: boolean = false;
-  autoScrollSpeed: number = 1;
-  autoScrollInterval: number = 100;
+  show_chords: boolean = true;
+  auto_scroll: boolean = false;
+  auto_scroll_speed: number = 1;
+  auto_scroll_interval: number = 100;
 }

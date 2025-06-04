@@ -25,7 +25,7 @@ function SongSettingsControl() {
 
   function setShowChords(value: boolean) {
     if (settings) {
-      const newSettings = settings.cloneWith({ showChords: value });
+      const newSettings = settings.cloneWith({ show_chords: value });
       Signals.settingsSong.set(newSettings);
       SettingsService.save(newSettings).then(() => console.log("Song settings updated"));
     }
@@ -33,7 +33,7 @@ function SongSettingsControl() {
 
   function setAutoScroll(value: boolean) {
     if (settings) {
-      const newSettings = settings.cloneWith({ autoScroll: value });
+      const newSettings = settings.cloneWith({ auto_scroll: value });
       Signals.settingsSong.set(newSettings);
       SettingsService.save(newSettings).then(() => console.log("Song settings updated"));
     }
@@ -41,7 +41,7 @@ function SongSettingsControl() {
 
   function setAutoScrollSpeed(speed: number, interval: number) {
     if (settings) {
-      const newSettings = settings.cloneWith({ autoScrollSpeed: speed, autoScrollInterval: interval });
+      const newSettings = settings.cloneWith({ auto_scroll_speed: speed, auto_scroll_interval: interval });
       Signals.settingsSong.set(newSettings);
       SettingsService.save(newSettings).then(() => console.log("Song settings updated"));
     }
@@ -53,7 +53,7 @@ function SongSettingsControl() {
         after={
           <Switch
             disabled={!settings}
-            checked={settings?.showChords ?? false}
+            checked={settings?.show_chords ?? false}
             onChange={(e) => {
               setShowChords(e.target.checked);
             }}
@@ -67,7 +67,7 @@ function SongSettingsControl() {
           <>
             <Switch
               disabled={!settings}
-              checked={settings?.autoScroll ?? false}
+              checked={settings?.auto_scroll ?? false}
               onChange={(e) => {
                 setAutoScroll(e.target.checked);
               }}

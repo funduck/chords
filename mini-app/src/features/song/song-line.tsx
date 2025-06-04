@@ -8,7 +8,7 @@ function SongLine({ line }: { line: SongLineDto }) {
 
   return (
     <Text>
-      {settings?.showChords ? (
+      {settings?.show_chords ? (
         <>
           {/* Chords over words */}
           {line.words.map((word, index) => {
