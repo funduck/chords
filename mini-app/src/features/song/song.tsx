@@ -56,6 +56,47 @@ function Song() {
     adjustSectionHeight();
   }, []);
 
+  // HANDLE SYNC SCROLLING IN ROOM
+  const ignoreScrollEvent = useRef(false);
+  useEffect(() => {
+    const screen = songContainerRef.current;
+    if (!screen) {
+      console.error("Song container not found");
+      return;
+    }
+    function handleScroll() {
+      if (ignoreScrollEvent.current) {
+        return;
+      }
+      const scrollPercent = (screen!.scrollTop / (screen!.scrollHeight - screen!.clientHeight)) * 100;
+      Signals.publishSongScroll.set(scrollPercent);
+    }
+    screen?.addEventListener("scroll", handleScroll);
+    console.log("Scroll event listener added");
+    return () => {
+      screen?.removeEventListener("scroll", handleScroll);
+    };
+  }, [song, songContainerRef.current]);
+
+  const applySongScroll = useSignal(Signals.applySongScroll);
+  useEffect(() => {
+    if (!songContainerRef.current) {
+      console.error("Song container not found for scrolling");
+      return;
+    }
+    console.debug("Applying song scroll:", applySongScroll);
+    if (applySongScroll !== null) {
+      // applySongScroll is a percentage (0-100)
+      const scrollTop =
+        (applySongScroll / 100) * (songContainerRef.current.scrollHeight - songContainerRef.current.clientHeight);
+      ignoreScrollEvent.current = true;
+      songContainerRef.current.scrollTo({ top: scrollTop, behavior: "smooth" });
+      setTimeout(() => {
+        ignoreScrollEvent.current = false;
+      }, 500); // Reset ignore after a short delay
+    }
+  }, [song, songContainerRef.current, applySongScroll]);
+
   if (!song) {
     return <div>Loading...</div>;
   }

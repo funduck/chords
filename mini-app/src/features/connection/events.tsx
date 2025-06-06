@@ -4,22 +4,31 @@ import { useSignal } from "@telegram-apps/sdk-react";
 import { Signals } from "@src/signals-registry";
 import { SongSettings } from "../song/settings";
 
-type Event = {
-  type: "song_settings";
-  data: {
-    userId: number;
-    roomId?: number;
-    songSettings: SongSettings;
-  };
-};
+type Event =
+  | {
+      type: "song_settings";
+      data: {
+        userId: number;
+        roomId?: number;
+        songSettings: SongSettings;
+      };
+    }
+  | {
+      type: "song_scroll";
+      data: {
+        userId: number;
+        roomId?: number;
+        scrollPercent: number;
+      };
+    };
 
 export function EventsPublisher() {
   const ws = useContext(WebSocketContext);
   const userId = useSignal(Signals.userId);
   const room = useSignal(Signals.room);
 
-  // Publishing song settings to the WebSocket server
   const publishSongSettings = useSignal(Signals.publishSongSettings);
+  const publishSongScroll = useSignal(Signals.publishSongScroll);
   useEffect(() => {
     if (!ws || !userId || !room) {
       return;
@@ -35,8 +44,22 @@ export function EventsPublisher() {
       };
       ws.send(JSON.stringify(event));
       Signals.publishSongSettings.set(null); // Clear the signal after publishing
+      console.debug("Published song settings:", publishSongSettings);
     }
-  }, [ws, userId, room, publishSongSettings]);
+    if (publishSongScroll) {
+      const event: Event = {
+        type: "song_scroll",
+        data: {
+          userId: userId,
+          roomId: room.id,
+          scrollPercent: publishSongScroll,
+        },
+      };
+      ws.send(JSON.stringify(event));
+      Signals.publishSongScroll.set(null); // Clear the signal after publishing
+      console.debug("Published song scroll:", publishSongScroll);
+    }
+  }, [ws, userId, room, publishSongSettings, publishSongScroll]);
 
   return <></>;
 }
@@ -61,15 +84,19 @@ export function EventsConsumer() {
         console.warn("Ignoring message from self:", dto);
         return;
       }
-
+      if (dto.data.roomId != room.id) {
+        console.warn("Received song settings for a different room:", dto);
+        return;
+      }
       switch (dto.type) {
         case "song_settings": {
-          if (dto.data.roomId != room.id) {
-            console.warn("Received song settings for a different room:", dto);
-            return;
-          }
           console.log("Received song settings:", dto.data.songSettings);
           Signals.applySongSettings.set(new SongSettings().fromJson(dto.data.songSettings));
+          break;
+        }
+        case "song_scroll": {
+          console.log("Received song scroll:", dto.data.scrollPercent);
+          Signals.applySongScroll.set(dto.data.scrollPercent);
           break;
         }
         default:
