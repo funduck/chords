@@ -5,7 +5,7 @@ import TabLink from "./components/tab-link";
 import { RoutesEnum } from "./routes";
 import { useNavigate } from "react-router";
 import AnonymousLogin from "./features/connection/anonymous-login";
-import WebSocketConnection from "./features/connection/websocket-connection";
+import { EventsConsumer, EventsPublisher } from "./features/connection/events";
 
 function App() {
   const navigate = useNavigate();
@@ -42,8 +42,9 @@ function App() {
 
   return (
     <>
+      <EventsPublisher />
+      <EventsConsumer />
       <AnonymousLogin />
-      <WebSocketConnection />
       <Tabbar>
         {tabs.map(({ id, Icon, link }) => (
           <Tabbar.Item

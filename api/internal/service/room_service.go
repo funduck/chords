@@ -15,7 +15,7 @@ import (
 type RoomService struct {
 	log           logger.Logger
 	roomChans     map[uint]chan *eventbus.Event // Maps room ID to event channels
-	roomUserIDs   map[uint][]uint               // Maps room ID to user IDs
+	roomUserIDs   map[uint]map[uint]bool        // Maps room ID to user IDs
 	userListeners map[uint]map[uint]string      // Maps room ID to user ID and listener ID
 }
 
@@ -28,7 +28,7 @@ func NewRoomService() *RoomService {
 	instance = &RoomService{
 		log:           logger.NewForModule("RoomService"),
 		roomChans:     make(map[uint]chan *eventbus.Event),
-		roomUserIDs:   make(map[uint][]uint),
+		roomUserIDs:   make(map[uint]map[uint]bool),
 		userListeners: make(map[uint]map[uint]string),
 	}
 	return instance
@@ -56,13 +56,26 @@ func (s *RoomService) broadcastRoomEvents(roomID uint) {
 		return
 	}
 	roomChan = make(chan *eventbus.Event, 8) // Buffered channel to prevent blocking
+	s.roomChans[roomID] = roomChan
 	for event := range roomChan {
+		userIDsSet, exists := s.roomUserIDs[roomID]
+		if !exists {
+			s.log.Warnw("No users found for room",
+				"roomID", roomID,
+			)
+			continue
+		}
+		userIDs := make([]uint, 0, len(userIDsSet))
+		for userID := range userIDsSet {
+			userIDs = append(userIDs, userID)
+		}
 		s.log.Debugw("Broadcasting event to room",
 			"roomID", roomID,
 			"eventType", event.Type,
 			"eventData", event.Data,
+			"users", userIDs,
 		)
-		eventbus.GetEventBus().SendToClients(s.roomUserIDs[roomID], event)
+		eventbus.GetEventBus().SendToClients(userIDs, event)
 	}
 }
 
@@ -92,16 +105,37 @@ func (s *RoomService) closeRoomChan(roomID uint) {
 
 // Add listener to user events and broadcasts to the room's event channel.
 func (s *RoomService) addUserListener(roomID uint, userID uint) {
-	if s.userListeners[roomID] == nil {
-		s.userListeners[roomID] = make(map[uint]string)
+	if s.roomUserIDs[roomID] == nil {
+		s.roomUserIDs[roomID] = make(map[uint]bool)
 	}
+	// if s.roomUserIDs[roomID][userID] {
+	// 	s.log.Debugw("User already exists in room user list",
+	// 		"roomID", roomID,
+	// 		"userID", userID,
+	// 	)
+	// 	return
+	// }
+	s.roomUserIDs[roomID][userID] = true
+
 	listener := eventbus.GetEventBus().AddClientListener(userID, func(event *eventbus.Event) {
 		ch := s.roomChans[roomID]
+		s.log.Debugw("User event received, pushing to room channel",
+			"roomID", roomID,
+			"userID", userID,
+			"eventType", event.Type,
+			"eventData", event.Data,
+			"channel", ch != nil,
+		)
 		if ch != nil {
 			ch <- event
 		}
 	})
+
+	if s.userListeners[roomID] == nil {
+		s.userListeners[roomID] = make(map[uint]string)
+	}
 	s.userListeners[roomID][userID] = listener
+
 	s.log.Debugw("Added user listener",
 		"roomID", roomID,
 		"userID", userID,
@@ -120,9 +154,22 @@ func (s *RoomService) removeUserListener(roomID uint, userID uint) {
 				"listenerID", listener,
 			)
 		}
+		if len(s.userListeners[roomID]) == 0 {
+			delete(s.userListeners, roomID)
+		}
 	}
-	if len(s.userListeners[roomID]) == 0 {
-		delete(s.userListeners, roomID)
+
+	if s.roomUserIDs[roomID] != nil {
+		if _, exists := s.roomUserIDs[roomID][userID]; exists {
+			delete(s.roomUserIDs[roomID], userID)
+			s.log.Debugw("Removed user from room user list",
+				"roomID", roomID,
+				"userID", userID,
+			)
+		}
+		if len(s.roomUserIDs[roomID]) == 0 {
+			delete(s.roomUserIDs, roomID)
+		}
 	}
 }
 

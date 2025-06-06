@@ -6,17 +6,17 @@ import { SettingsService } from "@src/services/settings.service";
 import { SongSettings } from "./settings";
 
 function SongSettingsControl() {
-  const settings = useSignal(Signals.settingsSong);
+  const settings = useSignal(Signals.applySongSettings);
 
   useEffect(() => {
     if (!settings) {
       SettingsService.load(SongSettings).then((loadedSettings) => {
         if (loadedSettings) {
           console.log("Song settings loaded");
-          Signals.settingsSong.set(loadedSettings);
+          Signals.applySongSettings.set(loadedSettings);
         } else {
           const newSettings = new SongSettings();
-          Signals.settingsSong.set(newSettings);
+          Signals.applySongSettings.set(newSettings);
           SettingsService.save(newSettings).then(() => console.log("Song settings created"));
         }
       });
@@ -26,7 +26,8 @@ function SongSettingsControl() {
   function setShowChords(value: boolean) {
     if (settings) {
       const newSettings = settings.cloneWith({ show_chords: value });
-      Signals.settingsSong.set(newSettings);
+      Signals.applySongSettings.set(newSettings);
+      Signals.publishSongSettings.set(newSettings);
       SettingsService.save(newSettings).then(() => console.log("Song settings updated"));
     }
   }
@@ -34,7 +35,8 @@ function SongSettingsControl() {
   function setAutoScroll(value: boolean) {
     if (settings) {
       const newSettings = settings.cloneWith({ auto_scroll: value });
-      Signals.settingsSong.set(newSettings);
+      Signals.applySongSettings.set(newSettings);
+      Signals.publishSongSettings.set(newSettings);
       SettingsService.save(newSettings).then(() => console.log("Song settings updated"));
     }
   }
@@ -42,7 +44,8 @@ function SongSettingsControl() {
   function setAutoScrollSpeed(speed: number, interval: number) {
     if (settings) {
       const newSettings = settings.cloneWith({ auto_scroll_speed: speed, auto_scroll_interval: interval });
-      Signals.settingsSong.set(newSettings);
+      Signals.applySongSettings.set(newSettings);
+      Signals.publishSongSettings.set(newSettings);
       SettingsService.save(newSettings).then(() => console.log("Song settings updated"));
     }
   }
@@ -80,8 +83,8 @@ function SongSettingsControl() {
       <Section header="Auto scroll speed">
         <Slider
           onChange={(e) => {
-            const speed = 1 + e / 50;
-            const interval = 50 * 1.01 ** (speed - 1);
+            const speed = 1 + e / 100;
+            const interval = 75 * 1.01 ** (speed - 1);
             setAutoScrollSpeed(speed, interval);
           }}
         />

@@ -1,4 +1,9 @@
 export abstract class BaseSettings {
+  fromJson(json: any): this {
+    Object.assign(this, json);
+    return this;
+  }
+
   cloneWith(fields: Partial<this> = {}): this {
     const clone = Object.create(this);
     Object.assign(clone, this, fields);

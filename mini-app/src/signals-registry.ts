@@ -1,5 +1,6 @@
 import { signal } from "@telegram-apps/signals";
 import { SongSettings } from "./features/song/settings";
+import { ChordsComApiInternalEntityRoom } from "./generated/api";
 
 export class Signals {
   static wsEventsConnected = signal(false);
@@ -8,5 +9,9 @@ export class Signals {
   static accessToken = signal<string | null>(null);
   static selectedTabId = signal<string | null>(null);
   static selectedSongId = signal<string | null>(null);
-  static settingsSong = signal<SongSettings | null>(null);
+  static userId = signal<number | null>(null);
+  static room = signal<ChordsComApiInternalEntityRoom | null>(null);
+
+  static applySongSettings = signal<SongSettings | null>(null);
+  static publishSongSettings = signal<SongSettings | null>(null);
 }

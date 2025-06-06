@@ -20,7 +20,8 @@ import { BrowserRouter } from "react-router";
 import AppRoutes from "./routes.tsx";
 import App from "./app.tsx";
 import { IsDev } from "./config.ts";
-import { initApi } from "./services/api.service.ts";
+import { WSProvider } from "./features/connection/ws-connection.tsx";
+import { ApiProvider } from "./features/connection/api-connection.tsx";
 
 const root = ReactDOM.createRoot(document.getElementById("root")!);
 
@@ -36,15 +37,17 @@ try {
 
   initTimeAgo(lang);
 
-  initApi();
-
   root.render(
     <StrictMode>
       <AppRoot>
-        <BrowserRouter>
-          <AppRoutes />
-          <App />
-        </BrowserRouter>
+        <ApiProvider>
+          <WSProvider>
+            <BrowserRouter>
+              <AppRoutes />
+              <App />
+            </BrowserRouter>
+          </WSProvider>
+        </ApiProvider>
       </AppRoot>
     </StrictMode>,
   );

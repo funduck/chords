@@ -3,6 +3,7 @@ package eventbus
 import (
 	"sync"
 
+	"chords.com/api/internal/logger"
 	"github.com/google/uuid"
 )
 
@@ -28,6 +29,7 @@ func NewClient(id uint) *Client {
 type EventBus struct {
 	clients map[uint]*Client
 	mu      sync.Mutex
+	log     logger.Logger
 }
 
 var instance *EventBus
@@ -42,12 +44,23 @@ func GetEventBus() *EventBus {
 func NewEventBus() *EventBus {
 	return &EventBus{
 		clients: make(map[uint]*Client),
+		log:     logger.NewForModule("EventBus"),
 	}
 }
 
 func (bus *EventBus) Register(client *Client) {
 	bus.mu.Lock()
 	defer bus.mu.Unlock()
+	// TODO: Add device id to client because now one user can have only 1 client
+	prevClient, exists := bus.clients[client.ID]
+	if exists {
+		bus.log.Warnw("Client already registered, replacing",
+			"clientID", client.ID,
+			"prevClientID", prevClient.ID,
+		)
+		client.SendChan = prevClient.SendChan   // Preserve send channel from previous client
+		client.Listeners = prevClient.Listeners // Preserve listeners from previous client
+	}
 	bus.clients[client.ID] = client
 }
 
@@ -67,6 +80,11 @@ func (bus *EventBus) Broadcast(event *Event) {
 		if event.Origin == id {
 			continue // Avoid sending the event back to the origin
 		}
+		bus.log.Debugw("Broadcasting event to client",
+			"clientID", id,
+			"eventType", event.Type,
+			"eventData", event.Data,
+		)
 		select {
 		case bus.clients[id].SendChan <- event:
 		default:
@@ -85,6 +103,11 @@ func (bus *EventBus) SendToClient(id uint, event *Event) {
 	bus.mu.Lock()
 	defer bus.mu.Unlock()
 	if client, exists := bus.clients[id]; exists {
+		bus.log.Debugw("Sending event to client",
+			"clientID", id,
+			"eventType", event.Type,
+			"eventData", event.Data,
+		)
 		select {
 		case client.SendChan <- event:
 		default:
@@ -99,10 +122,16 @@ func (bus *EventBus) SendToClients(ids []uint, event *Event) {
 	}
 	bus.mu.Lock()
 	defer bus.mu.Unlock()
+
 	for _, id := range ids {
 		if event.Origin == id {
 			continue // Avoid sending the event back to the origin
 		}
+		bus.log.Debugw("Sending event to multiple clients",
+			"clientID", id,
+			"eventType", event.Type,
+			"eventData", event.Data,
+		)
 		if client, exists := bus.clients[id]; exists {
 			select {
 			case client.SendChan <- event:

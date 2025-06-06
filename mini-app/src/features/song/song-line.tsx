@@ -4,7 +4,7 @@ import { useSignal } from "@telegram-apps/sdk-react";
 import { Text } from "@telegram-apps/telegram-ui";
 
 function SongLine({ line }: { line: SongLineDto }) {
-  const settings = useSignal(Signals.settingsSong);
+  const settings = useSignal(Signals.applySongSettings);
 
   return (
     <Text>

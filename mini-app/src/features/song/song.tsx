@@ -25,7 +25,7 @@ function Song() {
   const [settingsExpanded, setSettingsExpanded] = useState(false);
 
   // AUTO SCROLL SECTION WITH SONG LINES
-  const settings = useSignal(Signals.settingsSong);
+  const settings = useSignal(Signals.applySongSettings);
   const songContainerRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (settings?.auto_scroll && songContainerRef.current) {
