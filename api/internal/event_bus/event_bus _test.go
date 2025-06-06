@@ -62,7 +62,7 @@ func TestEventBus(t *testing.T) {
 			Type: "test_event",
 			Data: "test_data",
 		}
-		bus.AddClientListener(client.ID, func(e *Event) {
+		bus.AddClientListener(client.ID, "test_listener", func(e *Event) {
 			if e.Type != event.Type || e.Data != event.Data {
 				t.Errorf("expected %v, got %v", event, e)
 			}

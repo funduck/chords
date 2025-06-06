@@ -4,7 +4,6 @@ import (
 	"sync"
 
 	"chords.com/api/internal/logger"
-	"github.com/google/uuid"
 )
 
 type Event struct {
@@ -142,18 +141,15 @@ func (bus *EventBus) SendToClients(ids []uint, event *Event) {
 	}
 }
 
-func (bus *EventBus) AddClientListener(id uint, listener func(*Event)) string {
+func (bus *EventBus) AddClientListener(id uint, name string, listener func(*Event)) {
 	bus.mu.Lock()
 	defer bus.mu.Unlock()
 	if client, exists := bus.clients[id]; exists {
 		if client.Listeners == nil {
 			client.Listeners = make(map[string]func(*Event))
 		}
-		listenerKey := uuid.New().String()       // Generate a unique key for the listener
-		client.Listeners[listenerKey] = listener // Use a default listener key
-		return listenerKey
+		client.Listeners[name] = listener // Use a default listener key
 	}
-	return ""
 }
 
 func (bus *EventBus) RemoveClientListener(id uint, listenerKey string) {

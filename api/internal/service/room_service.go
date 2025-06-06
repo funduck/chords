@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"crypto/rand"
+	"fmt"
 	"math/big"
 
 	"chords.com/api/internal/auth"
@@ -108,16 +109,11 @@ func (s *RoomService) addUserListener(roomID uint, userID uint) {
 	if s.roomUserIDs[roomID] == nil {
 		s.roomUserIDs[roomID] = make(map[uint]bool)
 	}
-	// if s.roomUserIDs[roomID][userID] {
-	// 	s.log.Debugw("User already exists in room user list",
-	// 		"roomID", roomID,
-	// 		"userID", userID,
-	// 	)
-	// 	return
-	// }
 	s.roomUserIDs[roomID][userID] = true
 
-	listener := eventbus.GetEventBus().AddClientListener(userID, func(event *eventbus.Event) {
+	// Ensure BUS will route events for this user to the room channel
+	listener := fmt.Sprintf("room_%d_user_%d", roomID, userID)
+	eventbus.GetEventBus().AddClientListener(userID, listener, func(event *eventbus.Event) {
 		ch := s.roomChans[roomID]
 		s.log.Debugw("User event received, pushing to room channel",
 			"roomID", roomID,
@@ -130,7 +126,6 @@ func (s *RoomService) addUserListener(roomID uint, userID uint) {
 			ch <- event
 		}
 	})
-
 	if s.userListeners[roomID] == nil {
 		s.userListeners[roomID] = make(map[uint]string)
 	}
@@ -145,6 +140,7 @@ func (s *RoomService) addUserListener(roomID uint, userID uint) {
 
 func (s *RoomService) removeUserListener(roomID uint, userID uint) {
 	if s.userListeners[roomID] != nil {
+		// Remove routing from BUS to room from this user
 		if listener, exists := s.userListeners[roomID][userID]; exists {
 			eventbus.GetEventBus().RemoveClientListener(userID, listener)
 			delete(s.userListeners[roomID], userID)
