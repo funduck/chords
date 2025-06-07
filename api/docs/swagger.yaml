@@ -3,15 +3,17 @@ definitions:
     properties:
       code:
         type: string
-      createdAt:
+      created_at:
         type: string
-      deletedAt:
-        $ref: '#/definitions/gorm.DeletedAt'
+      deleted_at:
+        allOf:
+        - $ref: '#/definitions/gorm.DeletedAt'
+        description: Use pointer to allow null values
       id:
         type: integer
       ownerID:
         type: integer
-      updatedAt:
+      updated_at:
         type: string
       users:
         items:
@@ -20,10 +22,12 @@ definitions:
     type: object
   chords_com_api_internal_entity.User:
     properties:
-      createdAt:
+      created_at:
         type: string
-      deletedAt:
-        $ref: '#/definitions/gorm.DeletedAt'
+      deleted_at:
+        allOf:
+        - $ref: '#/definitions/gorm.DeletedAt'
+        description: Use pointer to allow null values
       id:
         type: integer
       isAnonymous:
@@ -36,7 +40,7 @@ definitions:
         items:
           $ref: '#/definitions/chords_com_api_internal_entity.Room'
         type: array
-      updatedAt:
+      updated_at:
         type: string
     type: object
   chords_com_api_internal_event_bus.Event:

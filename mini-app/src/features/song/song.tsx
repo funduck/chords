@@ -2,18 +2,35 @@ import { SongDto, SongService } from "@src/services/song.service";
 import { useEffect, useState, useRef } from "react";
 import { Accordion, List, Section, Title } from "@telegram-apps/telegram-ui";
 import { Signals } from "@src/signals-registry";
-import { useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import { useSignal } from "@telegram-apps/sdk-react";
 import SongLine from "./song-line";
 import SongSettingsControl from "./song-settings";
+import { RoutesEnum } from "@src/routes";
 
 function Song() {
   // GET SONG
-  const { songId: paramsSongId } = useParams();
-  const songId = useSignal(Signals.selectedSongId);
-  if (paramsSongId && paramsSongId !== songId) {
-    Signals.selectedSongId.set(paramsSongId);
+  let { songId } = useParams();
+
+  // Store songId in localStorage so app remembers it across sessions
+  if (!songId) {
+    songId = localStorage.getItem("songId") ?? "";
+    if (songId) {
+      console.log("Using songId from localStorage:", songId);
+    } else {
+      console.warn("No songId found in URL or localStorage, redirecting to Search.");
+      const navigate = useNavigate();
+      navigate(RoutesEnum.Search); // Redirect to search if no songId is provided
+      return null; // Prevent further rendering
+    }
+  } else {
+    localStorage.setItem("songId", songId);
   }
+
+  // const songId = useSignal(Signals.applySongId);
+  // if (paramsSongId && paramsSongId !== songId) {
+  //   Signals.applySongId.set(paramsSongId);
+  // }
   const [song, setSong] = useState<SongDto | null>(null);
   useEffect(() => {
     if (songId) {
@@ -93,7 +110,7 @@ function Song() {
       songContainerRef.current.scrollTo({ top: scrollTop, behavior: "smooth" });
       setTimeout(() => {
         ignoreScrollEvent.current = false;
-      }, 500); // Reset ignore after a short delay
+      }, 1000); // Reset ignore after a short delay
     }
   }, [song, songContainerRef.current, applySongScroll]);
 

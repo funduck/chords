@@ -10,7 +10,7 @@ import { EventsConsumer, EventsPublisher } from "./features/connection/events";
 function App() {
   const navigate = useNavigate();
 
-  const songId = useSignal(Signals.selectedSongId);
+  // const songId = useSignal(Signals.applySongId);
   const currentTab = useSignal(Signals.selectedTabId);
 
   const tabs = [
@@ -21,17 +21,23 @@ function App() {
       link: RoutesEnum.Search,
     },
     {
+      id: "room",
+      text: "Room",
+      Icon: () => <div>🏠</div>,
+      link: RoutesEnum.Room,
+    },
+    {
       id: "song",
       text: "Song",
       Icon: () => <div>🎵</div>,
-      link: RoutesEnum.Song(songId),
+      link: RoutesEnum.Song(),
     },
-    {
-      id: "settings",
-      text: "Settings",
-      Icon: () => <div>⚙️</div>,
-      link: RoutesEnum.Settings,
-    },
+    // {
+    //   id: "settings",
+    //   text: "Settings",
+    //   Icon: () => <div>⚙️</div>,
+    //   link: RoutesEnum.Settings,
+    // },
     // {
     //   id: "about",
     //   text: "About",

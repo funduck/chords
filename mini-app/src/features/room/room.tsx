@@ -1,4 +1,4 @@
-import { Button, Text, Input, Section } from "@telegram-apps/telegram-ui";
+import { Button, Text, Input, Section, Title } from "@telegram-apps/telegram-ui";
 import { useContext, useEffect, useState } from "react";
 import { RoomsApiContext } from "../connection/api-connection";
 import { useSignal } from "@telegram-apps/sdk-react";
@@ -15,7 +15,7 @@ function Room() {
       Signals.room.set(room);
       // Store the room code in local storage
       localStorage.setItem("roomCode", room.code!);
-      console.log("Joined room:", room.code);
+      console.log("Joined room:", room);
     } else {
       Signals.room.set(null);
       // Clear the room code from local storage
@@ -72,6 +72,8 @@ function Room() {
   if (!room) {
     return (
       <Section>
+        <Title>Room</Title>
+
         <Button onClick={createRoom}>Create Room</Button>
 
         <Input
@@ -89,6 +91,8 @@ function Room() {
   }
   return (
     <Section>
+      <Title>Room</Title>
+
       <Text>Code: {room.code}</Text>
       <br />
       <Button onClick={leaveRoom}>Leave Room</Button>

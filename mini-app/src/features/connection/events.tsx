@@ -3,6 +3,8 @@ import { WebSocketContext } from "./ws-connection";
 import { useSignal } from "@telegram-apps/sdk-react";
 import { Signals } from "@src/signals-registry";
 import { SongSettings } from "../song/settings";
+import { useNavigate } from "react-router";
+import { RoutesEnum } from "@src/routes";
 
 type Event =
   | {
@@ -20,6 +22,14 @@ type Event =
         roomId?: number;
         scrollPercent: number;
       };
+    }
+  | {
+      type: "song_id";
+      data: {
+        userId: number;
+        roomId?: number;
+        songId: string;
+      };
     };
 
 export function EventsPublisher() {
@@ -29,12 +39,15 @@ export function EventsPublisher() {
 
   const publishSongSettings = useSignal(Signals.publishSongSettings);
   const publishSongScroll = useSignal(Signals.publishSongScroll);
+  const publishSongId = useSignal(Signals.publishSongId);
   useEffect(() => {
     if (!ws || !userId || !room) {
       return;
     }
+    console.debug(room);
+    let event: Event | null = null;
     if (publishSongSettings) {
-      const event: Event = {
+      event = {
         type: "song_settings",
         data: {
           userId: userId,
@@ -42,12 +55,10 @@ export function EventsPublisher() {
           songSettings: publishSongSettings,
         },
       };
-      ws.send(JSON.stringify(event));
       Signals.publishSongSettings.set(null); // Clear the signal after publishing
-      console.debug("Published song settings:", publishSongSettings);
     }
     if (publishSongScroll) {
-      const event: Event = {
+      event = {
         type: "song_scroll",
         data: {
           userId: userId,
@@ -55,11 +66,24 @@ export function EventsPublisher() {
           scrollPercent: publishSongScroll,
         },
       };
-      ws.send(JSON.stringify(event));
       Signals.publishSongScroll.set(null); // Clear the signal after publishing
-      console.debug("Published song scroll:", publishSongScroll);
     }
-  }, [ws, userId, room, publishSongSettings, publishSongScroll]);
+    if (publishSongId) {
+      event = {
+        type: "song_id",
+        data: {
+          userId: userId,
+          roomId: room.id,
+          songId: publishSongId,
+        },
+      };
+      Signals.publishSongId.set(null); // Clear the signal after publishing
+    }
+    if (event) {
+      ws.send(JSON.stringify(event));
+      console.debug("Published:", event);
+    }
+  }, [ws, userId, room, publishSongSettings, publishSongScroll, publishSongId]);
 
   return <></>;
 }
@@ -68,6 +92,7 @@ export function EventsConsumer() {
   const ws = useContext(WebSocketContext);
   const userId = useSignal(Signals.userId);
   const room = useSignal(Signals.room);
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Handling messages only if we are in room and have a userId
@@ -88,15 +113,18 @@ export function EventsConsumer() {
         console.warn("Received song settings for a different room:", dto);
         return;
       }
+      console.debug("Received event:", dto);
       switch (dto.type) {
         case "song_settings": {
-          console.log("Received song settings:", dto.data.songSettings);
           Signals.applySongSettings.set(new SongSettings().fromJson(dto.data.songSettings));
           break;
         }
         case "song_scroll": {
-          console.log("Received song scroll:", dto.data.scrollPercent);
           Signals.applySongScroll.set(dto.data.scrollPercent);
+          break;
+        }
+        case "song_id": {
+          navigate(RoutesEnum.Song(dto.data.songId));
           break;
         }
         default:

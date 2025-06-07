@@ -83,8 +83,8 @@ function SongSettingsControl() {
       <Section header="Auto scroll speed">
         <Slider
           onChange={(e) => {
-            const speed = 1 + e / 100;
-            const interval = 75 * 1.01 ** (speed - 1);
+            const speed = 1 + e / 30;
+            const interval = 100 * 1.01 ** (speed - 1);
             setAutoScrollSpeed(speed, interval);
           }}
         />

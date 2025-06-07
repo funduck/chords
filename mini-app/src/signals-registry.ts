@@ -8,7 +8,6 @@ export class Signals {
   static language = signal<string | null>(null);
   static accessToken = signal<string | null>(null);
   static selectedTabId = signal<string | null>(null);
-  static selectedSongId = signal<string | null>(null);
   static userId = signal<number | null>(null);
   static room = signal<ChordsComApiInternalEntityRoom | null>(null);
 
@@ -17,4 +16,7 @@ export class Signals {
 
   static applySongScroll = signal<number | null>(null);
   static publishSongScroll = signal<number | null>(null);
+
+  static publishSongId = signal<string | null>(null);
+  // static applySongId = signal<string | null>(null);
 }

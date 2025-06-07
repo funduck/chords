@@ -277,11 +277,16 @@ const docTemplate = `{
                 "code": {
                     "type": "string"
                 },
-                "createdAt": {
+                "created_at": {
                     "type": "string"
                 },
-                "deletedAt": {
-                    "$ref": "#/definitions/gorm.DeletedAt"
+                "deleted_at": {
+                    "description": "Use pointer to allow null values",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/gorm.DeletedAt"
+                        }
+                    ]
                 },
                 "id": {
                     "type": "integer"
@@ -289,7 +294,7 @@ const docTemplate = `{
                 "ownerID": {
                     "type": "integer"
                 },
-                "updatedAt": {
+                "updated_at": {
                     "type": "string"
                 },
                 "users": {
@@ -303,11 +308,16 @@ const docTemplate = `{
         "chords_com_api_internal_entity.User": {
             "type": "object",
             "properties": {
-                "createdAt": {
+                "created_at": {
                     "type": "string"
                 },
-                "deletedAt": {
-                    "$ref": "#/definitions/gorm.DeletedAt"
+                "deleted_at": {
+                    "description": "Use pointer to allow null values",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/gorm.DeletedAt"
+                        }
+                    ]
                 },
                 "id": {
                     "type": "integer"
@@ -327,7 +337,7 @@ const docTemplate = `{
                         "$ref": "#/definitions/chords_com_api_internal_entity.Room"
                     }
                 },
-                "updatedAt": {
+                "updated_at": {
                     "type": "string"
                 }
             }
