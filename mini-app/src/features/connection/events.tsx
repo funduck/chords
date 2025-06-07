@@ -6,31 +6,82 @@ import { SongSettings } from "../song/settings";
 import { useNavigate } from "react-router";
 import { RoutesEnum } from "@src/routes";
 
-type Event =
-  | {
-      type: "song_settings";
-      data: {
-        userId: number;
-        roomId?: number;
-        songSettings: SongSettings;
-      };
+class Event {
+  // These fields are accepted by the server
+  origin: number;
+  context: string;
+  type: string;
+  data: any;
+
+  constructor(obj: { origin: number; context: string; type: string; data: any }) {
+    this.origin = obj.origin;
+    this.context = obj.context;
+    this.type = obj.type;
+    this.data = obj.data;
+  }
+
+  toJson(): string {
+    return JSON.stringify({
+      origin: this.origin,
+      context: this.context,
+      type: this.type,
+      data: this.data,
+    });
+  }
+
+  static fromJson(obj: string): Event {
+    const parsed = JSON.parse(obj);
+    if (!parsed.origin || !parsed.context || !parsed.type || !parsed.data) {
+      throw new Error("Invalid event format");
     }
-  | {
-      type: "song_scroll";
-      data: {
-        userId: number;
-        roomId?: number;
-        scrollPercent: number;
-      };
+    return new Event(parsed);
+  }
+}
+
+class RoomEvent {
+  private event: Event;
+
+  constructor(obj: Event | { userId: number; roomId: number; type: string; data: any }) {
+    if (obj instanceof Event) {
+      this.event = obj;
+      return;
     }
-  | {
-      type: "song_id";
-      data: {
-        userId: number;
-        roomId?: number;
-        songId: string;
-      };
-    };
+    this.event = new Event({
+      origin: obj.userId,
+      context: `room:${obj.roomId}`,
+      type: obj.type,
+      data: obj.data,
+    });
+  }
+
+  static fromJson(obj: string): RoomEvent {
+    return new RoomEvent(Event.fromJson(obj));
+  }
+
+  toJson(): string {
+    return this.event.toJson();
+  }
+
+  get userId(): number {
+    return this.event.origin;
+  }
+
+  get roomId(): number | null {
+    const re = this.event.context.match(/^room:(\d+)$/);
+    if (!re) {
+      return null;
+    }
+    return parseInt(re[1], 10);
+  }
+
+  get type(): string {
+    return this.event.type;
+  }
+
+  get data(): any {
+    return this.event.data;
+  }
+}
 
 export function EventsPublisher() {
   const ws = useContext(WebSocketContext);
@@ -45,42 +96,42 @@ export function EventsPublisher() {
       return;
     }
     console.debug(room);
-    let event: Event | null = null;
+    let event: RoomEvent | null = null;
     if (publishSongSettings) {
-      event = {
+      event = new RoomEvent({
+        userId: userId,
+        roomId: room.id!,
         type: "song_settings",
         data: {
-          userId: userId,
-          roomId: room.id,
           songSettings: publishSongSettings,
         },
-      };
+      });
       Signals.publishSongSettings.set(null); // Clear the signal after publishing
     }
     if (publishSongScroll) {
-      event = {
+      event = new RoomEvent({
+        userId: userId,
+        roomId: room.id!,
         type: "song_scroll",
         data: {
-          userId: userId,
-          roomId: room.id,
           scrollPercent: publishSongScroll,
         },
-      };
+      });
       Signals.publishSongScroll.set(null); // Clear the signal after publishing
     }
     if (publishSongId) {
-      event = {
+      event = new RoomEvent({
+        userId: userId,
+        roomId: room.id!,
         type: "song_id",
         data: {
-          userId: userId,
-          roomId: room.id,
           songId: publishSongId,
         },
-      };
+      });
       Signals.publishSongId.set(null); // Clear the signal after publishing
     }
     if (event) {
-      ws.send(JSON.stringify(event));
+      ws.send(event.toJson());
       console.debug("Published:", event);
     }
   }, [ws, userId, room, publishSongSettings, publishSongScroll, publishSongId]);
@@ -100,17 +151,17 @@ export function EventsConsumer() {
       return;
     }
     ws.onmessage = (event) => {
-      const dto = JSON.parse(event.data) as Event;
-      if (!dto || !dto.data || !dto.type) {
-        console.warn("Received invalid event data:", dto);
+      if (!event || !event.data) {
+        console.warn("Received empty event data");
         return;
       }
-      if (dto.data?.userId == userId) {
+      const dto = RoomEvent.fromJson(event.data);
+      if (dto.userId == userId) {
         console.warn("Ignoring message from self:", dto);
         return;
       }
-      if (dto.data.roomId != room.id) {
-        console.warn("Received song settings for a different room:", dto);
+      if (dto.roomId != room.id) {
+        console.warn("Received event for a different room:", dto);
         return;
       }
       console.debug("Received event:", dto);

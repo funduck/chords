@@ -48,8 +48,7 @@ func (a *App) NewWSHandler() http.HandlerFunc {
 			for event := range client.SendChan {
 				log.Debugw("Sending event to user",
 					"userID", accessToken.UserID,
-					"eventType", event.Type,
-					"eventData", event.Data,
+					"event", event,
 				)
 				conn.WriteJSON(event)
 			}
@@ -76,11 +75,6 @@ func (a *App) NewWSHandler() http.HandlerFunc {
 				)
 				continue
 			} else {
-				log.Debugw("Processing event",
-					"userID", accessToken.UserID,
-					"eventType", event.Type,
-					"eventData", event.Data,
-				)
 				bus.OnClientEvent(accessToken.UserID, &event)
 			}
 

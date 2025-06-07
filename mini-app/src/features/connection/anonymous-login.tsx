@@ -16,8 +16,9 @@ function AnonymousLogin() {
       const sub = response.access_token.split(".")[1];
       if (sub) {
         const decodedSub = JSON.parse(atob(sub));
-        Signals.userId.set(decodedSub.sub || null);
-        console.log("User ID set from access token:", decodedSub.sub);
+        const userId = parseInt(decodedSub.sub, 10);
+        Signals.userId.set(userId || null);
+        console.log("User ID set from access token:", userId);
       }
 
       Signals.accessToken.set(response.access_token);

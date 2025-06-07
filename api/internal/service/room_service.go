@@ -72,8 +72,7 @@ func (s *RoomService) broadcastRoomEvents(roomID uint) {
 		}
 		s.log.Debugw("Broadcasting event to room",
 			"roomID", roomID,
-			"eventType", event.Type,
-			"eventData", event.Data,
+			"event", event,
 			"users", userIDs,
 		)
 		eventbus.GetEventBus().SendToClients(userIDs, event)
@@ -117,9 +116,7 @@ func (s *RoomService) addUserListener(roomID uint, userID uint) {
 		ch := s.roomChans[roomID]
 		s.log.Debugw("User event received, pushing to room channel",
 			"roomID", roomID,
-			"userID", userID,
-			"eventType", event.Type,
-			"eventData", event.Data,
+			"event", event,
 			"channel", ch != nil,
 		)
 		if ch != nil {

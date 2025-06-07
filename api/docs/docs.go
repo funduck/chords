@@ -345,11 +345,19 @@ const docTemplate = `{
         "chords_com_api_internal_event_bus.Event": {
             "type": "object",
             "properties": {
-                "data": {},
+                "context": {
+                    "description": "Optional context for the event, client specific",
+                    "type": "string"
+                },
+                "data": {
+                    "description": "Client specific event data"
+                },
                 "origin": {
+                    "description": "ID of the client that originated the event",
                     "type": "integer"
                 },
                 "type": {
+                    "description": "Client specific event type",
                     "type": "string"
                 }
             }

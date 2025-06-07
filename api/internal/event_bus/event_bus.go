@@ -7,9 +7,10 @@ import (
 )
 
 type Event struct {
-	Origin uint        `json:"origin"`
-	Type   string      `json:"type"`
-	Data   interface{} `json:"data"`
+	Origin  uint        `json:"origin"`            // ID of the client that originated the event
+	Context string      `json:"context,omitempty"` // Optional context for the event, client specific
+	Type    string      `json:"type"`              // Client specific event type
+	Data    interface{} `json:"data"`              // Client specific event data
 }
 
 type Client struct {
@@ -75,37 +76,35 @@ func (bus *EventBus) Broadcast(event *Event) {
 	}
 	bus.mu.Lock()
 	defer bus.mu.Unlock()
-	for id := range bus.clients {
-		if event.Origin == id {
+	for clientID := range bus.clients {
+		if event.Origin == clientID {
 			continue // Avoid sending the event back to the origin
 		}
 		bus.log.Debugw("Broadcasting event to client",
-			"clientID", id,
-			"eventType", event.Type,
-			"eventData", event.Data,
+			"clientID", clientID,
+			"event", event,
 		)
 		select {
-		case bus.clients[id].SendChan <- event:
+		case bus.clients[clientID].SendChan <- event:
 		default:
 			// Drop if buffer is full
 		}
 	}
 }
 
-func (bus *EventBus) SendToClient(id uint, event *Event) {
+func (bus *EventBus) SendToClient(clientID uint, event *Event) {
 	if event == nil {
 		return
 	}
-	if event.Origin == id {
+	if event.Origin == clientID {
 		return // Avoid sending the event back to the origin
 	}
 	bus.mu.Lock()
 	defer bus.mu.Unlock()
-	if client, exists := bus.clients[id]; exists {
+	if client, exists := bus.clients[clientID]; exists {
 		bus.log.Debugw("Sending event to client",
-			"clientID", id,
-			"eventType", event.Type,
-			"eventData", event.Data,
+			"clientID", clientID,
+			"event", event,
 		)
 		select {
 		case client.SendChan <- event:
@@ -115,23 +114,22 @@ func (bus *EventBus) SendToClient(id uint, event *Event) {
 	}
 }
 
-func (bus *EventBus) SendToClients(ids []uint, event *Event) {
+func (bus *EventBus) SendToClients(clientIDs []uint, event *Event) {
 	if event == nil {
 		return
 	}
 	bus.mu.Lock()
 	defer bus.mu.Unlock()
 
-	for _, id := range ids {
-		if event.Origin == id {
+	for _, clientID := range clientIDs {
+		if event.Origin == clientID {
 			continue // Avoid sending the event back to the origin
 		}
 		bus.log.Debugw("Sending event to multiple clients",
-			"clientID", id,
-			"eventType", event.Type,
-			"eventData", event.Data,
+			"clientID", clientID,
+			"event", event,
 		)
-		if client, exists := bus.clients[id]; exists {
+		if client, exists := bus.clients[clientID]; exists {
 			select {
 			case client.SendChan <- event:
 			default:
@@ -141,10 +139,10 @@ func (bus *EventBus) SendToClients(ids []uint, event *Event) {
 	}
 }
 
-func (bus *EventBus) AddClientListener(id uint, name string, listener func(*Event)) {
+func (bus *EventBus) AddClientListener(clientID uint, name string, listener func(*Event)) {
 	bus.mu.Lock()
 	defer bus.mu.Unlock()
-	if client, exists := bus.clients[id]; exists {
+	if client, exists := bus.clients[clientID]; exists {
 		if client.Listeners == nil {
 			client.Listeners = make(map[string]func(*Event))
 		}
@@ -152,26 +150,26 @@ func (bus *EventBus) AddClientListener(id uint, name string, listener func(*Even
 	}
 }
 
-func (bus *EventBus) RemoveClientListener(id uint, listenerKey string) {
+func (bus *EventBus) RemoveClientListener(clientID uint, listenerKey string) {
 	bus.mu.Lock()
 	defer bus.mu.Unlock()
-	if client, exists := bus.clients[id]; exists {
+	if client, exists := bus.clients[clientID]; exists {
 		if client.Listeners != nil {
 			delete(client.Listeners, listenerKey)
 		}
 	}
 }
 
-func (bus *EventBus) OnClientEvent(id uint, event *Event) {
+func (bus *EventBus) OnClientEvent(clientID uint, event *Event) {
 	if event == nil {
 		return
 	}
 	if event.Origin == 0 {
-		event.Origin = id
+		event.Origin = clientID
 	}
 	bus.mu.Lock()
 	defer bus.mu.Unlock()
-	if client, exists := bus.clients[id]; exists {
+	if client, exists := bus.clients[clientID]; exists {
 		if client.Listeners != nil {
 			for _, listener := range client.Listeners {
 				listener(event)

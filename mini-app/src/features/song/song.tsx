@@ -82,7 +82,8 @@ function Song() {
       return;
     }
     function handleScroll() {
-      if (ignoreScrollEvent.current) {
+      // We ignore scroll events if auto-scroll is enabled or if we are applying a scroll event
+      if (ignoreScrollEvent.current || settings?.auto_scroll) {
         return;
       }
       const scrollPercent = (screen!.scrollTop / (screen!.scrollHeight - screen!.clientHeight)) * 100;
@@ -93,7 +94,7 @@ function Song() {
     return () => {
       screen?.removeEventListener("scroll", handleScroll);
     };
-  }, [song, songContainerRef.current]);
+  }, [song, songContainerRef.current, settings?.auto_scroll]);
 
   const applySongScroll = useSignal(Signals.applySongScroll);
   useEffect(() => {
@@ -101,18 +102,18 @@ function Song() {
       console.error("Song container not found for scrolling");
       return;
     }
-    console.debug("Applying song scroll:", applySongScroll);
-    if (applySongScroll !== null) {
+    if (applySongScroll !== null && !settings?.auto_scroll) {
+      console.debug("Applying song scroll:", applySongScroll);
       // applySongScroll is a percentage (0-100)
       const scrollTop =
         (applySongScroll / 100) * (songContainerRef.current.scrollHeight - songContainerRef.current.clientHeight);
       ignoreScrollEvent.current = true;
-      songContainerRef.current.scrollTo({ top: scrollTop, behavior: "smooth" });
       setTimeout(() => {
         ignoreScrollEvent.current = false;
       }, 1000); // Reset ignore after a short delay
+      songContainerRef.current.scrollTo({ top: scrollTop, behavior: "smooth" });
     }
-  }, [song, songContainerRef.current, applySongScroll]);
+  }, [song, songContainerRef.current, applySongScroll, settings?.auto_scroll]);
 
   if (!song) {
     return <div>Loading...</div>;
