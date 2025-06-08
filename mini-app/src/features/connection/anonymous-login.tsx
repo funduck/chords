@@ -34,24 +34,32 @@ function AnonymousLogin() {
     Signals.accessToken.set(null);
 
     const refreshToken = localStorage.getItem("refresh_token");
-    if (refreshToken) {
-      authApi
-        .apiAuthRefreshTokenPost({ data: { refresh_token: refreshToken } })
+
+    new Promise<void>(async (resolve) => {
+      if (refreshToken) {
+        try {
+          await authApi
+            .apiAuthRefreshTokenPost({ data: { refresh_token: refreshToken } })
+            .then(handleTokens)
+            .then(() => {
+              console.log("Refreshed access token successfully");
+            });
+          return;
+        } catch (err) {
+          console.error("Failed to refresh access token:", err);
+          console.log("Will log in anonymously");
+        }
+      }
+
+      await authApi
+        .apiAuthAnonymousPost()
         .then(handleTokens)
         .then(() => {
-          console.log("Refreshed access token successfully");
+          console.log("Logged in anonymously successfully");
         })
         .catch(console.error);
-      return;
-    }
-
-    authApi
-      .apiAuthAnonymousPost()
-      .then(handleTokens)
-      .then(() => {
-        console.log("Logged in anonymously successfully");
-      })
-      .catch(console.error);
+      resolve();
+    });
   }, [authApi]);
 
   return <></>;

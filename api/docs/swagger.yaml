@@ -1,4 +1,9 @@
 definitions:
+  chords_com_api_internal_entity.JoinRoomRequest:
+    properties:
+      room_code:
+        type: string
+    type: object
   chords_com_api_internal_entity.Room:
     properties:
       code:
@@ -13,12 +18,17 @@ definitions:
         type: integer
       ownerID:
         type: integer
+      state: {}
       updated_at:
         type: string
       users:
         items:
           $ref: '#/definitions/chords_com_api_internal_entity.User'
         type: array
+    type: object
+  chords_com_api_internal_entity.UpdateRoomRequest:
+    properties:
+      state: {}
     type: object
   chords_com_api_internal_entity.User:
     properties:
@@ -64,11 +74,6 @@ definitions:
       valid:
         description: Valid is true if Time is not NULL
         type: boolean
-    type: object
-  internal_app.JoinRoomRequest:
-    properties:
-      room_code:
-        type: string
     type: object
   internal_app.LoginResponse:
     properties:
@@ -146,6 +151,47 @@ paths:
       summary: Create a new room
       tags:
       - rooms
+  /api/rooms/{id}:
+    patch:
+      consumes:
+      - application/json
+      description: Update the state of a room.
+      parameters:
+      - description: Room ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Update Room Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/chords_com_api_internal_entity.UpdateRoomRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Room updated successfully
+          schema:
+            $ref: '#/definitions/chords_com_api_internal_entity.Room'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Update a room
+      tags:
+      - rooms
   /api/rooms/{id}/leave:
     post:
       consumes:
@@ -156,7 +202,7 @@ paths:
         in: path
         name: id
         required: true
-        type: string
+        type: integer
       produces:
       - application/json
       responses:
@@ -168,10 +214,6 @@ paths:
             type: string
         "401":
           description: Unauthorized
-          schema:
-            type: string
-        "404":
-          description: Room Not Found
           schema:
             type: string
         "500":
@@ -194,7 +236,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/internal_app.JoinRoomRequest'
+          $ref: '#/definitions/chords_com_api_internal_entity.JoinRoomRequest'
       produces:
       - application/json
       responses:

@@ -1,12 +1,10 @@
 package app
 
 import (
-	"fmt"
 	"net/http"
 
-	"github.com/go-chi/chi/v5"
-
 	"chords.com/api/internal/auth"
+	"chords.com/api/internal/entity"
 	_ "chords.com/api/internal/entity"
 )
 
@@ -35,17 +33,13 @@ func (a *App) CreateRoom(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-type JoinRoomRequest struct {
-	RoomCode string `json:"room_code"`
-}
-
 // JoinRoom godoc
 // @Summary      Join a room
 // @Description  Join a room using the room code.
 // @Tags         rooms
 // @Accept       json
 // @Produce      json
-// @Param        request body JoinRoomRequest true "Join Room Request"
+// @Param        request body entity.JoinRoomRequest true "Join Room Request"
 // @Security     BearerAuth
 // @Success      200 {object} entity.Room "Room joined successfully"
 // @Failure      400 {object} string "Bad Request"
@@ -54,7 +48,7 @@ type JoinRoomRequest struct {
 // @Failure      500 {object} string "Internal Server Error"
 // @Router       /api/rooms/join [post]
 func (a *App) JoinRoom(w http.ResponseWriter, r *http.Request) {
-	dto := JoinRoomRequest{}
+	dto := entity.JoinRoomRequest{}
 	if err := parseBody(w, r, &dto); err != nil {
 		return
 	}
@@ -63,7 +57,7 @@ func (a *App) JoinRoom(w http.ResponseWriter, r *http.Request) {
 		a.respondError(w, http.StatusUnauthorized, err)
 		return
 	} else {
-		room, err := a.roomService.JoinRoom(r.Context(), dto.RoomCode, accessToken)
+		room, err := a.roomService.JoinRoom(r.Context(), accessToken, dto.RoomCode)
 		if err != nil {
 			a.respondError(w, http.StatusInternalServerError, err)
 			return
@@ -78,18 +72,16 @@ func (a *App) JoinRoom(w http.ResponseWriter, r *http.Request) {
 // @Tags         rooms
 // @Accept       json
 // @Produce      json
-// @Param        id path string true "Room ID"
+// @Param        id path integer true "Room ID"
 // @Security     BearerAuth
 // @Success      204 "Room left successfully"
 // @Failure      400 {object} string "Bad Request"
 // @Failure      401 {object} string "Unauthorized"
-// @Failure      404 {object} string "Room Not Found"
 // @Failure      500 {object} string "Internal Server Error"
 // @Router       /api/rooms/{id}/leave [post]
 func (a *App) LeaveRoom(w http.ResponseWriter, r *http.Request) {
-	roomID := chi.URLParam(r, "id")
-	if roomID == "" {
-		a.respondError(w, http.StatusBadRequest, fmt.Errorf("room ID is required"))
+	roomID, err := parseURLParamUint(w, r, "id")
+	if err != nil {
 		return
 	}
 
@@ -97,10 +89,48 @@ func (a *App) LeaveRoom(w http.ResponseWriter, r *http.Request) {
 		a.respondError(w, http.StatusUnauthorized, err)
 		return
 	} else {
-		if err := a.roomService.LeaveRoom(r.Context(), roomID, accessToken); err != nil {
+		if err := a.roomService.LeaveRoom(r.Context(), accessToken, roomID); err != nil {
 			a.respondError(w, http.StatusInternalServerError, err)
 			return
 		}
 		w.WriteHeader(http.StatusNoContent)
+	}
+}
+
+// UpdateRoom godoc
+// @Summary      Update a room
+// @Description  Update the state of a room.
+// @Tags         rooms
+// @Accept       json
+// @Produce      json
+// @Param        id path integer true "Room ID"
+// @Param        request body entity.UpdateRoomRequest true "Update Room Request"
+// @Security     BearerAuth
+// @Success      200 {object} entity.Room "Room updated successfully"
+// @Failure      400 {object} string "Bad Request"
+// @Failure      401 {object} string "Unauthorized"
+// @Failure      500 {object} string "Internal Server Error"
+// @Router       /api/rooms/{id} [patch]
+func (a *App) UpdateRoom(w http.ResponseWriter, r *http.Request) {
+	roomID, err := parseURLParamUint(w, r, "id")
+	if err != nil {
+		return
+	}
+
+	dto := entity.UpdateRoomRequest{}
+	if err := parseBody(w, r, &dto); err != nil {
+		return
+	}
+
+	if accessToken, err := auth.GetAccessToken(r.Context()); err != nil {
+		a.respondError(w, http.StatusUnauthorized, err)
+		return
+	} else {
+		room, err := a.roomService.UpdateRoom(r.Context(), accessToken, roomID, &dto)
+		if err != nil {
+			a.respondError(w, http.StatusInternalServerError, err)
+			return
+		}
+		a.respondJSON(w, http.StatusOK, room)
 	}
 }

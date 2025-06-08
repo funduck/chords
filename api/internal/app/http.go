@@ -5,7 +5,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 
+	"github.com/go-chi/chi/v5"
 	"gopkg.in/go-playground/validator.v9"
 )
 
@@ -35,6 +37,22 @@ func parseBody[T any](w http.ResponseWriter, r *http.Request, t *T) error {
 	}
 
 	return nil
+}
+
+func parseURLParamUint(w http.ResponseWriter, r *http.Request, param string) (uint, error) {
+	paramValue := chi.URLParam(r, param)
+	if paramValue == "" {
+		e := newErrorResponse(fmt.Sprintf("missing URL parameter: %s", param))
+		e.writeError(w, http.StatusBadRequest)
+		return 0, fmt.Errorf("missing URL parameter: %s", param)
+	}
+	id, err := strconv.ParseUint(paramValue, 10, 32)
+	if err != nil {
+		e := newErrorResponse(fmt.Sprintf("invalid URL parameter %s: %v", param, err))
+		e.writeError(w, http.StatusBadRequest)
+		return 0, fmt.Errorf("invalid URL parameter %s: %v", param, err)
+	}
+	return uint(id), nil
 }
 
 func (er ErrorResponse) writeError(w http.ResponseWriter, code int) {

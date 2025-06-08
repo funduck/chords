@@ -26,6 +26,7 @@ function SongSettingsControl() {
   function setShowChords(value: boolean) {
     if (settings) {
       const newSettings = settings.cloneWith({ show_chords: value });
+
       Signals.applySongSettings.set(newSettings);
       Signals.publishSongSettings.set(newSettings);
       SettingsService.save(newSettings).then(() => console.log("Song settings updated"));

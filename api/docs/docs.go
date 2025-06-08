@@ -134,7 +134,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_app.JoinRoomRequest"
+                            "$ref": "#/definitions/chords_com_api_internal_entity.JoinRoomRequest"
                         }
                     }
                 ],
@@ -172,6 +172,70 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/rooms/{id}": {
+            "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Update the state of a room.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "rooms"
+                ],
+                "summary": "Update a room",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Room ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Update Room Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/chords_com_api_internal_entity.UpdateRoomRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Room updated successfully",
+                        "schema": {
+                            "$ref": "#/definitions/chords_com_api_internal_entity.Room"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/api/rooms/{id}/leave": {
             "post": {
                 "security": [
@@ -192,7 +256,7 @@ const docTemplate = `{
                 "summary": "Leave a room",
                 "parameters": [
                     {
-                        "type": "string",
+                        "type": "integer",
                         "description": "Room ID",
                         "name": "id",
                         "in": "path",
@@ -211,12 +275,6 @@ const docTemplate = `{
                     },
                     "401": {
                         "description": "Unauthorized",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "404": {
-                        "description": "Room Not Found",
                         "schema": {
                             "type": "string"
                         }
@@ -271,6 +329,14 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "chords_com_api_internal_entity.JoinRoomRequest": {
+            "type": "object",
+            "properties": {
+                "room_code": {
+                    "type": "string"
+                }
+            }
+        },
         "chords_com_api_internal_entity.Room": {
             "type": "object",
             "properties": {
@@ -294,6 +360,7 @@ const docTemplate = `{
                 "ownerID": {
                     "type": "integer"
                 },
+                "state": {},
                 "updated_at": {
                     "type": "string"
                 },
@@ -303,6 +370,12 @@ const docTemplate = `{
                         "$ref": "#/definitions/chords_com_api_internal_entity.User"
                     }
                 }
+            }
+        },
+        "chords_com_api_internal_entity.UpdateRoomRequest": {
+            "type": "object",
+            "properties": {
+                "state": {}
             }
         },
         "chords_com_api_internal_entity.User": {
@@ -371,14 +444,6 @@ const docTemplate = `{
                 "valid": {
                     "description": "Valid is true if Time is not NULL",
                     "type": "boolean"
-                }
-            }
-        },
-        "internal_app.JoinRoomRequest": {
-            "type": "object",
-            "properties": {
-                "room_code": {
-                    "type": "string"
                 }
             }
         },

@@ -18,5 +18,4 @@ export class Signals {
   static publishSongScroll = signal<number | null>(null);
 
   static publishSongId = signal<string | null>(null);
-  // static applySongId = signal<string | null>(null);
 }

@@ -1,8 +1,8 @@
 source .env
 
 # API
-echo $VITE_API_URI/swagger/doc.json
-curl -sL $VITE_API_URI/swagger/doc.json -o api.json
+echo $CODEGEN_API_URI/swagger/doc.json
+curl -sL $CODEGEN_API_URI/swagger/doc.json -o api.json
 
 rm -rf src/generated/api
 

@@ -5,6 +5,8 @@ import { Signals } from "@src/signals-registry";
 import { SongSettings } from "../song/settings";
 import { useNavigate } from "react-router";
 import { RoutesEnum } from "@src/routes";
+import { RoomsApiContext } from "./api-connection";
+import { RoomState } from "../room/room";
 
 class Event {
   // These fields are accepted by the server
@@ -87,6 +89,7 @@ export function EventsPublisher() {
   const ws = useContext(WebSocketContext);
   const userId = useSignal(Signals.userId);
   const room = useSignal(Signals.room);
+  const roomsApi = useContext(RoomsApiContext);
 
   const publishSongSettings = useSignal(Signals.publishSongSettings);
   const publishSongScroll = useSignal(Signals.publishSongScroll);
@@ -95,7 +98,6 @@ export function EventsPublisher() {
     if (!ws || !userId || !room) {
       return;
     }
-    console.debug(room);
     let event: RoomEvent | null = null;
     if (publishSongSettings) {
       event = new RoomEvent({
@@ -133,6 +135,20 @@ export function EventsPublisher() {
     if (event) {
       ws.send(event.toJson());
       console.debug("Published:", event);
+      const roomState = (room.state as RoomState) || {};
+      roomState.song_settings = publishSongSettings || roomState.song_settings;
+      roomState.song_id = publishSongId || roomState.song_id;
+      console.debug("Updating room state:", roomState);
+      roomsApi
+        ?.apiRoomsIdPatch({
+          id: room.id!,
+          request: {
+            state: roomState,
+          },
+        })
+        .catch((error) => {
+          console.error("Failed to update room state:", error);
+        });
     }
   }, [ws, userId, room, publishSongSettings, publishSongScroll, publishSongId]);
 

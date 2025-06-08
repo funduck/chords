@@ -196,7 +196,7 @@ func (s *RoomService) CreateRoom(ctx context.Context, accessToken *auth.AccessTo
 	return room, nil
 }
 
-func (s *RoomService) JoinRoom(ctx context.Context, roomCode string, accessToken *auth.AccessToken) (*entity.Room, error) {
+func (s *RoomService) JoinRoom(ctx context.Context, accessToken *auth.AccessToken, roomCode string) (*entity.Room, error) {
 	tx := orm.GetDB(ctx)
 
 	// Find the room by code
@@ -229,15 +229,14 @@ func (s *RoomService) JoinRoom(ctx context.Context, roomCode string, accessToken
 	s.addUserListener(room.ID, accessToken.UserID)
 
 	s.log.Infow("User joined room",
-		"roomID", room.ID,
-		"roomCode", room.Code,
 		"userID", accessToken.UserID,
+		"room", room,
 	)
 
 	return &room, nil
 }
 
-func (s *RoomService) LeaveRoom(ctx context.Context, roomID string, accessToken *auth.AccessToken) error {
+func (s *RoomService) LeaveRoom(ctx context.Context, accessToken *auth.AccessToken, roomID uint) error {
 	tx := orm.GetDB(ctx)
 
 	// Find the room by code
@@ -285,4 +284,39 @@ func (s *RoomService) LeaveRoom(ctx context.Context, roomID string, accessToken 
 	)
 
 	return nil
+}
+
+func (s *RoomService) UpdateRoom(ctx context.Context, accessToken *auth.AccessToken, roomID uint, request *entity.UpdateRoomRequest) (*entity.Room, error) {
+	tx := orm.GetDB(ctx)
+
+	// Find the room by ID
+	room := entity.Room{}
+	if err := tx.First(&room, roomID).Error; err != nil {
+		return nil, tx.Error
+	}
+	s.log.Infow("User is trying to update room",
+		"userID", accessToken.UserID,
+		"room", room,
+	)
+
+	for _, user := range room.Users {
+		if user.ID == accessToken.UserID {
+			// User is part of the room, proceed with update
+			break
+		}
+		return nil, fmt.Errorf("user %d is not in room %d", accessToken.UserID, roomID)
+	}
+
+	room.Update(request)
+
+	if err := tx.Save(&room).Error; err != nil {
+		return nil, err
+	}
+
+	s.log.Infow("Updated room",
+		"roomID", room.ID,
+		"request", request,
+	)
+
+	return &room, nil
 }
