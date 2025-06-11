@@ -3,7 +3,6 @@ package app
 import (
 	"net/http"
 
-	"chords.com/api/internal/auth"
 	"chords.com/api/internal/entity"
 	_ "chords.com/api/internal/entity"
 )
@@ -20,17 +19,16 @@ import (
 // @Failure      500 {object} string "Internal Server Error"
 // @Router       /api/rooms [post]
 func (a *App) CreateRoom(w http.ResponseWriter, r *http.Request) {
-	if accessToken, err := auth.GetAccessToken(r.Context()); err != nil {
-		a.respondError(w, http.StatusUnauthorized, err)
+	accessToken, err := getAccessToken(w, r)
+	if err != nil {
 		return
-	} else {
-		room, err := a.roomService.CreateRoom(r.Context(), accessToken)
-		if err != nil {
-			a.respondError(w, http.StatusInternalServerError, err)
-			return
-		}
-		a.respondJSON(w, http.StatusCreated, room)
 	}
+	room, err := a.roomService.CreateRoom(r.Context(), accessToken)
+	if err != nil {
+		a.respondError(w, http.StatusInternalServerError, err)
+		return
+	}
+	a.respondJSON(w, http.StatusCreated, room)
 }
 
 // JoinRoom godoc
@@ -44,7 +42,6 @@ func (a *App) CreateRoom(w http.ResponseWriter, r *http.Request) {
 // @Success      200 {object} entity.Room "Room joined successfully"
 // @Failure      400 {object} string "Bad Request"
 // @Failure      401 {object} string "Unauthorized"
-// @Failure      404 {object} string "Room Not Found"
 // @Failure      500 {object} string "Internal Server Error"
 // @Router       /api/rooms/join [post]
 func (a *App) JoinRoom(w http.ResponseWriter, r *http.Request) {
@@ -53,17 +50,16 @@ func (a *App) JoinRoom(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if accessToken, err := auth.GetAccessToken(r.Context()); err != nil {
-		a.respondError(w, http.StatusUnauthorized, err)
+	accessToken, err := getAccessToken(w, r)
+	if err != nil {
 		return
-	} else {
-		room, err := a.roomService.JoinRoom(r.Context(), accessToken, dto.RoomCode)
-		if err != nil {
-			a.respondError(w, http.StatusInternalServerError, err)
-			return
-		}
-		a.respondJSON(w, http.StatusOK, room)
 	}
+	room, err := a.roomService.JoinRoom(r.Context(), accessToken, dto.RoomCode)
+	if err != nil {
+		a.respondError(w, http.StatusInternalServerError, err)
+		return
+	}
+	a.respondJSON(w, http.StatusOK, room)
 }
 
 // LeaveRoom godoc
@@ -85,16 +81,15 @@ func (a *App) LeaveRoom(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if accessToken, err := auth.GetAccessToken(r.Context()); err != nil {
-		a.respondError(w, http.StatusUnauthorized, err)
+	accessToken, err := getAccessToken(w, r)
+	if err != nil {
 		return
-	} else {
-		if err := a.roomService.LeaveRoom(r.Context(), accessToken, roomID); err != nil {
-			a.respondError(w, http.StatusInternalServerError, err)
-			return
-		}
-		w.WriteHeader(http.StatusNoContent)
 	}
+	if err := a.roomService.LeaveRoom(r.Context(), accessToken, roomID); err != nil {
+		a.respondError(w, http.StatusInternalServerError, err)
+		return
+	}
+	w.WriteHeader(http.StatusNoContent)
 }
 
 // UpdateRoom godoc
@@ -122,15 +117,14 @@ func (a *App) UpdateRoom(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if accessToken, err := auth.GetAccessToken(r.Context()); err != nil {
-		a.respondError(w, http.StatusUnauthorized, err)
+	accessToken, err := getAccessToken(w, r)
+	if err != nil {
 		return
-	} else {
-		room, err := a.roomService.UpdateRoom(r.Context(), accessToken, roomID, &dto)
-		if err != nil {
-			a.respondError(w, http.StatusInternalServerError, err)
-			return
-		}
-		a.respondJSON(w, http.StatusOK, room)
 	}
+	room, err := a.roomService.UpdateRoom(r.Context(), accessToken, roomID, &dto)
+	if err != nil {
+		a.respondError(w, http.StatusInternalServerError, err)
+		return
+	}
+	a.respondJSON(w, http.StatusOK, room)
 }

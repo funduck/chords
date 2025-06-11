@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"chords.com/api/internal/auth"
 	"github.com/go-chi/chi/v5"
 	"gopkg.in/go-playground/validator.v9"
 )
@@ -67,6 +68,16 @@ func (er ErrorResponse) writeError(w http.ResponseWriter, code int) {
 	}
 
 	w.Write(e)
+}
+
+func getAccessToken(w http.ResponseWriter, r *http.Request) (*auth.AccessToken, error) {
+	accessToken, err := auth.GetAccessToken(r.Context())
+	if err != nil {
+		e := newErrorResponse(fmt.Sprintf("failed to get access token: %v", err))
+		e.writeError(w, http.StatusUnauthorized)
+		return nil, err
+	}
+	return accessToken, nil
 }
 
 func (a *App) respondError(w http.ResponseWriter, code int, err error) {

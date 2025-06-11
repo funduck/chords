@@ -1,2 +1,4 @@
+# Add files or directories to ignore
 /tmp
 /*.sqlite
+/api.env
