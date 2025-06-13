@@ -12,9 +12,7 @@ import { init } from "./init.ts";
 // Mock the environment in case, we are outside Telegram.
 import "./mock-env.ts";
 
-import { initI18Next } from "./services/locale.service.ts";
 import { Signals } from "./signals-registry.ts";
-import { initTimeAgo } from "./services/timeago.service.ts";
 import { AppRoot } from "@telegram-apps/telegram-ui";
 import { BrowserRouter } from "react-router";
 import AppRoutes from "./routes.tsx";
@@ -32,10 +30,6 @@ try {
   // Set the language.
   const lang = retrieveLaunchParams().initData?.user?.languageCode || "en";
   Signals.language.set(lang);
-
-  initI18Next({ languageCode: lang });
-
-  initTimeAgo(lang);
 
   root.render(
     <StrictMode>
