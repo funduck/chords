@@ -34,7 +34,9 @@ func InitForTest() *Config {
 		AccessTokenExpiresInSeconds: 3600,
 		LoggerEnv:                   "test",
 		LoggerLevel:                 "debug",
-		LoggerLevels:                map[string]string{},
+		LoggerLevels: map[string]string{
+			"db": "info",
+		},
 	}
 	return config
 }

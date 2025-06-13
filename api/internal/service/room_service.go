@@ -168,6 +168,9 @@ func (s *RoomService) removeUserListener(roomID uint, userID uint) {
 
 // CreateRoom creates a new room with a unique code and adds the user to it.
 func (s *RoomService) CreateRoom(ctx context.Context, accessToken *auth.AccessToken) (*entity.Room, error) {
+	s.log.Debugw("User is trying to create a new room",
+		"userID", accessToken.UserID,
+	)
 	tx := orm.GetDB(ctx)
 
 	var err error
@@ -186,34 +189,54 @@ func (s *RoomService) CreateRoom(ctx context.Context, accessToken *auth.AccessTo
 		"ownerID", room.OwnerID,
 	)
 
-	// Start broadcasting events for the room
-	go func() {
-		s.broadcastRoomEvents(room.ID)
-	}()
-
-	s.addUserListener(room.ID, accessToken.UserID)
+	s.JoinRoom(ctx, accessToken, room.Code)
 
 	return room, nil
 }
 
 func (s *RoomService) JoinRoom(ctx context.Context, accessToken *auth.AccessToken, roomCode string) (*entity.Room, error) {
+	s.log.Debugw("User is trying to join room",
+		"userID", accessToken.UserID,
+		"roomCode", roomCode,
+	)
 	tx := orm.GetDB(ctx)
 
 	// Find the room by code
 	room := entity.Room{}
-	if err := tx.Where("code = ?", roomCode).First(&room).Error; err != nil {
+	if err := tx.Preload("Users").Where("code = ?", roomCode).First(&room).Error; err != nil {
 		return nil, err
 	}
-	s.log.Infow("User is trying to join room",
-		"roomID", room.ID,
-		"roomCode", room.Code,
-		"userID", accessToken.UserID,
-	)
+
+	// Check if user is already in the room
+	for _, u := range room.Users {
+		if u.ID == accessToken.UserID {
+			s.log.Infow("User already in room",
+				"roomID", room.ID,
+				"userID", accessToken.UserID,
+			)
+			return &room, nil
+		}
+	}
 
 	// Find user
 	user := entity.User{}
-	if err := tx.First(&user, accessToken.UserID).Error; err != nil {
+	if err := tx.Preload("Rooms").First(&user, accessToken.UserID).Error; err != nil {
 		return nil, err
+	}
+
+	// Leave all rooms the user is currently in
+	roomIDs := make([]uint, 0, len(user.Rooms))
+	for _, r := range user.Rooms {
+		roomIDs = append(roomIDs, r.ID)
+	}
+	for _, roomID := range roomIDs {
+		if err := s.LeaveRoom(ctx, accessToken, roomID); err != nil {
+			s.log.Errorw("Failed to leave room while joining another",
+				"roomID", roomID,
+				"userID", accessToken.UserID,
+			)
+			return nil, fmt.Errorf("failed to leave room %d while joining room %d: %w", roomID, room.ID, err)
+		}
 	}
 
 	// Add user to the room
@@ -230,13 +253,17 @@ func (s *RoomService) JoinRoom(ctx context.Context, accessToken *auth.AccessToke
 
 	s.log.Infow("User joined room",
 		"userID", accessToken.UserID,
-		"room", room,
+		"roomID", room.ID,
 	)
 
 	return &room, nil
 }
 
 func (s *RoomService) LeaveRoom(ctx context.Context, accessToken *auth.AccessToken, roomID uint) error {
+	s.log.Debugw("User is trying to leave room",
+		"userID", accessToken.UserID,
+		"roomID", roomID,
+	)
 	tx := orm.GetDB(ctx)
 
 	// Find the room by code
@@ -251,12 +278,6 @@ func (s *RoomService) LeaveRoom(ctx context.Context, accessToken *auth.AccessTok
 		return tx.Error
 	}
 
-	s.log.Infow("User is trying to leave room",
-		"roomID", room.ID,
-		"roomCode", room.Code,
-		"userID", accessToken.UserID,
-	)
-
 	if err := tx.Model(&room).Association("Users").Delete(&user); err != nil {
 		return err
 	}
@@ -264,9 +285,8 @@ func (s *RoomService) LeaveRoom(ctx context.Context, accessToken *auth.AccessTok
 	s.removeUserListener(room.ID, accessToken.UserID)
 
 	if accessToken.UserID == room.OwnerID {
-		s.log.Infow("User is the owner of the room, deleting room",
+		s.log.Infow("Deleting room because owner left",
 			"roomID", room.ID,
-			"roomCode", room.Code,
 			"userID", accessToken.UserID,
 		)
 		// If the user is the owner, we can delete the room
@@ -279,7 +299,6 @@ func (s *RoomService) LeaveRoom(ctx context.Context, accessToken *auth.AccessTok
 
 	s.log.Infow("User left room",
 		"roomID", room.ID,
-		"roomCode", room.Code,
 		"userID", accessToken.UserID,
 	)
 
@@ -287,6 +306,11 @@ func (s *RoomService) LeaveRoom(ctx context.Context, accessToken *auth.AccessTok
 }
 
 func (s *RoomService) UpdateRoom(ctx context.Context, accessToken *auth.AccessToken, roomID uint, request *entity.UpdateRoomRequest) (*entity.Room, error) {
+	s.log.Debugw("User is trying to update room",
+		"userID", accessToken.UserID,
+		"roomID", roomID,
+		"request", request,
+	)
 	tx := orm.GetDB(ctx)
 
 	// Find the room by ID
@@ -294,10 +318,6 @@ func (s *RoomService) UpdateRoom(ctx context.Context, accessToken *auth.AccessTo
 	if err := tx.First(&room, roomID).Error; err != nil {
 		return nil, tx.Error
 	}
-	s.log.Infow("User is trying to update room",
-		"userID", accessToken.UserID,
-		"room", room,
-	)
 
 	for _, user := range room.Users {
 		if user.ID == accessToken.UserID {

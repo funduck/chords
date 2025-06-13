@@ -3,14 +3,10 @@ package orm
 import (
 	"database/sql"
 	"fmt"
-	"log"
-	"os"
-	"time"
 
 	"chords.com/api/internal/entity"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
 )
 
 func InitForTest() (*gorm.DB, *sql.DB) {
@@ -24,15 +20,16 @@ func InitForTest() (*gorm.DB, *sql.DB) {
 	file := "file::memory:?cache=shared"
 
 	gormdb, err := gorm.Open(sqlite.Open(file), &gorm.Config{
-		Logger: logger.New(
-			log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer
-			logger.Config{
-				SlowThreshold:             time.Second,
-				LogLevel:                  logger.Info,
-				IgnoreRecordNotFoundError: true,
-				ParameterizedQueries:      false, // Don't include params in the SQL log
-				Colorful:                  true,
-			}),
+		Logger: NewGormLogger(),
+		// Logger: logger.New(
+		// 	log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer
+		// 	logger.Config{
+		// 		SlowThreshold:             time.Second,
+		// 		LogLevel:                  logger.Info,
+		// 		IgnoreRecordNotFoundError: true,
+		// 		ParameterizedQueries:      false, // Don't include params in the SQL log
+		// 		Colorful:                  true,
+		// 	}),
 	},
 	)
 	if err != nil {
@@ -42,7 +39,7 @@ func InitForTest() (*gorm.DB, *sql.DB) {
 	if err != nil {
 		panic(err)
 	}
-	if err := gormdb.AutoMigrate(entity.Room{}); err != nil {
+	if err := gormdb.AutoMigrate(entity.Room{}, entity.User{}); err != nil {
 		panic(err)
 	}
 

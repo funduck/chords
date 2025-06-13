@@ -10,7 +10,7 @@ type Room struct {
 	BaseEntity
 	Code    string `gorm:"unique;not null" json:"code"`
 	OwnerID uint
-	Users   []User          `gorm:"many2many:room_users;"`
+	Users   []*User         `gorm:"many2many:room_users;"`
 	StateDB json.RawMessage `json:"-" gorm:"column:state;type:json"`
 	State   interface{}     `json:"state" gorm:"-"`
 }

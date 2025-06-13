@@ -8,26 +8,35 @@ import (
 	gormLogger "gorm.io/gorm/logger"
 )
 
-type GormLogger struct{}
+type dbLogger struct {
+	logger.Logger
+}
 
-func (l GormLogger) LogMode(LogLevel gormLogger.LogLevel) gormLogger.Interface {
+func NewGormLogger() dbLogger {
+	return dbLogger{
+		Logger: logger.NewForModule("db"),
+	}
+}
+
+func (l dbLogger) LogMode(LogLevel gormLogger.LogLevel) gormLogger.Interface {
+	// We do not apply any specific log level handling here
 	return l
 }
-func (l GormLogger) Info(ctx context.Context, template string, args ...interface{}) {
-	logger.GetLogger(ctx).Infof(template, args)
+func (l dbLogger) Info(ctx context.Context, template string, args ...interface{}) {
+	l.Infof(template, args...)
 }
-func (l GormLogger) Warn(ctx context.Context, template string, args ...interface{}) {
-	logger.GetLogger(ctx).Warnf(template, args)
+func (l dbLogger) Warn(ctx context.Context, template string, args ...interface{}) {
+	l.Warnf(template, args...)
 }
-func (l GormLogger) Error(ctx context.Context, template string, args ...interface{}) {
-	logger.GetLogger(ctx).Errorf(template, args)
+func (l dbLogger) Error(ctx context.Context, template string, args ...interface{}) {
+	l.Errorf(template, args...)
 }
-func (l GormLogger) Trace(ctx context.Context, begin time.Time, fc func() (sql string, rowsAffected int64), err error) {
+func (l dbLogger) Trace(ctx context.Context, begin time.Time, fc func() (sql string, rowsAffected int64), err error) {
 	sql, rowsAffected := fc()
 	duration := time.Since(begin).String()
 	if err == nil {
-		logger.GetLogger(ctx).Debugf("trace duration %s, rows affected %d, sql: %s", duration, rowsAffected, sql)
+		l.Debugf("trace duration %s, rows affected %d, sql: %s", duration, rowsAffected, sql)
 	} else {
-		logger.GetLogger(ctx).Errorf("trace duration %s, rows affected %d, sql: %s, error: %v", duration, rowsAffected, sql, err)
+		l.Errorf("trace duration %s, rows affected %d, sql: %s, error: %v", duration, rowsAffected, sql, err)
 	}
 }

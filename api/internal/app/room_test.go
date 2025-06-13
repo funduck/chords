@@ -69,7 +69,7 @@ func TestCreateRoomHandler(t *testing.T) {
 	})
 
 	t.Run("Join Room Handler", func(t *testing.T) {
-		dto := JoinRoomRequest{
+		dto := entity.JoinRoomRequest{
 			RoomCode: room.Code,
 		}
 		bytesData, err := json.Marshal(dto)
@@ -92,7 +92,7 @@ func TestCreateRoomHandler(t *testing.T) {
 	})
 
 	t.Run("Join Room with another user", func(t *testing.T) {
-		dto := JoinRoomRequest{
+		dto := entity.JoinRoomRequest{
 			RoomCode: room.Code,
 		}
 		bytesData, err := json.Marshal(dto)

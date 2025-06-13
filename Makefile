@@ -14,3 +14,7 @@ mini-app-dev:
 
 api-dev:
 	cd api && make dev
+
+# Test mode
+api-test:
+	cd api && make test

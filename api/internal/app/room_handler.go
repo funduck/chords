@@ -5,6 +5,7 @@ import (
 
 	"chords.com/api/internal/entity"
 	_ "chords.com/api/internal/entity"
+	"chords.com/api/internal/orm"
 )
 
 // CreateRoom godoc
@@ -23,11 +24,19 @@ func (a *App) CreateRoom(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		return
 	}
+
+	// Start a transaction
+	tx := orm.GetDB(r.Context())
+	orm.SetDB(r.Context(), tx.Begin())
+	defer tx.Rollback()
+
 	room, err := a.roomService.CreateRoom(r.Context(), accessToken)
 	if err != nil {
 		a.respondError(w, http.StatusInternalServerError, err)
 		return
 	}
+
+	tx.Commit()
 	a.respondJSON(w, http.StatusCreated, room)
 }
 

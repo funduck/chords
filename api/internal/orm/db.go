@@ -57,7 +57,9 @@ func GetDB(ctx context.Context) *gorm.DB {
 
 func InitSQLite() (*gorm.DB, *sql.DB) {
 	file := config.New().SQLiteFile
-	gormdb, err := gorm.Open(sqlite.Open(file), &gorm.Config{})
+	gormdb, err := gorm.Open(sqlite.Open(file), &gorm.Config{
+		Logger: NewGormLogger(),
+	})
 	if err != nil {
 		panic(err)
 	}
