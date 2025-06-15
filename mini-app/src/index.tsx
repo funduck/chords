@@ -13,13 +13,13 @@ import { init } from "./init.ts";
 import "./mock-env.ts";
 
 import { Signals } from "./signals-registry.ts";
-import { AppRoot } from "@telegram-apps/telegram-ui";
 import { BrowserRouter } from "react-router";
 import AppRoutes from "./routes.tsx";
 import App from "./app.tsx";
 import { IsDev } from "./config.ts";
 import { WSProvider } from "./features/connection/ws-connection.tsx";
 import { ApiProvider } from "./features/connection/api-connection.tsx";
+import { AppRoot } from "@telegram-apps/telegram-ui";
 
 const root = ReactDOM.createRoot(document.getElementById("root")!);
 

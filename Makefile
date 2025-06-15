@@ -18,3 +18,9 @@ api-dev:
 # Test mode
 api-test:
 	cd api && make test
+
+dev:
+	concurrently \
+		"make caddy-dev" \
+		"make mini-app-dev" \
+		"make api-dev"

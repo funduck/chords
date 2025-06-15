@@ -1,4 +1,4 @@
-import { Button, Text, Input, Section, Title } from "@telegram-apps/telegram-ui";
+import { Button, Input, Section, Snackbar } from "@telegram-apps/telegram-ui";
 import { useContext, useEffect, useState } from "react";
 import { RoomsApiContext } from "../connection/api-connection";
 import { useSignal } from "@telegram-apps/sdk-react";
@@ -17,6 +17,7 @@ function Room() {
   const roomsApi = useContext(RoomsApiContext);
   const room = useSignal(Signals.room);
   const [roomCode, setRoomCode] = useState<string | null>(null);
+  const [codeCopied, setCodeCopied] = useState(false);
   const navigate = useNavigate();
 
   function handleRoomState(state: RoomState) {
@@ -68,6 +69,21 @@ function Room() {
       .then(handleRoom)
       .catch(console.error);
   }
+  function copyCode() {
+    if (!room) {
+      console.error("No room to copy code from");
+      return;
+    }
+    setCodeCopied(true);
+    navigator.clipboard
+      .writeText(room.code || "")
+      .then(() => {
+        console.log("Room code copied to clipboard:", room.code);
+      })
+      .catch((err) => {
+        console.error("Failed to copy room code:", err);
+      });
+  }
   function leaveRoom() {
     if (!roomsApi) {
       console.error("Rooms API is not available");
@@ -97,31 +113,47 @@ function Room() {
 
   if (!room) {
     return (
-      <Section>
-        <Title>Room</Title>
+      <>
+        <Section header="New Room">
+          <Button
+            size="l"
+            stretched={true}
+            mode="bezeled"
+            onClick={() => {
+              createRoom();
+            }}
+          >
+            Create
+          </Button>
+        </Section>
 
-        <Button onClick={createRoom}>Create Room</Button>
-
-        <Input
-          header="Room code"
-          name="roomCode"
-          onChange={(event) => setRoomCode(event.target.value)}
-          after={
-            <Button onClick={() => joinRoom()} disabled={roomCode == ""}>
-              Join Room
-            </Button>
-          }
-        />
-      </Section>
+        <Section header="Join Room">
+          <Input
+            before={
+              <Button size="m" mode="bezeled" onClick={() => joinRoom()} disabled={(roomCode?.length || 0) != 6}>
+                Join
+              </Button>
+            }
+            // header="Room code"
+            name="roomCode"
+            status="focused"
+            onChange={(event) => setRoomCode(event.target.value)}
+          />
+        </Section>
+      </>
     );
   }
-  return (
-    <Section>
-      <Title>Room</Title>
 
-      <Text>Code: {room.code}</Text>
+  return (
+    <Section header="Room">
+      <Button size="m" stretched={true} mode="bezeled" onClick={copyCode}>
+        Copy Code {room.code}
+      </Button>
+      {codeCopied && <Snackbar onClose={() => setCodeCopied(false)}>Code copied</Snackbar>}
       <br />
-      <Button onClick={leaveRoom}>Leave Room</Button>
+      <Button size="m" stretched={true} mode="bezeled" onClick={leaveRoom}>
+        Leave Room
+      </Button>
     </Section>
   );
 }

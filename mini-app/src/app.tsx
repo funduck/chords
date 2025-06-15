@@ -1,5 +1,5 @@
 import { useSignal } from "@telegram-apps/sdk-react";
-import { Tabbar } from "@telegram-apps/telegram-ui";
+import { Image, Tabbar } from "@telegram-apps/telegram-ui";
 import { Signals } from "./signals-registry";
 import TabLink from "./components/tab-link";
 import { RoutesEnum } from "./routes";
@@ -10,26 +10,29 @@ import { EventsConsumer, EventsPublisher } from "./features/connection/events";
 function App() {
   const navigate = useNavigate();
 
-  // const songId = useSignal(Signals.applySongId);
   const currentTab = useSignal(Signals.selectedTabId);
 
   const tabs = [
     {
       id: "search",
       text: "Search",
-      Icon: () => <div>🔍</div>,
+      Icon: () => (
+        <Image style={{ background: "white", borderRadius: "50%" }} src="/src/assets/search.svg" alt="Search Icon" />
+      ),
       link: RoutesEnum.Search,
     },
     {
       id: "room",
       text: "Room",
-      Icon: () => <div>🏠</div>,
+      Icon: () => (
+        <Image style={{ background: "white", borderRadius: "20%" }} src="/src/assets/room.png" alt="Room Icon" />
+      ),
       link: RoutesEnum.Room,
     },
     {
       id: "song",
       text: "Song",
-      Icon: () => <div>🎵</div>,
+      Icon: () => <Image style={{ borderRadius: "50%" }} src="/src/assets/song.jpg" alt="Song Icon" />,
       link: RoutesEnum.Song(),
     },
     // {
