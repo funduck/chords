@@ -6,7 +6,7 @@ import Tabbar from "@components/tabbar";
 
 import TabLink from "./components/tab-link";
 import AnonymousLogin from "./features/connection/anonymous-login";
-import { EventsConsumer, EventsPublisher } from "./features/connection/events";
+import { EventsConsumer, EventsPublisher } from "./hooks/events";
 import { RoutesEnum } from "./routes";
 import { Signals } from "./signals-registry";
 

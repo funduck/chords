@@ -3,6 +3,7 @@ import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 
 import { ChordsComApiInternalEntityRoom } from "@src/generated/api";
+import { WebSocketContext } from "@src/hooks/websocket";
 import { RoutesEnum } from "@src/routes";
 import { Signals } from "@src/signals-registry";
 
@@ -13,7 +14,7 @@ import Snackbar from "@components/snackbar";
 
 import { SongSettings } from "@features/song/settings";
 
-import { RoomsApiContext } from "../connection/api-connection";
+import { RoomsApiContext } from "../../hooks/api";
 
 export type RoomState = {
   song_id: string | null;
@@ -22,6 +23,7 @@ export type RoomState = {
 
 function Room() {
   const roomsApi = useContext(RoomsApiContext);
+  const ws = useContext(WebSocketContext);
   const room = useSignal(Signals.room);
   const [roomCode, setRoomCode] = useState<string | null>(null);
   const [codeCopied, setCodeCopied] = useState(false);
@@ -108,6 +110,10 @@ function Room() {
 
   // Automatically join the room if roomCode is set and the API is available
   useEffect(() => {
+    if (!roomsApi || !ws) {
+      // Waiting for both API and WebSocket to be available
+      return;
+    }
     if (room) {
       return; // Already in a room
     }
@@ -116,7 +122,7 @@ function Room() {
       console.log("Found stored room code:", storedRoomCode);
       joinRoom(storedRoomCode);
     }
-  }, [roomsApi]);
+  }, [roomsApi, ws]);
 
   if (!room) {
     return (

@@ -44,7 +44,7 @@ func GetEventBus() *EventBus {
 func NewEventBus() *EventBus {
 	return &EventBus{
 		clients: make(map[uint]*Client),
-		log:     logger.NewForModule("EventBus"),
+		log:     logger.NewForModule("eventbus"),
 	}
 }
 
@@ -62,6 +62,11 @@ func (bus *EventBus) Register(client *Client) {
 		client.Listeners = prevClient.Listeners // Preserve listeners from previous client
 	}
 	bus.clients[client.ID] = client
+	bus.log.Debugw("Client registered",
+		"clientID", client.ID,
+		"sendChanSize", len(client.SendChan),
+		"listeners", len(client.Listeners),
+	)
 }
 
 func (bus *EventBus) Unregister(client *Client) {
@@ -147,6 +152,16 @@ func (bus *EventBus) AddClientListener(clientID uint, name string, listener func
 			client.Listeners = make(map[string]func(*Event))
 		}
 		client.Listeners[name] = listener // Use a default listener key
+		bus.log.Debugw("Added listener for client",
+			"clientID", clientID,
+			"listenerName", name,
+			"listenersCount", len(client.Listeners),
+		)
+	} else {
+		bus.log.Warnw("Client not found for adding listener",
+			"clientID", clientID,
+			"listenerName", name,
+		)
 	}
 }
 
@@ -156,6 +171,11 @@ func (bus *EventBus) RemoveClientListener(clientID uint, listenerKey string) {
 	if client, exists := bus.clients[clientID]; exists {
 		if client.Listeners != nil {
 			delete(client.Listeners, listenerKey)
+			bus.log.Debugw("Removed listener for client",
+				"clientID", clientID,
+				"listenerKey", listenerKey,
+				"listenersCount", len(client.Listeners),
+			)
 		}
 	}
 }
@@ -170,10 +190,20 @@ func (bus *EventBus) OnClientEvent(clientID uint, event *Event) {
 	bus.mu.Lock()
 	defer bus.mu.Unlock()
 	if client, exists := bus.clients[clientID]; exists {
-		if client.Listeners != nil {
+		if len(client.Listeners) > 0 {
 			for _, listener := range client.Listeners {
 				listener(event)
 			}
+		} else {
+			bus.log.Debugw("No listeners for client",
+				"clientID", clientID,
+				"event", event,
+			)
 		}
+	} else {
+		bus.log.Warnw("Client not found for event",
+			"clientID", clientID,
+			"event", event,
+		)
 	}
 }

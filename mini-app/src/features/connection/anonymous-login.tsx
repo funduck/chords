@@ -1,7 +1,8 @@
-import { InternalAppLoginResponse } from "@src/generated/api";
-import { Signals } from "@src/signals-registry";
 import { useContext, useEffect } from "react";
-import { AuthApiContext } from "./api-connection";
+
+import { InternalAppLoginResponse } from "@src/generated/api";
+import { AuthApiContext } from "@src/hooks/api";
+import { Signals } from "@src/signals-registry";
 
 function AnonymousLogin() {
   const authApi = useContext(AuthApiContext);

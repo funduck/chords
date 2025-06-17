@@ -1,12 +1,15 @@
-import { useContext, useEffect } from "react";
-import { WebSocketContext } from "./ws-connection";
 import { useSignal } from "@telegram-apps/sdk-react";
-import { Signals } from "@src/signals-registry";
-import { SongSettings } from "../song/settings";
+import { cloneDeep, isEqual } from "lodash";
+import { useContext, useEffect } from "react";
 import { useNavigate } from "react-router";
+
+import { RoomsApiContext } from "@src/hooks/api";
+import { WebSocketContext } from "@src/hooks/websocket";
 import { RoutesEnum } from "@src/routes";
-import { RoomsApiContext } from "./api-connection";
-import { RoomState } from "../room/room";
+import { Signals } from "@src/signals-registry";
+
+import { RoomState } from "@features/room/room";
+import { SongSettings } from "@features/song/settings";
 
 class Event {
   // These fields are accepted by the server
@@ -135,20 +138,26 @@ export function EventsPublisher() {
     if (event) {
       ws.send(event.toJson());
       console.debug("Published:", event);
-      const roomState = (room.state as RoomState) || {};
+
+      // Clone the room state to avoid mutating the original object
+      const roomState = cloneDeep((room.state as RoomState) || {});
+
       roomState.song_settings = publishSongSettings || roomState.song_settings;
       roomState.song_id = publishSongId || roomState.song_id;
-      console.debug("Updating room state:", roomState);
-      roomsApi
-        ?.apiRoomsIdPatch({
-          id: room.id!,
-          request: {
-            state: roomState,
-          },
-        })
-        .catch((error) => {
-          console.error("Failed to update room state:", error);
-        });
+
+      if (!isEqual(roomState, room.state)) {
+        console.debug("Updating room state:", roomState);
+        roomsApi
+          ?.apiRoomsIdPatch({
+            id: room.id!,
+            request: {
+              state: roomState,
+            },
+          })
+          .catch((error) => {
+            console.error("Failed to update room state:", error);
+          });
+      }
     }
   }, [ws, userId, room, publishSongSettings, publishSongScroll, publishSongId]);
 

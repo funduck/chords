@@ -19,6 +19,7 @@
     "i18next-http-backend": "^3.0.1",
     "i18next-resources-to-backend": "^1.2.1",
     "javascript-time-ago": "^2.5.11",
+    "lodash": "^4.17.21",
     "react": "^18.2.0",
     "react-dnd": "^14.0.2",
     "react-dnd-html5-backend": "^14.0.0",
@@ -29,6 +30,7 @@
   },
   "devDependencies": {
     "@trivago/prettier-plugin-sort-imports": "^4.3.0",
+    "@types/lodash": "^4.17.17",
     "@types/react": "^18.2.15",
     "@types/react-dom": "^18.2.7",
     "@typescript-eslint/eslint-plugin": "^6.0.0",

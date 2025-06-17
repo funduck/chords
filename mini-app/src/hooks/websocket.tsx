@@ -1,11 +1,12 @@
+import { useSignal } from "@telegram-apps/sdk-react";
+import { ReactNode, createContext, useEffect, useState } from "react";
+
 import { ApiWsUrl } from "@src/config";
 import { Signals } from "@src/signals-registry";
-import { useSignal } from "@telegram-apps/sdk-react";
-import { createContext, ReactNode, useEffect, useState } from "react";
 
 export const WebSocketContext = createContext<WebSocket | null>(null);
 
-export function WSProvider({ children }: { children: ReactNode }) {
+export function WebSocketProvider({ children }: { children: ReactNode }) {
   const [ws, setWs] = useState<WebSocket | null>(null);
   const accessToken = useSignal(Signals.accessToken);
 

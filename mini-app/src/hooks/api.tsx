@@ -1,8 +1,9 @@
+import { useSignal } from "@telegram-apps/sdk-react";
+import { ReactNode, createContext, useEffect, useState } from "react";
+
 import { ApiHttpUrl } from "@src/config";
 import { AuthApi, Configuration, RoomsApi } from "@src/generated/api";
 import { Signals } from "@src/signals-registry";
-import { useSignal } from "@telegram-apps/sdk-react";
-import { createContext, ReactNode, useEffect, useState } from "react";
 
 export const AuthApiContext = createContext<AuthApi | null>(null);
 export const RoomsApiContext = createContext<RoomsApi | null>(null);

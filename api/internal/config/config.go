@@ -33,7 +33,7 @@ func InitForTest() *Config {
 		Secret:                      "test_secret",
 		AccessTokenExpiresInSeconds: 3600,
 		LoggerEnv:                   "test",
-		LoggerLevel:                 "debug",
+		LoggerLevel:                 "error",
 		LoggerLevels: map[string]string{
 			"db": "info",
 		},

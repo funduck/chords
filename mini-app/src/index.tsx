@@ -9,8 +9,8 @@ import { EnvUnsupported } from "@components/env-unsupported.tsx";
 
 import App from "./app.tsx";
 import { IsDev } from "./config.ts";
-import { ApiProvider } from "./features/connection/api-connection.tsx";
-import { WSProvider } from "./features/connection/ws-connection.tsx";
+import { ApiProvider } from "./hooks/api.tsx";
+import { WebSocketProvider } from "./hooks/websocket.tsx";
 import "./index.css";
 import { init } from "./init.ts";
 // Mock the environment in case, we are outside Telegram.
@@ -32,12 +32,12 @@ try {
     <StrictMode>
       <AppRoot>
         <ApiProvider>
-          <WSProvider>
+          <WebSocketProvider>
             <BrowserRouter>
               <AppRoutes />
               <App />
             </BrowserRouter>
-          </WSProvider>
+          </WebSocketProvider>
         </ApiProvider>
       </AppRoot>
     </StrictMode>,

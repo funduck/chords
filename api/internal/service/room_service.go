@@ -210,6 +210,13 @@ func (s *RoomService) JoinRoom(ctx context.Context, accessToken *auth.AccessToke
 	// Check if user is already in the room
 	for _, u := range room.Users {
 		if u.ID == accessToken.UserID {
+			// Start broadcasting events for the room
+			go func() {
+				s.broadcastRoomEvents(room.ID)
+			}()
+			// Add user to the room's event listeners
+			s.addUserListener(room.ID, accessToken.UserID)
+
 			s.log.Infow("User already in room",
 				"roomID", room.ID,
 				"userID", accessToken.UserID,
@@ -248,7 +255,7 @@ func (s *RoomService) JoinRoom(ctx context.Context, accessToken *auth.AccessToke
 	go func() {
 		s.broadcastRoomEvents(room.ID)
 	}()
-
+	// Add user to the room's event listeners
 	s.addUserListener(room.ID, accessToken.UserID)
 
 	s.log.Infow("User joined room",
