@@ -1,4 +1,6 @@
-import { FixedLayout, List, Section } from "@telegram-apps/telegram-ui";
+import FixedLayout from "@components/fixed-layout";
+import List from "@components/list";
+import Section from "@components/section";
 
 function Settings() {
   return (

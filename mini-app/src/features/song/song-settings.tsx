@@ -1,8 +1,14 @@
-import { Cell, Section, Slider, Switch } from "@telegram-apps/telegram-ui";
 import { useSignal } from "@telegram-apps/sdk-react";
 import { useEffect } from "react";
-import { Signals } from "@src/signals-registry";
+
 import { SettingsService } from "@src/services/settings.service";
+import { Signals } from "@src/signals-registry";
+
+import Cell from "@components/cell";
+import Section from "@components/section";
+import Slider from "@components/slider";
+import Switch from "@components/switch";
+
 import { SongSettings } from "./settings";
 
 function SongSettingsControl() {
@@ -61,22 +67,20 @@ function SongSettingsControl() {
             onChange={(e) => {
               setShowChords(e.target.checked);
             }}
-          ></Switch>
+          />
         }
       >
         Show chords
       </Cell>
       <Cell
         after={
-          <>
-            <Switch
-              disabled={!settings}
-              checked={settings?.auto_scroll ?? false}
-              onChange={(e) => {
-                setAutoScroll(e.target.checked);
-              }}
-            ></Switch>
-          </>
+          <Switch
+            disabled={!settings}
+            checked={settings?.auto_scroll ?? false}
+            onChange={(e) => {
+              setAutoScroll(e.target.checked);
+            }}
+          />
         }
       >
         Auto scroll

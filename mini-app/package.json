@@ -46,20 +46,22 @@
   "prettier": {
     "tabWidth": 2,
     "printWidth": 120,
+    "plugins": [
+      "@trivago/prettier-plugin-sort-imports"
+    ],
     "importOrderParserPlugins": [
-      "typescript",
-      "jsx",
       "tsx",
+      "jsx",
+      "typescript",
       "decorators-legacy"
     ],
     "importOrder": [
-      "^@infra/(.*)$",
       "<THIRD_PARTY_MODULES>",
       "^@generated/(.*)$",
-      "^@domain/(.*)$",
       "^@src/(.*)$",
-      "^@config/(.*)$",
-      "^@modules/(.*)$",
+      "^@components/(.*)$",
+      "^@features/(.*)$",
+      "^@hooks/(.*)$",
       "^[./]"
     ],
     "importOrderSeparation": true,

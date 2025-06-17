@@ -1,7 +1,12 @@
-import { SongDescrDto, SongService } from "@src/services/song.service";
 import { useEffect, useState } from "react";
+
+import { SongDescrDto, SongService } from "@src/services/song.service";
+
+import List from "@components/list";
+import Section from "@components/section";
+import Title from "@components/title";
+
 import SearchSongListItem from "./search-song-list-item";
-import { List, Section, Title } from "@telegram-apps/telegram-ui";
 
 function Search() {
   let [songs, setSongs] = useState<SongDescrDto[] | null>(null);

@@ -1,12 +1,19 @@
-import { Button, Input, Section, Snackbar } from "@telegram-apps/telegram-ui";
-import { useContext, useEffect, useState } from "react";
-import { RoomsApiContext } from "../connection/api-connection";
 import { useSignal } from "@telegram-apps/sdk-react";
-import { Signals } from "@src/signals-registry";
-import { ChordsComApiInternalEntityRoom } from "@src/generated/api";
-import { SongSettings } from "../song/settings";
+import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router";
+
+import { ChordsComApiInternalEntityRoom } from "@src/generated/api";
 import { RoutesEnum } from "@src/routes";
+import { Signals } from "@src/signals-registry";
+
+import Button from "@components/button";
+import Input from "@components/input";
+import Section from "@components/section";
+import Snackbar from "@components/snackbar";
+
+import { SongSettings } from "@features/song/settings";
+
+import { RoomsApiContext } from "../connection/api-connection";
 
 export type RoomState = {
   song_id: string | null;
@@ -116,9 +123,8 @@ function Room() {
       <>
         <Section header="New Room">
           <Button
-            size="l"
             stretched={true}
-            mode="bezeled"
+            size="m"
             onClick={() => {
               createRoom();
             }}
@@ -130,11 +136,10 @@ function Room() {
         <Section header="Join Room">
           <Input
             before={
-              <Button size="m" mode="bezeled" onClick={() => joinRoom()} disabled={(roomCode?.length || 0) != 6}>
+              <Button onClick={joinRoom} size="m" disabled={(roomCode?.length || 0) != 6}>
                 Join
               </Button>
             }
-            // header="Room code"
             name="roomCode"
             status="focused"
             onChange={(event) => setRoomCode(event.target.value)}
@@ -146,12 +151,12 @@ function Room() {
 
   return (
     <Section header="Room">
-      <Button size="m" stretched={true} mode="bezeled" onClick={copyCode}>
+      <Button stretched={true} onClick={copyCode}>
         Copy Code {room.code}
       </Button>
       {codeCopied && <Snackbar onClose={() => setCodeCopied(false)}>Code copied</Snackbar>}
       <br />
-      <Button size="m" stretched={true} mode="bezeled" onClick={leaveRoom}>
+      <Button stretched={true} onClick={leaveRoom}>
         Leave Room
       </Button>
     </Section>

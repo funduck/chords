@@ -1,12 +1,18 @@
-import { SongDto, SongService } from "@src/services/song.service";
-import { useEffect, useState, useRef } from "react";
-import { Accordion, List, Section, Title } from "@telegram-apps/telegram-ui";
-import { Signals } from "@src/signals-registry";
-import { useNavigate, useParams } from "react-router";
 import { useSignal } from "@telegram-apps/sdk-react";
+import { useEffect, useRef, useState } from "react";
+import { useNavigate, useParams } from "react-router";
+
+import { RoutesEnum } from "@src/routes";
+import { SongDto, SongService } from "@src/services/song.service";
+import { Signals } from "@src/signals-registry";
+
+import Accordion from "@components/accordion";
+import List from "@components/list";
+import Section from "@components/section";
+import Title from "@components/title";
+
 import SongLine from "./song-line";
 import SongSettingsControl from "./song-settings";
-import { RoutesEnum } from "@src/routes";
 
 function Song() {
   // GET SONG

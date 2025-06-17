@@ -1,8 +1,11 @@
+import { useNavigate } from "react-router";
+
 import { RoutesEnum } from "@src/routes";
 import { SongDescrDto } from "@src/services/song.service";
 import { Signals } from "@src/signals-registry";
-import { ButtonCell, Section } from "@telegram-apps/telegram-ui";
-import { useNavigate } from "react-router";
+
+import ButtonCell from "@components/button-cell";
+import Section from "@components/section";
 
 function SearchSongListItem({ song }: { song: SongDescrDto }) {
   const navigate = useNavigate();

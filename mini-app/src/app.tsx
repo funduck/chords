@@ -1,11 +1,14 @@
 import { useSignal } from "@telegram-apps/sdk-react";
-import { Image, Tabbar } from "@telegram-apps/telegram-ui";
-import { Signals } from "./signals-registry";
-import TabLink from "./components/tab-link";
-import { RoutesEnum } from "./routes";
 import { useNavigate } from "react-router";
+
+import Image from "@components/image";
+import Tabbar from "@components/tabbar";
+
+import TabLink from "./components/tab-link";
 import AnonymousLogin from "./features/connection/anonymous-login";
 import { EventsConsumer, EventsPublisher } from "./features/connection/events";
+import { RoutesEnum } from "./routes";
+import { Signals } from "./signals-registry";
 
 function App() {
   const navigate = useNavigate();
@@ -58,7 +61,6 @@ function App() {
         {tabs.map(({ id, Icon, link }) => (
           <Tabbar.Item
             key={id}
-            // text={text}
             selected={id === currentTab}
             onClick={() => {
               navigate(link);
