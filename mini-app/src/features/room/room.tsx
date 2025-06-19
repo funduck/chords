@@ -1,83 +1,21 @@
 import { useSignal } from "@telegram-apps/sdk-react";
-import { useContext, useEffect, useState } from "react";
-import { useNavigate } from "react-router";
+import { useContext, useState } from "react";
 
-import { ChordsComApiInternalEntityRoom } from "@src/generated/api";
-import { WebSocketContext } from "@src/hooks/websocket";
-import { RoutesEnum } from "@src/routes";
+import { RoomServiceContext } from "@src/hooks/room-service";
 import { Signals } from "@src/signals-registry";
 
 import Button from "@components/button";
 import Input from "@components/input";
 import Section from "@components/section";
 import Snackbar from "@components/snackbar";
-
-import { SongSettings } from "@features/song/settings";
-
-import { RoomsApiContext } from "../../hooks/api";
-
-export type RoomState = {
-  song_id: string | null;
-  song_settings: SongSettings;
-};
+import Text from "@components/text";
 
 function Room() {
-  const roomsApi = useContext(RoomsApiContext);
-  const ws = useContext(WebSocketContext);
   const room = useSignal(Signals.room);
   const [roomCode, setRoomCode] = useState<string | null>(null);
   const [codeCopied, setCodeCopied] = useState(false);
-  const navigate = useNavigate();
+  const roomService = useContext(RoomServiceContext);
 
-  function handleRoomState(state: RoomState) {
-    if (!state) {
-      console.error("Invalid room state:", state);
-      return;
-    }
-    if (state.song_settings) {
-      console.log("Applying room state:", state);
-      Signals.applySongSettings.set(new SongSettings().fromJson(state.song_settings));
-    }
-    if (state.song_id) {
-      console.log("Navigating to song:", state.song_id);
-      navigate(RoutesEnum.Song(state.song_id));
-    }
-  }
-
-  function handleRoom(room?: ChordsComApiInternalEntityRoom) {
-    if (room) {
-      Signals.room.set(room);
-      // Store the room code in local storage
-      localStorage.setItem("roomCode", room.code!);
-      console.log("Joined room:", room);
-      // Apply room state
-      handleRoomState(room.state as RoomState);
-    } else {
-      Signals.room.set(null);
-      // Clear the room code from local storage
-      localStorage.removeItem("roomCode");
-      console.log("Left room");
-    }
-  }
-  function createRoom() {
-    if (!roomsApi) {
-      console.error("Rooms API is not available");
-      return;
-    }
-    roomsApi.apiRoomsPost().then(handleRoom).catch(console.error);
-  }
-  function joinRoom(forceRoomCode?: string) {
-    if (!roomsApi) {
-      console.error("Rooms API is not available");
-      return;
-    }
-    roomsApi
-      .apiRoomsJoinPost({
-        request: { room_code: roomCode || forceRoomCode },
-      })
-      .then(handleRoom)
-      .catch(console.error);
-  }
   function copyCode() {
     if (!room) {
       console.error("No room to copy code from");
@@ -93,48 +31,20 @@ function Room() {
         console.error("Failed to copy room code:", err);
       });
   }
-  function leaveRoom() {
-    if (!roomsApi) {
-      console.error("Rooms API is not available");
-      return;
-    }
-    roomsApi
-      .apiRoomsIdLeavePost({
-        id: room!.id!,
-      })
-      .then(() => {
-        handleRoom();
-      })
-      .catch(console.error);
-  }
 
-  // Automatically join the room if roomCode is set and the API is available
-  useEffect(() => {
-    if (!roomsApi || !ws) {
-      // Waiting for both API and WebSocket to be available
-      return;
-    }
-    if (room) {
-      return; // Already in a room
-    }
-    const storedRoomCode = localStorage.getItem("roomCode");
-    if (storedRoomCode) {
-      console.log("Found stored room code:", storedRoomCode);
-      joinRoom(storedRoomCode);
-    }
-  }, [roomsApi, ws]);
+  if (!roomService) {
+    return (
+      <>
+        <Text>Waiting for api...</Text>
+      </>
+    );
+  }
 
   if (!room) {
     return (
       <>
         <Section header="New Room">
-          <Button
-            stretched={true}
-            size="m"
-            onClick={() => {
-              createRoom();
-            }}
-          >
+          <Button stretched={true} size="m" onClick={() => roomService.createRoom()}>
             Create
           </Button>
         </Section>
@@ -142,7 +52,7 @@ function Room() {
         <Section header="Join Room">
           <Input
             before={
-              <Button onClick={joinRoom} size="m" disabled={(roomCode?.length || 0) != 6}>
+              <Button onClick={() => roomService.joinRoom(roomCode!)} size="m" disabled={(roomCode?.length || 0) != 6}>
                 Join
               </Button>
             }
@@ -162,7 +72,7 @@ function Room() {
       </Button>
       {codeCopied && <Snackbar onClose={() => setCodeCopied(false)}>Code copied</Snackbar>}
       <br />
-      <Button stretched={true} onClick={leaveRoom}>
+      <Button stretched={true} onClick={() => roomService.leaveRoom(room)}>
         Leave Room
       </Button>
     </Section>

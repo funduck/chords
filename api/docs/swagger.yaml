@@ -11,9 +11,8 @@ definitions:
       created_at:
         type: string
       deleted_at:
-        allOf:
-        - $ref: '#/definitions/gorm.DeletedAt'
-        description: Use pointer to allow null values
+        example: "2025-06-18T15:04:05Z"
+        type: string
       id:
         type: integer
       ownerID:
@@ -35,9 +34,8 @@ definitions:
       created_at:
         type: string
       deleted_at:
-        allOf:
-        - $ref: '#/definitions/gorm.DeletedAt'
-        description: Use pointer to allow null values
+        example: "2025-06-18T15:04:05Z"
+        type: string
       id:
         type: integer
       isAnonymous:
@@ -66,14 +64,6 @@ definitions:
       type:
         description: Client specific event type
         type: string
-    type: object
-  gorm.DeletedAt:
-    properties:
-      time:
-        type: string
-      valid:
-        description: Valid is true if Time is not NULL
-        type: boolean
     type: object
   internal_app.LoginResponse:
     properties:

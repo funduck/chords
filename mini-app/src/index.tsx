@@ -10,6 +10,7 @@ import { EnvUnsupported } from "@components/env-unsupported.tsx";
 import App from "./app.tsx";
 import { IsDev } from "./config.ts";
 import { ApiProvider } from "./hooks/api.tsx";
+import { RoomServiceProvider } from "./hooks/room-service.tsx";
 import { WebSocketProvider } from "./hooks/websocket.tsx";
 import "./index.css";
 import { init } from "./init.ts";
@@ -34,8 +35,10 @@ try {
         <ApiProvider>
           <WebSocketProvider>
             <BrowserRouter>
-              <AppRoutes />
-              <App />
+              <RoomServiceProvider>
+                <AppRoutes />
+                <App />
+              </RoomServiceProvider>
             </BrowserRouter>
           </WebSocketProvider>
         </ApiProvider>

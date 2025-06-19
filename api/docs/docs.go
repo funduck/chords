@@ -341,12 +341,8 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "deleted_at": {
-                    "description": "Use pointer to allow null values",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/gorm.DeletedAt"
-                        }
-                    ]
+                    "type": "string",
+                    "example": "2025-06-18T15:04:05Z"
                 },
                 "id": {
                     "type": "integer"
@@ -379,12 +375,8 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "deleted_at": {
-                    "description": "Use pointer to allow null values",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/gorm.DeletedAt"
-                        }
-                    ]
+                    "type": "string",
+                    "example": "2025-06-18T15:04:05Z"
                 },
                 "id": {
                     "type": "integer"
@@ -426,18 +418,6 @@ const docTemplate = `{
                 "type": {
                     "description": "Client specific event type",
                     "type": "string"
-                }
-            }
-        },
-        "gorm.DeletedAt": {
-            "type": "object",
-            "properties": {
-                "time": {
-                    "type": "string"
-                },
-                "valid": {
-                    "description": "Valid is true if Time is not NULL",
-                    "type": "boolean"
                 }
             }
         },

@@ -105,7 +105,7 @@ func (s *RoomService) closeRoomChan(roomID uint) {
 
 // Add listener to user events and broadcasts to the room's event channel.
 func (s *RoomService) addUserListener(roomID uint, userID uint) {
-	if s.roomUserIDs[roomID] == nil {
+	if _, ok := s.roomUserIDs[roomID]; !ok {
 		s.roomUserIDs[roomID] = make(map[uint]bool)
 	}
 	s.roomUserIDs[roomID][userID] = true
@@ -123,7 +123,7 @@ func (s *RoomService) addUserListener(roomID uint, userID uint) {
 			ch <- event
 		}
 	})
-	if s.userListeners[roomID] == nil {
+	if _, ok := s.userListeners[roomID]; !ok {
 		s.userListeners[roomID] = make(map[uint]string)
 	}
 	s.userListeners[roomID][userID] = listener
@@ -152,8 +152,8 @@ func (s *RoomService) removeUserListener(roomID uint, userID uint) {
 		}
 	}
 
-	if s.roomUserIDs[roomID] != nil {
-		if _, exists := s.roomUserIDs[roomID][userID]; exists {
+	if _, ok := s.roomUserIDs[roomID]; ok {
+		if _, ok := s.roomUserIDs[roomID][userID]; ok {
 			delete(s.roomUserIDs[roomID], userID)
 			s.log.Debugw("Removed user from room user list",
 				"roomID", roomID,

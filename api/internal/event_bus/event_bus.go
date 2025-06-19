@@ -158,7 +158,7 @@ func (bus *EventBus) AddClientListener(clientID uint, name string, listener func
 			"listenersCount", len(client.Listeners),
 		)
 	} else {
-		bus.log.Warnw("Client not found for adding listener",
+		bus.log.Infow("Client not found for adding listener",
 			"clientID", clientID,
 			"listenerName", name,
 		)

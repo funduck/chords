@@ -8,8 +8,9 @@ import { WebSocketContext } from "@src/hooks/websocket";
 import { RoutesEnum } from "@src/routes";
 import { Signals } from "@src/signals-registry";
 
-import { RoomState } from "@features/room/room";
 import { SongSettings } from "@features/song/settings";
+
+import { RoomState } from "./room-service";
 
 class Event {
   // These fields are accepted by the server
