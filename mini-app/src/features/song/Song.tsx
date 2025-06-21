@@ -1,18 +1,19 @@
+import { Group, Space } from "@mantine/core";
 import { useSignal } from "@telegram-apps/sdk-react";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 
-import { RoutesEnum } from "@src/routes";
+import { RoutesEnum } from "@src/Router";
+import Dropdown from "@src/components/Dropdown";
+import Stack from "@src/components/Stack";
+import Title from "@src/components/Title";
+import { Signals } from "@src/services/signals-registry";
 import { SongDto, SongService } from "@src/services/song.service";
-import { Signals } from "@src/signals-registry";
 
-import Accordion from "@components/accordion";
-import List from "@components/list";
 import Section from "@components/section";
-import Title from "@components/title";
 
-import SongLine from "./song-line";
-import SongSettingsControl from "./song-settings";
+import SongLine from "./SongLine";
+import SongSettingsControl from "./SongSettings";
 
 function Song() {
   // GET SONG
@@ -125,37 +126,31 @@ function Song() {
     return <div>Loading...</div>;
   }
 
+  Signals.pageTitle.set(`"${song.title}" by "${song.artist}"`);
+
   return (
-    <>
-      <Title>
-        <b>{song.title}</b> ({song.artist})
-      </Title>
+    <div>
+      <Group justify="space-between">
+        <Dropdown
+          title="Settings"
+          onChange={() => {
+            adjustSectionHeight();
+          }}
+        >
+          <Dropdown.Item>
+            <SongSettingsControl />
+          </Dropdown.Item>
+        </Dropdown>
+      </Group>
 
-      <List>
-        <Section>
-          <Accordion
-            onChange={(e) => {
-              setSettingsExpanded(e);
-              adjustSectionHeight();
-            }}
-            expanded={settingsExpanded}
-          >
-            <Accordion.Summary>Settings</Accordion.Summary>
-            <Accordion.Content>
-              <SongSettingsControl />
-            </Accordion.Content>
-          </Accordion>
-        </Section>
+      <Space h="xl" />
 
-        <Section>
-          <div ref={songContainerRef} style={{ overflowY: "scroll", maxHeight: sectionHeight }}>
-            {song.lines.map((line, index) => (
-              <SongLine key={index} line={line} />
-            ))}
-          </div>
-        </Section>
-      </List>
-    </>
+      <div ref={songContainerRef} style={{ overflowY: "scroll", maxHeight: sectionHeight }}>
+        {song.lines.map((line, index) => (
+          <SongLine key={index} line={line} />
+        ))}
+      </div>
+    </div>
   );
 }
 

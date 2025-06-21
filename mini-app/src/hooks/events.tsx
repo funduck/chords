@@ -3,10 +3,10 @@ import { cloneDeep, isEqual } from "lodash";
 import { useContext, useEffect } from "react";
 import { useNavigate } from "react-router";
 
+import { RoutesEnum } from "@src/Router";
 import { RoomsApiContext } from "@src/hooks/api";
 import { WebSocketContext } from "@src/hooks/websocket";
-import { RoutesEnum } from "@src/routes";
-import { Signals } from "@src/signals-registry";
+import { Signals } from "@src/services/signals-registry";
 
 import { SongSettings } from "@features/song/settings";
 

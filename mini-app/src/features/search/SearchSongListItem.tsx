@@ -1,16 +1,16 @@
 import { useNavigate } from "react-router";
 
-import { RoutesEnum } from "@src/routes";
+import { RoutesEnum } from "@src/Router";
+import ButtonCell from "@src/components/ButtonCell";
+import { Signals } from "@src/services/signals-registry";
 import { SongDescrDto } from "@src/services/song.service";
-import { Signals } from "@src/signals-registry";
 
-import ButtonCell from "@components/button-cell";
-import Section from "@components/section";
+import Stack from "@components/Stack";
 
 function SearchSongListItem({ song }: { song: SongDescrDto }) {
   const navigate = useNavigate();
   return (
-    <Section>
+    <Stack>
       <ButtonCell
         onClick={() => {
           navigate(RoutesEnum.Song(song.id));
@@ -19,7 +19,7 @@ function SearchSongListItem({ song }: { song: SongDescrDto }) {
       >
         {song.artist} {song.title}
       </ButtonCell>
-    </Section>
+    </Stack>
   );
 }
 

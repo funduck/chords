@@ -1,11 +1,11 @@
-import { Title as TelegramTitle } from "@telegram-apps/telegram-ui";
+import { Text } from "@mantine/core";
 
 type TitleProps = {
   children: React.ReactNode;
 };
 
 function Title({ children }: TitleProps) {
-  return <TelegramTitle>{children}</TelegramTitle>;
+  return <Text size="xl">{children}</Text>;
 }
 
 export default Title;

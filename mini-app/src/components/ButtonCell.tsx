@@ -1,4 +1,4 @@
-import { ButtonCell as TelegramButtonCell } from "@telegram-apps/telegram-ui";
+import { Anchor } from "@mantine/core";
 
 type ButtonCellProps = {
   onClick: () => void;
@@ -6,7 +6,7 @@ type ButtonCellProps = {
 };
 
 function ButtonCell({ onClick, children }: ButtonCellProps) {
-  return <TelegramButtonCell onClick={onClick}>{children}</TelegramButtonCell>;
+  return <Anchor onClick={onClick}>{children}</Anchor>;
 }
 
 export default ButtonCell;

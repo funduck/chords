@@ -1,11 +1,11 @@
-import { Text as TelegramText } from "@telegram-apps/telegram-ui";
+import { Text as MantineText } from "@mantine/core";
 
 type TextProps = {
   children: React.ReactNode;
 };
 
 function Text({ children }: TextProps) {
-  return <TelegramText>{children}</TelegramText>;
+  return <MantineText size="md">{children}</MantineText>;
 }
 
 export default Text;

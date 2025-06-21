@@ -1,13 +1,14 @@
 import { signal } from "@telegram-apps/signals";
-import { SongSettings } from "./features/song/settings";
-import { ChordsComApiInternalEntityRoom } from "./generated/api";
+
+import { SongSettings } from "../features/song/settings";
+import { ChordsComApiInternalEntityRoom } from "../generated/api";
 
 export class Signals {
+  static pageTitle = signal<string | null>(null);
+
   static wsEventsConnected = signal(false);
-  static isTelegramAuthorized = signal(false);
-  static language = signal<string | null>(null);
   static accessToken = signal<string | null>(null);
-  static selectedTabId = signal<string | null>(null);
+
   static userId = signal<number | null>(null);
   static room = signal<ChordsComApiInternalEntityRoom | null>(null);
 

@@ -1,5 +1,3 @@
-import { Section as TelegramSection } from "@telegram-apps/telegram-ui";
-
 type SectionProps = {
   header?: string;
   footer?: string;
@@ -8,9 +6,11 @@ type SectionProps = {
 
 function Section({ header, footer, children }: SectionProps) {
   return (
-    <TelegramSection header={header} footer={footer}>
+    <section className="block">
+      <b>{header}</b>
       {children}
-    </TelegramSection>
+      <small>{footer}</small>
+    </section>
   );
 }
 

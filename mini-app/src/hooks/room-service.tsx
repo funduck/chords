@@ -2,10 +2,10 @@ import { useSignal } from "@telegram-apps/sdk-react";
 import { ReactNode, createContext, useContext, useEffect, useState } from "react";
 import { NavigateFunction, useNavigate } from "react-router";
 
+import { RoutesEnum } from "@src/Router";
 import { SongSettings } from "@src/features/song/settings";
 import { ChordsComApiInternalEntityRoom, RoomsApi } from "@src/generated/api";
-import { RoutesEnum } from "@src/routes";
-import { Signals } from "@src/signals-registry";
+import { Signals } from "@src/services/signals-registry";
 
 import { RoomsApiContext } from "./api";
 import { WebSocketContext } from "./websocket";
