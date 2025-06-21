@@ -3,7 +3,7 @@ import { ReactNode, createContext, useEffect, useState } from "react";
 
 import { ApiHttpUrl } from "@src/config";
 import { AuthApi, Configuration, RoomsApi } from "@src/generated/api";
-import { Signals } from "@src/signals-registry";
+import { Signals } from "@src/services/signals-registry";
 
 export const AuthApiContext = createContext<AuthApi | null>(null);
 export const RoomsApiContext = createContext<RoomsApi | null>(null);

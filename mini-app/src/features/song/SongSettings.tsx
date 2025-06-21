@@ -1,13 +1,12 @@
 import { useSignal } from "@telegram-apps/sdk-react";
 import { useEffect } from "react";
 
+import Slider from "@src/components/Slider";
 import { SettingsService } from "@src/services/settings.service";
-import { Signals } from "@src/signals-registry";
+import { Signals } from "@src/services/signals-registry";
 
-import Cell from "@components/cell";
-import Section from "@components/section";
-import Slider from "@components/slider";
-import Switch from "@components/switch";
+import Stack from "@components/Stack";
+import Switch from "@components/Switch";
 
 import { SongSettings } from "./settings";
 
@@ -58,43 +57,29 @@ function SongSettingsControl() {
   }
 
   return (
-    <>
-      <Cell
-        after={
-          <Switch
-            disabled={!settings}
-            checked={settings?.show_chords ?? false}
-            onChange={(e) => {
-              setShowChords(e.target.checked);
-            }}
-          />
-        }
-      >
-        Show chords
-      </Cell>
-      <Cell
-        after={
-          <Switch
-            disabled={!settings}
-            checked={settings?.auto_scroll ?? false}
-            onChange={(e) => {
-              setAutoScroll(e.target.checked);
-            }}
-          />
-        }
-      >
-        Auto scroll
-      </Cell>
-      <Section header="Auto scroll speed">
-        <Slider
-          onChange={(e) => {
-            const speed = 1 + e / 30;
-            const interval = 100 * 1.01 ** (speed - 1);
-            setAutoScrollSpeed(speed, interval);
-          }}
-        />
-      </Section>
-    </>
+    <Stack gap="xl">
+      <Switch
+        label="Show chords"
+        disabled={!settings}
+        checked={settings?.show_chords ?? false}
+        onChange={setShowChords}
+      />
+      <Switch
+        label="Auto scroll"
+        disabled={!settings}
+        checked={settings?.auto_scroll ?? false}
+        onChange={setAutoScroll}
+      />
+      <Slider
+        label="Auto scroll speed"
+        disabled={!settings}
+        onChange={(e) => {
+          const speed = 1 + Math.floor(e / 30);
+          const interval = 100 / speed;
+          setAutoScrollSpeed(1, interval);
+        }}
+      />
+    </Stack>
   );
 }
 

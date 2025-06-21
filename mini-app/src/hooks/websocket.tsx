@@ -2,7 +2,7 @@ import { useSignal } from "@telegram-apps/sdk-react";
 import { ReactNode, createContext, useEffect, useState } from "react";
 
 import { ApiWsUrl } from "@src/config";
-import { Signals } from "@src/signals-registry";
+import { Signals } from "@src/services/signals-registry";
 
 export const WebSocketContext = createContext<WebSocket | null>(null);
 

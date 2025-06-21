@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 
+import Stack from "@src/components/Stack";
+import { Signals } from "@src/services/signals-registry";
 import { SongDescrDto, SongService } from "@src/services/song.service";
 
-import List from "@components/list";
 import Section from "@components/section";
-import Title from "@components/title";
 
-import SearchSongListItem from "./search-song-list-item";
+import SearchSongListItem from "./SearchSongListItem";
 
 function Search() {
   let [songs, setSongs] = useState<SongDescrDto[] | null>(null);
@@ -19,15 +19,16 @@ function Search() {
     return <div>Loading...</div>;
   }
 
+  Signals.pageTitle.set("Song List");
+
   return (
     <>
       <Section>
-        <Title>Song List</Title>
-        <List>
+        <Stack>
           {songs.map((song) => (
             <SearchSongListItem key={song.id} song={song} />
           ))}
-        </List>
+        </Stack>
       </Section>
     </>
   );
