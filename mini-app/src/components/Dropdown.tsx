@@ -1,4 +1,4 @@
-import { Box, Button, Menu } from "@mantine/core";
+import { Button, Menu } from "@mantine/core";
 
 type DropdownProps = {
   onChange?: (expanded: boolean) => void;

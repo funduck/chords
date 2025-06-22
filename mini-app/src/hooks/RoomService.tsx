@@ -7,8 +7,8 @@ import { SongSettings } from "@src/features/song/settings";
 import { ChordsComApiInternalEntityRoom, RoomsApi } from "@src/generated/api";
 import { Signals } from "@src/services/signals-registry";
 
-import { RoomsApiContext } from "./api";
-import { WebSocketContext } from "./websocket";
+import { RoomsApiContext } from "./Api";
+import { WebSocketContext } from "./WebSocket";
 
 export type RoomState = {
   song_id: string | null;
@@ -26,13 +26,13 @@ class RoomService {
       console.error("Invalid room state:", state);
       return;
     }
-    if (state.song_settings) {
-      console.log("Applying room state:", state);
-      Signals.applySongSettings.set(new SongSettings().fromJson(state.song_settings));
-    }
     if (state.song_id) {
       console.log("Navigating to song:", state.song_id);
       this.navigate(RoutesEnum.Song(state.song_id));
+    }
+    if (state.song_settings) {
+      console.log("Applying room state:", state);
+      Signals.applySongSettings.set(new SongSettings().fromJson(state.song_settings));
     }
   }
 
@@ -116,7 +116,7 @@ export function RoomServiceProvider({ children }: { children: ReactNode }) {
     }
 
     return () => {
-      console.log("Cleaning up RoomService");
+      console.debug("Cleaning up RoomService");
       setRoomService(null);
     };
   }, [accessToken, roomsApi, ws]);

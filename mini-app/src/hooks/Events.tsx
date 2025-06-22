@@ -4,13 +4,13 @@ import { useContext, useEffect } from "react";
 import { useNavigate } from "react-router";
 
 import { RoutesEnum } from "@src/Router";
-import { RoomsApiContext } from "@src/hooks/api";
-import { WebSocketContext } from "@src/hooks/websocket";
+import { RoomsApiContext } from "@src/hooks/Api";
+import { WebSocketContext } from "@src/hooks/WebSocket";
 import { Signals } from "@src/services/signals-registry";
 
 import { SongSettings } from "@features/song/settings";
 
-import { RoomState } from "./room-service";
+import { RoomState } from "./RoomService";
 
 class Event {
   // These fields are accepted by the server

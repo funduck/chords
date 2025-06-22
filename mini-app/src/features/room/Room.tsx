@@ -5,7 +5,7 @@ import { useContext, useState } from "react";
 import Button from "@src/components/Button";
 import Input from "@src/components/Input";
 import Stack from "@src/components/Stack";
-import { RoomServiceContext } from "@src/hooks/room-service";
+import { RoomServiceContext } from "@src/hooks/RoomService";
 import { Signals } from "@src/services/signals-registry";
 
 import Text from "@components/Text";
@@ -24,7 +24,9 @@ function Room() {
     );
   }
 
-  Signals.pageTitle.set("Room");
+  setTimeout(() => {
+    Signals.pageTitle.set("Room");
+  }, 0);
 
   if (!room) {
     return (

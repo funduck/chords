@@ -3,11 +3,11 @@ import "@mantine/core/styles.css";
 import { BrowserRouter } from "react-router";
 
 import Router from "./Router";
-import AnonymousLogin from "./features/connection/anonymous-login";
-import { ApiProvider } from "./hooks/api";
-import { EventsConsumer, EventsPublisher } from "./hooks/events";
-import { RoomServiceProvider } from "./hooks/room-service";
-import { WebSocketProvider } from "./hooks/websocket";
+import AnonymousLogin from "./features/auth/AnonymousLogin";
+import { ApiProvider } from "./hooks/Api";
+import { EventsConsumer, EventsPublisher } from "./hooks/Events";
+import { RoomServiceProvider } from "./hooks/RoomService";
+import { WebSocketProvider } from "./hooks/WebSocket";
 import "./index.css";
 import { theme } from "./theme";
 

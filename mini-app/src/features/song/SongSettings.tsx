@@ -74,9 +74,9 @@ function SongSettingsControl() {
         label="Auto scroll speed"
         disabled={!settings}
         onChange={(e) => {
-          const speed = 1 + Math.floor(e / 30);
-          const interval = 100 / speed;
-          setAutoScrollSpeed(1, interval);
+          const speed = 1 + e;
+          const interval = 2000;
+          setAutoScrollSpeed(speed, interval);
         }}
       />
     </Stack>

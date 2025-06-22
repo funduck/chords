@@ -19,7 +19,9 @@ function Search() {
     return <div>Loading...</div>;
   }
 
-  Signals.pageTitle.set("Song List");
+  setTimeout(() => {
+    Signals.pageTitle.set("Song List");
+  }, 0);
 
   return (
     <>

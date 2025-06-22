@@ -115,6 +115,9 @@ const mockData: SongDto[] = [
     ],
   },
 ];
+mockData.forEach((song, index) => {
+  song.lines.push(...song.lines); // Duplicate lines for testing
+});
 
 export class SongService {
   static listSongs = async (): Promise<SongDescrDto[]> => {

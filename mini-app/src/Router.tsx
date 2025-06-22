@@ -85,6 +85,7 @@ function Router() {
           <Stack gap="md">
             {tabs.map(({ id, link, text }) => (
               <Anchor
+                key={id}
                 id={id}
                 onClick={() => {
                   Signals.pageTitle.set(text);
