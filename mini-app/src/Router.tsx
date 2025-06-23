@@ -1,4 +1,4 @@
-import { Anchor, AppShell, Box, Burger, Drawer, Group, Space } from "@mantine/core";
+import { Anchor, AppShell, Burger, Button, Drawer, Group, Space } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { useSignal } from "@telegram-apps/sdk-react";
 import { Route, Routes, useNavigate } from "react-router";
@@ -57,48 +57,43 @@ function Router() {
     },
   ];
 
-  const [opened, { open, close }] = useDisclosure();
+  const [mobileOpened, { toggle: toggleMobile }] = useDisclosure();
+  const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(true);
 
   return (
     <AppShell
       header={{ height: 60 }}
-      navbar={{ width: 300, breakpoint: "sm", collapsed: { mobile: !opened } }}
+      navbar={{ width: 300, breakpoint: "sm", collapsed: { mobile: !mobileOpened, desktop: !desktopOpened } }}
       padding="md"
     >
       <AppShell.Header>
         <Group justify="normal" m="sm">
-          <Burger opened={opened} onClick={open} aria-label="Toggle navigation" />
+          {/* <Burger opened={opened} onClick={open} aria-label="Toggle navigation" /> */}
+          <Burger hiddenFrom="sm" opened={mobileOpened} onClick={toggleMobile} />
           <Title>{pageTitle}</Title>
         </Group>
-        <Drawer
-          withCloseButton={false}
-          closeOnClickOutside={true}
-          closeOnEscape={true}
-          offset={8}
-          radius="md"
-          opened={opened}
-          onClose={close}
-          onClick={close}
-        >
-          <ThemeSwitch />
-          <Space h="xl" />
-          <Stack gap="md">
-            {tabs.map(({ id, link, text }) => (
-              <Anchor
-                key={id}
-                id={id}
-                onClick={() => {
-                  Signals.pageTitle.set(text);
-                  navigate(link);
-                  close();
-                }}
-              >
-                <Title>{text}</Title>
-              </Anchor>
-            ))}
-          </Stack>
-        </Drawer>
       </AppShell.Header>
+      <AppShell.Navbar p="lg">
+        <Stack gap="lg">
+          {tabs.map(({ id, link, text }) => (
+            <Anchor
+              key={id}
+              id={id}
+              onClick={() => {
+                Signals.pageTitle.set(text);
+                navigate(link);
+                close();
+              }}
+            >
+              <Title>{text}</Title>
+            </Anchor>
+          ))}
+        </Stack>
+        <Space h="xl" />
+        <ThemeSwitch />
+      </AppShell.Navbar>
+      {/* <AppShell.Aside>Aside</AppShell.Aside> */}
+      <AppShell.Footer></AppShell.Footer>
       <AppShell.Main>
         <Routes>
           <Route index element={<Search />} />

@@ -1,4 +1,4 @@
-import { Box, Divider, Group, Space } from "@mantine/core";
+import { Box, Divider, Group, ScrollArea, Space } from "@mantine/core";
 import { useSignal } from "@telegram-apps/sdk-react";
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router";
@@ -33,8 +33,7 @@ function Song() {
   const applySongSettings = useSignal(Signals.applySongSettings);
   const applySongScroll = useSignal(Signals.applySongScroll);
 
-  const songContainerRef = useRef<HTMLDivElement>(null);
-  const [sectionHeight, setSectionHeight] = useState<string>("20vh");
+  const songViewportRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (songId) {
@@ -44,58 +43,39 @@ function Song() {
 
   // AUTO SCROLL SECTION WITH SONG LINES
   useEffect(() => {
-    if (applySongSettings?.auto_scroll && songContainerRef.current) {
+    if (applySongSettings?.auto_scroll && songViewportRef.current) {
       const interval = setInterval(() => {
-        songContainerRef.current?.scrollBy({ top: applySongSettings?.auto_scroll_speed ?? 1, behavior: "smooth" });
+        songViewportRef.current?.scrollBy({ top: applySongSettings?.auto_scroll_speed ?? 1, behavior: "smooth" });
       }, applySongSettings?.auto_scroll_interval ?? 100);
       return () => clearInterval(interval);
     }
   }, [applySongSettings?.auto_scroll, applySongSettings?.auto_scroll_speed]);
 
-  // ADJUST HEIGHT OF SECTION WITH SONG LINES
-  const tabBarHeight = 50; // Adjust this value based on your tab bar's height
-  const adjustSectionHeightNow = () => {
-    const songContainerStart = songContainerRef.current?.getBoundingClientRect().top ?? 0;
-    const availableHeight = window.innerHeight - songContainerStart - tabBarHeight;
-    setSectionHeight(`${availableHeight}px`);
-  };
-  const adjustSectionHeight = () => {
-    setTimeout(() => {
-      adjustSectionHeightNow();
-    }, 100);
-    setTimeout(() => {
-      adjustSectionHeightNow();
-    }, 500);
-  };
-  useEffect(() => {
-    adjustSectionHeight();
-  }, []);
-
-  // HANDLE SYNC SCROLLING IN ROOM
+  // // HANDLE SYNC SCROLLING IN ROOM
   const ignoreScrollEvent = useRef(false);
-  useEffect(() => {
-    const screen = songContainerRef.current;
-    if (!screen) {
-      console.error("Song container not found");
-      return;
-    }
-    function handleScroll() {
-      // We ignore scroll events if auto-scroll is enabled or if we are applying a scroll event
-      if (ignoreScrollEvent.current || applySongSettings?.auto_scroll) {
-        return;
-      }
-      const scrollPercent = (screen!.scrollTop / (screen!.scrollHeight - screen!.clientHeight)) * 100;
-      Signals.publishSongScroll.set(scrollPercent);
-    }
-    screen?.addEventListener("scroll", handleScroll);
-    console.log("Scroll event listener added");
-    return () => {
-      screen?.removeEventListener("scroll", handleScroll);
-    };
-  }, [song, songContainerRef.current, applySongSettings?.auto_scroll]);
+  // useEffect(() => {
+  //   const screen = songContainerRef.current;
+  //   if (!screen) {
+  //     console.error("Song container not found");
+  //     return;
+  //   }
+  //   function handleScroll() {
+  //     // We ignore scroll events if auto-scroll is enabled or if we are applying a scroll event
+  //     if (ignoreScrollEvent.current || applySongSettings?.auto_scroll) {
+  //       return;
+  //     }
+  //     const scrollPercent = (screen!.scrollTop / (screen!.scrollHeight - screen!.clientHeight)) * 100;
+  //     Signals.publishSongScroll.set(scrollPercent);
+  //   }
+  //   screen?.addEventListener("scroll", handleScroll);
+  //   console.log("Scroll event listener added");
+  //   return () => {
+  //     screen?.removeEventListener("scroll", handleScroll);
+  //   };
+  // }, [song, songContainerRef.current, applySongSettings?.auto_scroll]);
 
   useEffect(() => {
-    if (!songContainerRef.current) {
+    if (!songViewportRef.current) {
       console.error("Song container not found for scrolling");
       return;
     }
@@ -112,7 +92,7 @@ function Song() {
 
     // applySongScroll is a percentage (0-100)
     const scrollTop =
-      (applySongScroll / 100) * (songContainerRef.current.scrollHeight - songContainerRef.current.clientHeight);
+      (applySongScroll / 100) * (songViewportRef.current.scrollHeight - songViewportRef.current.clientHeight);
 
     // Ignore scroll events for a short time not to emit the scroll events like it is manual scrolling
     ignoreScrollEvent.current = true;
@@ -121,8 +101,8 @@ function Song() {
       ignoreScrollEvent.current = false;
     }, 1000);
 
-    songContainerRef.current.scrollTo({ top: scrollTop, behavior: "smooth" });
-  }, [song, songContainerRef.current, applySongScroll, applySongSettings?.auto_scroll]);
+    songViewportRef.current.scrollTo({ top: scrollTop, behavior: "smooth" });
+  }, [song, songViewportRef.current, applySongScroll, applySongSettings?.auto_scroll]);
 
   if (!song) {
     return <div>Loading...</div>;
@@ -134,24 +114,16 @@ function Song() {
   }, 0);
 
   return (
-    <div>
+    <Box>
       <Group justify="space-between">
-        <Dropdown
-          title="Settings"
-          onChange={() => {
-            adjustSectionHeight();
-          }}
-        >
+        <Dropdown title="Settings">
           <SongSettingsControl />
         </Dropdown>
       </Group>
 
       <Space h="xl" />
 
-      <div
-        ref={songContainerRef}
-        style={{ backgroundColor: "Background", overflowY: "scroll", maxHeight: sectionHeight }}
-      >
+      <ScrollArea.Autosize viewportRef={songViewportRef} type="always" style={{ backgroundColor: "Background" }}>
         <Stack gap="xl">
           <Box>
             {song.lines.map((line, index) => (
@@ -160,12 +132,12 @@ function Song() {
           </Box>
           <Box>
             <Divider />
-            <Space />
+            <Space h="md" />
             <Text>End</Text>
           </Box>
         </Stack>
-      </div>
-    </div>
+      </ScrollArea.Autosize>
+    </Box>
   );
 }
 
