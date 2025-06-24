@@ -1,8 +1,9 @@
 import { useSignal } from "@telegram-apps/sdk-react";
 
-import Text from "@src/components/Text";
 import { Signals } from "@src/services/signals-registry";
 import { SongLineDto } from "@src/services/song.service";
+
+import Text from "@components/Text";
 
 function SongLine({ line }: { line: SongLineDto }) {
   const settings = useSignal(Signals.applySongSettings);

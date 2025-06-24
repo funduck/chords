@@ -2,12 +2,12 @@ import { CopyButton } from "@mantine/core";
 import { useSignal } from "@telegram-apps/sdk-react";
 import { useContext, useState } from "react";
 
-import Button from "@src/components/Button";
-import Input from "@src/components/Input";
-import Stack from "@src/components/Stack";
 import { RoomServiceContext } from "@src/hooks/RoomService";
 import { Signals } from "@src/services/signals-registry";
 
+import Button from "@components/Button";
+import Input from "@components/Input";
+import Stack from "@components/Stack";
 import Text from "@components/Text";
 import Section from "@components/section";
 

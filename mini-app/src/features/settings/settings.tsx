@@ -1,5 +1,4 @@
-import Stack from "@src/components/Stack";
-
+import Stack from "@components/Stack";
 import Section from "@components/section";
 
 function Settings() {

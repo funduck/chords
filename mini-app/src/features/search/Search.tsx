@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 
-import Stack from "@src/components/Stack";
 import { Signals } from "@src/services/signals-registry";
 import { SongDescrDto, SongService } from "@src/services/song.service";
 
+import Stack from "@components/Stack";
 import Section from "@components/section";
 
 import SearchSongListItem from "./SearchSongListItem";

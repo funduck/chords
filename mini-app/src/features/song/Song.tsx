@@ -3,11 +3,13 @@ import { useSignal } from "@telegram-apps/sdk-react";
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router";
 
-import Dropdown from "@src/components/Dropdown";
-import Stack from "@src/components/Stack";
-import Text from "@src/components/Text";
 import { Signals } from "@src/services/signals-registry";
 import { SongDto, SongService } from "@src/services/song.service";
+
+import Dropdown from "@components/Dropdown";
+import Stack from "@components/Stack";
+import Text from "@components/Text";
+import Title from "@components/Title";
 
 import SongLine from "./SongLine";
 import SongSettingsControl from "./SongSettings";
@@ -28,28 +30,47 @@ function Song() {
     localStorage.setItem("songId", songId);
   }
 
+  const songViewportRef = useRef<HTMLDivElement>(null);
   const [song, setSong] = useState<SongDto | null>(null);
-
   const applySongSettings = useSignal(Signals.applySongSettings);
   const applySongScroll = useSignal(Signals.applySongScroll);
 
-  const songViewportRef = useRef<HTMLDivElement>(null);
-
   useEffect(() => {
     if (songId) {
-      SongService.getSong(songId).then(setSong);
+      SongService.getSong(songId).then(setSong).catch(console.error);
     }
   }, [songId]);
 
   // AUTO SCROLL SECTION WITH SONG LINES
   useEffect(() => {
-    if (applySongSettings?.auto_scroll && songViewportRef.current) {
+    if (applySongSettings?.auto_scroll) {
+      const scrollInterval = applySongSettings?.auto_scroll_interval ?? 100;
+      let scrollSpeed = applySongSettings?.auto_scroll_speed ?? 1; // 1-100
+      // Get font size in pixels
+      const fontSize = parseFloat(getComputedStyle(document.documentElement).fontSize);
+      // Convert scroll speed from percentage to pixels
+      scrollSpeed = (scrollSpeed / 100) * fontSize;
+      console.debug("Auto-scrolling is enabled, starting interval", { scrollInterval, scrollSpeed });
       const interval = setInterval(() => {
-        songViewportRef.current?.scrollBy({ top: applySongSettings?.auto_scroll_speed ?? 1, behavior: "smooth" });
-      }, applySongSettings?.auto_scroll_interval ?? 100);
-      return () => clearInterval(interval);
+        if (!songViewportRef.current) {
+          console.debug("Auto-scrolling: songViewportRef is null");
+          return;
+        }
+        const top = scrollSpeed; //(songViewportRef.current.scrollHeight * scrollSpeed) / 100;
+        console.debug("Auto-scrolling by", top, "pixels");
+        songViewportRef.current.scrollBy({ top, behavior: "smooth" });
+      }, scrollInterval);
+      return () => {
+        console.debug("Auto-scrolling interval cleared");
+        clearInterval(interval);
+      };
     }
-  }, [applySongSettings?.auto_scroll, applySongSettings?.auto_scroll_speed]);
+  }, [
+    songViewportRef.current,
+    applySongSettings?.auto_scroll,
+    applySongSettings?.auto_scroll_interval,
+    applySongSettings?.auto_scroll_speed,
+  ]);
 
   // // HANDLE SYNC SCROLLING IN ROOM
   const ignoreScrollEvent = useRef(false);
@@ -75,10 +96,6 @@ function Song() {
   // }, [song, songContainerRef.current, applySongSettings?.auto_scroll]);
 
   useEffect(() => {
-    if (!songViewportRef.current) {
-      console.error("Song container not found for scrolling");
-      return;
-    }
     // If auto-scroll is enabled, we don't apply manual scroll
     if (applySongSettings?.auto_scroll) {
       return;
@@ -87,8 +104,12 @@ function Song() {
     if (applySongScroll == null) {
       return;
     }
+    if (!songViewportRef.current) {
+      console.debug("Apply scroll: song container not found");
+      return;
+    }
 
-    console.debug("Applying song scroll:", applySongScroll);
+    console.debug("Applying scroll:", applySongScroll);
 
     // applySongScroll is a percentage (0-100)
     const scrollTop =
@@ -108,23 +129,31 @@ function Song() {
     return <div>Loading...</div>;
   }
 
-  // Without setTimeout React throws an error that we are updating Router state while rendering Song
-  setTimeout(() => {
-    Signals.pageTitle.set(`"${song.title}" by "${song.artist}"`);
-  }, 0);
-
   return (
     <Box>
-      <Group justify="space-between">
+      <Group justify="space-between" style={{ position: "fixed", top: "10px", right: "10px", zIndex: 1000 }}>
         <Dropdown title="Settings">
           <SongSettingsControl />
         </Dropdown>
       </Group>
 
-      <Space h="xl" />
-
-      <ScrollArea.Autosize viewportRef={songViewportRef} type="always" style={{ backgroundColor: "Background" }}>
+      {/* <ScrollArea.Autosize viewportRef={songViewportRef} type="always" style={{ backgroundColor: "Background" }}> */}
+      <div
+        ref={songViewportRef}
+        className="song-viewport"
+        style={{
+          overflowY: "auto",
+          maxHeight: "80vh",
+          paddingTop: "20px",
+        }}
+      >
         <Stack gap="xl">
+          <Box>
+            <Title>{`"${song.title}" by "${song.artist}"`}</Title>
+            <Space h="md" />
+            <Divider />
+          </Box>
+
           <Box>
             {song.lines.map((line, index) => (
               <SongLine key={index} line={line} />
@@ -136,7 +165,8 @@ function Song() {
             <Text>End</Text>
           </Box>
         </Stack>
-      </ScrollArea.Autosize>
+        {/* </ScrollArea.Autosize> */}
+      </div>
     </Box>
   );
 }

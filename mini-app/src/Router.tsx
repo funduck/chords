@@ -1,10 +1,9 @@
-import { Anchor, AppShell, Burger, Button, Drawer, Group, Space } from "@mantine/core";
+import { Anchor, AppShell, Burger, Group, Space } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { useSignal } from "@telegram-apps/sdk-react";
 import { Route, Routes, useNavigate } from "react-router";
 
-import Image from "@src/components/Image";
-
+import Image from "@components/Image";
 import Stack from "@components/Stack";
 
 import ThemeSwitch from "./components/ThemeSwitch";
@@ -58,17 +57,15 @@ function Router() {
   ];
 
   const [mobileOpened, { toggle: toggleMobile }] = useDisclosure();
-  const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(true);
 
   return (
     <AppShell
       header={{ height: 60 }}
-      navbar={{ width: 300, breakpoint: "sm", collapsed: { mobile: !mobileOpened, desktop: !desktopOpened } }}
+      navbar={{ width: 300, breakpoint: "sm", collapsed: { mobile: !mobileOpened, desktop: false } }}
       padding="md"
     >
       <AppShell.Header>
         <Group justify="normal" m="sm">
-          {/* <Burger opened={opened} onClick={open} aria-label="Toggle navigation" /> */}
           <Burger hiddenFrom="sm" opened={mobileOpened} onClick={toggleMobile} />
           <Title>{pageTitle}</Title>
         </Group>
