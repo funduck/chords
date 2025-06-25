@@ -1,6 +1,6 @@
 import { Anchor, AppShell, Burger, Group, Space } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { useSignal } from "@telegram-apps/sdk-react";
+import { useState } from "react";
 import { Route, Routes, useNavigate } from "react-router";
 
 import Image from "@components/Image";
@@ -11,7 +11,6 @@ import Title from "./components/Title";
 import Room from "./features/room/Room";
 import Search from "./features/search/Search";
 import Song from "./features/song/Song";
-import { Signals } from "./services/signals-registry";
 
 class RoutesEnum {
   static Search = "/";
@@ -28,8 +27,6 @@ export { RoutesEnum };
 
 function Router() {
   const navigate = useNavigate();
-
-  const pageTitle = useSignal(Signals.pageTitle);
 
   const tabs = [
     {
@@ -68,7 +65,6 @@ function Router() {
       <AppShell.Header>
         <Group justify="normal" m="sm">
           <Burger hiddenFrom="sm" opened={mobileOpened} onClick={toggleMobile} />
-          <Title>{pageTitle}</Title>
         </Group>
       </AppShell.Header>
       <AppShell.Navbar p="lg">
@@ -78,9 +74,8 @@ function Router() {
               key={id}
               id={id}
               onClick={() => {
-                Signals.pageTitle.set(text);
+                toggleMobile();
                 navigate(link);
-                close();
               }}
             >
               <Title>{text}</Title>

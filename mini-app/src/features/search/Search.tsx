@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 
-import { Signals } from "@src/services/signals-registry";
 import { SongDescrDto, SongService } from "@src/services/song.service";
 
 import Stack from "@components/Stack";
@@ -18,10 +17,6 @@ function Search() {
   if (!songs) {
     return <div>Loading...</div>;
   }
-
-  setTimeout(() => {
-    Signals.pageTitle.set("Song List");
-  }, 0);
 
   return (
     <>

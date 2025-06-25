@@ -24,10 +24,6 @@ function Room() {
     );
   }
 
-  setTimeout(() => {
-    Signals.pageTitle.set("Room");
-  }, 0);
-
   if (!room) {
     return (
       <>

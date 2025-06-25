@@ -4,8 +4,6 @@ import { SongSettings } from "../features/song/settings";
 import { ChordsComApiInternalEntityRoom } from "../generated/api";
 
 export class Signals {
-  static pageTitle = signal<string | null>(null);
-
   static wsEventsConnected = signal(false);
   static accessToken = signal<string | null>(null);
 
