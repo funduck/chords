@@ -1,5 +1,4 @@
 import { useSignal } from "@telegram-apps/sdk-react";
-import { useEffect } from "react";
 
 import { SettingsService } from "@src/services/settings.service";
 import { Signals } from "@src/services/signals-registry";
@@ -8,28 +7,8 @@ import Slider from "@components/Slider";
 import Stack from "@components/Stack";
 import Switch from "@components/Switch";
 
-import { SongSettings } from "./settings";
-
 function SongSettingsControl() {
   const settings = useSignal(Signals.applySongSettings);
-
-  useEffect(() => {
-    if (!settings) {
-      SettingsService.load(SongSettings)
-        .then((loadedSettings) => {
-          if (loadedSettings) {
-            console.log("Song settings loaded");
-            Signals.applySongSettings.set(loadedSettings);
-          } else {
-            console.log("Song settings created");
-            const newSettings = new SongSettings();
-            Signals.applySongSettings.set(newSettings);
-            SettingsService.save(newSettings).catch(console.error);
-          }
-        })
-        .catch(console.error);
-    }
-  }, []);
 
   function setShowChords(value: boolean) {
     console.debug("setShowChords", value);

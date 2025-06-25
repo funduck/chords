@@ -63,6 +63,7 @@ function Router() {
       header={{ height: 60 }}
       navbar={{ width: 300, breakpoint: "sm", collapsed: { mobile: !mobileOpened, desktop: false } }}
       padding="md"
+      style={{ display: "flex", flexDirection: "column", height: "100vh" }}
     >
       <AppShell.Header>
         <Group justify="normal" m="sm">
@@ -91,7 +92,7 @@ function Router() {
       </AppShell.Navbar>
       {/* <AppShell.Aside>Aside</AppShell.Aside> */}
       <AppShell.Footer></AppShell.Footer>
-      <AppShell.Main>
+      <AppShell.Main id="appshelmain" style={{ display: "flex", flex: 1, flexDirection: "column" }}>
         <Routes>
           <Route index element={<Search />} />
           <Route path="room" element={<Room />} />
