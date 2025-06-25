@@ -1,4 +1,4 @@
-import { CopyButton } from "@mantine/core";
+import { CopyButton, Fieldset, Flex, TextInput } from "@mantine/core";
 import { useSignal } from "@telegram-apps/sdk-react";
 import { useContext, useState } from "react";
 
@@ -6,10 +6,8 @@ import { RoomServiceContext } from "@src/hooks/RoomService";
 import { Signals } from "@src/services/signals-registry";
 
 import Button from "@components/Button";
-import Input from "@components/Input";
 import Stack from "@components/Stack";
 import Text from "@components/Text";
-import Section from "@components/section";
 
 function Room() {
   const room = useSignal(Signals.room);
@@ -27,21 +25,26 @@ function Room() {
   if (!room) {
     return (
       <>
-        <Section header="New Room">
-          <Button onClick={() => roomService.createRoom()}>Create</Button>
-        </Section>
+        <Stack>
+          <Fieldset legend="Create Room">
+            <Button stretched={true} onClick={() => roomService.createRoom()}>
+              Create
+            </Button>
+          </Fieldset>
 
-        <Section header="Join Room">
-          <Input
-            before={
+          <Fieldset legend="Join Room">
+            <Flex direction={"row"} gap="md">
+              <TextInput
+                name="roomCode"
+                onChange={(event) => setRoomCode(event.target.value)}
+                error={(roomCode?.length || 0) != 6 ? `Need ${6 - (roomCode?.length || 0)} more characters` : undefined}
+              />
               <Button onClick={() => roomService.joinRoom(roomCode!)} disabled={(roomCode?.length || 0) != 6}>
                 Join
               </Button>
-            }
-            name="roomCode"
-            onChange={(event) => setRoomCode(event.target.value)}
-          />
-        </Section>
+            </Flex>
+          </Fieldset>
+        </Stack>
       </>
     );
   }

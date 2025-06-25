@@ -2,14 +2,15 @@ import { Button as MantineButton } from "@mantine/core";
 import React from "react";
 
 type ButtonProps = {
-  onClick?: () => void;
   children: React.ReactNode;
   disabled?: boolean;
+  onClick?: () => void;
+  stretched?: boolean;
 };
 
-const Button: React.FC<ButtonProps> = ({ onClick, children, disabled }) => {
+const Button: React.FC<ButtonProps> = ({ children, disabled, onClick, stretched }) => {
   return (
-    <MantineButton variant="outline" onClick={onClick} disabled={disabled}>
+    <MantineButton w={stretched ? "100%" : ""} variant="outline" onClick={onClick} disabled={disabled}>
       {children}
     </MantineButton>
   );
