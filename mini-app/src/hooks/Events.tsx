@@ -103,7 +103,7 @@ export function EventsPublisher() {
       return;
     }
     let event: RoomEvent | null = null;
-    if (publishSongSettings) {
+    if (publishSongSettings !== null) {
       event = new RoomEvent({
         userId: userId,
         roomId: room.id!,
@@ -114,7 +114,7 @@ export function EventsPublisher() {
       });
       Signals.publishSongSettings.set(null); // Clear the signal after publishing
     }
-    if (publishSongScroll) {
+    if (publishSongScroll !== null) {
       event = new RoomEvent({
         userId: userId,
         roomId: room.id!,
@@ -125,7 +125,7 @@ export function EventsPublisher() {
       });
       Signals.publishSongScroll.set(null); // Clear the signal after publishing
     }
-    if (publishSongId) {
+    if (publishSongId !== null) {
       event = new RoomEvent({
         userId: userId,
         roomId: room.id!,

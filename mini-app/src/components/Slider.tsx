@@ -17,7 +17,9 @@ function Slider({ disabled, label, onChange, value }: SliderProps) {
         size="md"
         disabled={disabled}
         value={value ?? 0} // Ensure value is controlled and defaults to 0
-        onChange={(val) => onChange(val)} // Pass the value directly to the onChange handler
+        onChange={(val) => {
+          onChange(val);
+        }}
       ></MantineSlider>
     </Box>
   );

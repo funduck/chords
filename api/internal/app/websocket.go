@@ -54,13 +54,16 @@ func (a *App) NewWSHandler() http.HandlerFunc {
 			}
 		}()
 
-		// Read loop (optional: handle incoming messages)
+		// Read loop
 		for {
 			messageType, bytes, err := conn.ReadMessage()
 			if err != nil {
+				log.Errorw("Failed to read message from WebSocket",
+					"userID", accessToken.UserID,
+					"error", err,
+				)
 				break
 			}
-			// Optionally handle incoming messages here
 			log.Debugw("Received message from user",
 				"userID", accessToken.UserID,
 				"messageType", messageType,

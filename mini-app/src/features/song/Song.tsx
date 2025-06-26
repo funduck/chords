@@ -39,6 +39,12 @@ function Song() {
   const applySongSettings = useSignal(Signals.applySongSettings);
   const applySongScroll = useSignal(Signals.applySongScroll);
 
+  // This flag prevents emitting scroll events we are applying scroll events from room
+  const emitScrollEvent = useRef(true);
+
+  // This is used to debounce the scroll events when user scrolls manually
+  const emittingScrollTimeout = useRef(null as ReturnType<typeof setTimeout> | null);
+
   useEffect(() => {
     if (songId) {
       SongService.getSong(songId).then(setSong).catch(console.error);
@@ -63,7 +69,8 @@ function Song() {
     }
   }, []);
 
-  // AUTO SCROLL SECTION WITH SONG LINES
+  // HANDLE SYNC SCROLLING IN ROOM
+  // Auto scrolling
   useEffect(() => {
     if (
       songViewportRef.current &&
@@ -73,16 +80,27 @@ function Song() {
     ) {
       const scrollInterval = applySongSettings.auto_scroll_interval;
       let scrollSpeed = applySongSettings.auto_scroll_speed; // 1-100
+
       // Get font size in pixels
       const fontSize = parseFloat(getComputedStyle(document.documentElement).fontSize);
       // Convert scroll speed from percentage to pixels
       scrollSpeed = 4 * Math.ceil((scrollSpeed / 100) * fontSize);
+
       console.debug("Auto-scrolling is enabled, starting interval", { scrollInterval, scrollSpeed });
       const interval = setInterval(() => {
         if (!songViewportRef.current) {
           console.debug("Auto-scrolling: songViewportRef is null");
           return;
         }
+
+        // Prevent emitting scroll events while auto-scrolling
+        emitScrollEvent.current = false;
+        songViewportRef.current.onscrollend = () => {
+          setTimeout(() => {
+            emitScrollEvent.current = true;
+          }, 10);
+        };
+
         songViewportRef.current.scrollBy({
           top: scrollSpeed,
           behavior: "smooth",
@@ -99,36 +117,32 @@ function Song() {
     applySongSettings?.auto_scroll_interval,
     applySongSettings?.auto_scroll_speed,
   ]);
-
-  // // HANDLE SYNC SCROLLING IN ROOM
-  const ignoreScrollEvent = useRef(false);
-  useEffect(() => {
-    const screen = songViewportRef.current;
-    if (!screen) {
+  // Emitting scroll events
+  function onScrollPositionChange() {
+    if (!songViewportRef.current) {
       console.error("Song container not found");
       return;
     }
-    function handleScroll() {
-      // We ignore scroll events if auto-scroll is enabled or if we are applying a scroll event
-      if (ignoreScrollEvent.current || applySongSettings?.auto_scroll) {
-        return;
-      }
-      const scrollPercent = (screen!.scrollTop / (screen!.scrollHeight - screen!.clientHeight)) * 100;
-      Signals.publishSongScroll.set(scrollPercent);
-    }
-    screen?.addEventListener("scroll", handleScroll);
-    console.log("Scroll event listener added");
-    return () => {
-      screen?.removeEventListener("scroll", handleScroll);
-    };
-  }, [songViewportRef.current, applySongSettings?.auto_scroll]);
-
-  useEffect(() => {
-    // If auto-scroll is enabled, we don't apply manual scroll
-    if (applySongSettings?.auto_scroll) {
+    if (!emitScrollEvent.current) {
       return;
     }
-    // If applySongScroll is null, we ignore it
+    const scrollPercent =
+      (songViewportRef.current!.scrollTop /
+        (songViewportRef.current!.scrollHeight - songViewportRef.current!.clientHeight)) *
+      100;
+
+    // Debounce scroll events to avoid flooding the signal
+    if (emittingScrollTimeout.current) {
+      clearTimeout(emittingScrollTimeout.current);
+      emittingScrollTimeout.current = null;
+    }
+    emittingScrollTimeout.current = setTimeout(() => {
+      Signals.publishSongScroll.set(scrollPercent);
+      console.debug("Scroll event emitted:", scrollPercent);
+    }, 10);
+  }
+  // Applying scroll events
+  useEffect(() => {
     if (applySongScroll == null) {
       return;
     }
@@ -143,14 +157,15 @@ function Song() {
     const scrollTop =
       (applySongScroll / 100) * (songViewportRef.current.scrollHeight - songViewportRef.current.clientHeight);
 
-    // Ignore scroll events for a short time not to emit the scroll events like it is manual scrolling
-    ignoreScrollEvent.current = true;
-    // Reset ignore after a short delay
-    setTimeout(() => {
-      ignoreScrollEvent.current = false;
-    }, 1000);
+    // Prevent emitting scroll events while applying scroll
+    emitScrollEvent.current = false;
+    songViewportRef.current.onscrollend = () => {
+      emitScrollEvent.current = true;
+    };
 
     songViewportRef.current.scrollTo({ top: scrollTop, behavior: "smooth" });
+
+    Signals.applySongScroll.set(null); // Clear the signal after applying
   }, [song, songViewportRef.current, applySongScroll, applySongSettings?.auto_scroll]);
 
   if (!song) {
@@ -168,6 +183,7 @@ function Song() {
       <ScrollArea
         viewportRef={songViewportRef}
         type="always"
+        onScrollPositionChange={onScrollPositionChange}
         style={{
           display: "flex",
           flexGrow: 1,
