@@ -1,5 +1,4 @@
 import { useSignal } from "@telegram-apps/sdk-react";
-import { useRef, useState } from "react";
 
 import { SettingsService } from "@src/services/settings.service";
 import { Signals } from "@src/services/signals-registry";
@@ -49,12 +48,12 @@ function SongSettingsControl() {
 
   return (
     <Stack gap="xl">
-      <Switch
+      {/* <Switch
         label="Show chords"
         disabled={!settings}
         checked={settings?.show_chords ?? false}
         onChange={setShowChords}
-      />
+      /> */}
       <Switch
         label="Auto scroll"
         disabled={!settings}
