@@ -6,3 +6,18 @@
     width: 24px;
     height: 24px;
 }
+
+.chordpro .title {
+    font-size: 1.2em;
+    font-weight: normal;
+    font-style: italic;
+}
+
+.chordpro .subtitle {
+    font-size: normal;
+    font-style: italic;
+}
+
+.chordpro .chord {
+    font-weight: bold;
+}

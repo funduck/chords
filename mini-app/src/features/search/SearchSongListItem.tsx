@@ -17,7 +17,7 @@ function SearchSongListItem({ song }: { song: SongDescrDto }) {
           Signals.publishSongId.set(song.id);
         }}
       >
-        {song.artist} {song.title}
+        {song.artist} - {song.title}
       </ButtonCell>
     </Stack>
   );

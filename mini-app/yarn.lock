@@ -691,6 +691,13 @@
     javascript-natural-sort "0.7.1"
     lodash "^4.17.21"
 
+"@types/chordsheetjs@^6.2.0":
+  version "6.2.0"
+  resolved "https://registry.yarnpkg.com/@types/chordsheetjs/-/chordsheetjs-6.2.0.tgz#b4ddc35c25e91eabdb9b78ccd03a823722488aad"
+  integrity sha512-d6StUJ++J7j43R+ofiMcsYGj5TmMdA+auTMA/iHAlMBjZQL74UIc8IxCAnwqBhIyc3NlypFTHacAbXvMYOfiPA==
+  dependencies:
+    chordsheetjs "*"
+
 "@types/json-schema@^7.0.12":
   version "7.0.12"
   resolved "https://registry.yarnpkg.com/@types/json-schema/-/json-schema-7.0.12.tgz#d70faba7039d5fca54c83c7dbab41051d2b6f6cb"
@@ -952,6 +959,16 @@ change-case@^5.4.4:
   version "5.4.4"
   resolved "https://registry.yarnpkg.com/change-case/-/change-case-5.4.4.tgz#0d52b507d8fb8f204343432381d1a6d7bff97a02"
   integrity sha512-HRQyTk2/YPEkt9TnUPbOpr64Uw3KOicFWPVBb+xiHvd6eBx/qPr9xqfBFDT8P2vWsvvz4jbEkfDe71W3VyNu2w==
+
+chordproject-parser@^1.0.4:
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/chordproject-parser/-/chordproject-parser-1.0.4.tgz#e539d461e2b124f6697a901af0178009c4e8cbdb"
+  integrity sha512-cvRj0z0PCN5qV5EqcVh1Mg4H8Kw+m7fWQI+hLUe6vJoVRjT7cDSGxWyqLGszM/hgqFEQu1UQOWp0K9pBkliGDw==
+
+chordsheetjs@*, chordsheetjs@^12.3.0:
+  version "12.3.0"
+  resolved "https://registry.yarnpkg.com/chordsheetjs/-/chordsheetjs-12.3.0.tgz#5e2dceb32e2113d3c408f9f1657056c0a40a592f"
+  integrity sha512-jSHrb8HfLFbbLzXcDRfQqf8UpypiSgnd1MEYYbYenWJmqByiqRXNX+TOpyl4r81RaHHe0eb2dfPgp+q9r4PBdw==
 
 clsx@^2.1.1:
   version "2.1.1"

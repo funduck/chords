@@ -7,12 +7,12 @@ import { SettingsService } from "@src/services/settings.service";
 import { Signals } from "@src/services/signals-registry";
 import { SongDto, SongService } from "@src/services/song.service";
 
+import Chordpro from "@components/Chordpro";
 import Dropdown from "@components/Dropdown";
 import Stack from "@components/Stack";
 import Text from "@components/Text";
 import Title from "@components/Title";
 
-import SongLine from "./SongLine";
 import SongSettingsControl from "./SongSettings";
 import { SongSettings } from "./settings";
 
@@ -198,14 +198,12 @@ function Song() {
           </Box>
 
           <Box>
-            {song.lines.map((line, index) => (
-              <SongLine key={index} line={line} />
-            ))}
+            <Chordpro sheet={song.sheet} />
           </Box>
           <Box>
             <Divider />
             <Space h="md" />
-            <Text>End</Text>
+            <Text style={{ fontStyle: "italic" }}>End</Text>
           </Box>
         </Stack>
       </ScrollArea>

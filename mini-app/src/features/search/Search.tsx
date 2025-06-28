@@ -11,8 +11,10 @@ function Search() {
   let [songs, setSongs] = useState<SongDescrDto[] | null>(null);
 
   useEffect(() => {
-    SongService.listSongs().then(setSongs);
-  });
+    if (!songs) {
+      SongService.listSongs().then(setSongs);
+    }
+  }, []);
 
   if (!songs) {
     return <div>Loading...</div>;
