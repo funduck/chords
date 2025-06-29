@@ -4,6 +4,7 @@ import { BrowserRouter } from "react-router";
 
 import Router from "./Router";
 import AnonymousLogin from "./features/auth/AnonymousLogin";
+import { SearchProvider } from "./features/search/SearchContext";
 import { ApiProvider } from "./hooks/Api";
 import { EventsConsumer, EventsPublisher } from "./hooks/Events";
 import { RoomServiceProvider } from "./hooks/RoomService";
@@ -18,10 +19,12 @@ function App() {
         <ApiProvider>
           <WebSocketProvider>
             <RoomServiceProvider>
-              <EventsPublisher />
-              <EventsConsumer />
-              <AnonymousLogin />
-              <Router />
+              <SearchProvider>
+                <EventsPublisher />
+                <EventsConsumer />
+                <AnonymousLogin />
+                <Router />
+              </SearchProvider>
             </RoomServiceProvider>
           </WebSocketProvider>
         </ApiProvider>

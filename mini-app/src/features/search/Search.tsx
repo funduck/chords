@@ -1,45 +1,45 @@
 import { Button, Flex, Pagination, Space, TextInput } from "@mantine/core";
 import { useContext, useEffect, useState } from "react";
 
-import { LibraryApiContext, SongInfoEntity } from "@src/hooks/Api";
+import { LibraryApiContext } from "@src/hooks/Api";
 
 import Stack from "@components/Stack";
 import Section from "@components/section";
 
+import { useSearchContext } from "./SearchContext";
 import SearchSongListItem from "./SearchSongListItem";
 
 function Search() {
   const libraryApi = useContext(LibraryApiContext);
+  const { searchState, updateSearchState } = useSearchContext();
 
-  const [query, setQuery] = useState<string>("");
-  const [pageSize, setPageSize] = useState<number>(10);
   const [searching, setSearching] = useState<boolean>(false);
-  const [songs, setSongs] = useState<SongInfoEntity[] | null>(null);
-  const [totalPages, setTotalPages] = useState<number>(0);
-  const [currentPage, setCurrentPage] = useState<number>(1);
 
   useEffect(() => {
     if (searching && libraryApi) {
       libraryApi
         .searchPublicLibrary({
           request: {
-            query,
-            limit: pageSize,
-            offset: pageSize * (currentPage - 1) || 0,
+            query: searchState.query,
+            limit: searchState.pageSize,
+            offset: searchState.pageSize * (searchState.currentPage - 1) || 0,
             return_rows: true,
-            return_total: true, // TODO it is possible to skip counting total
+            return_total: true,
           },
         })
         .then((res) => {
-          setSongs(res.songs!);
-          setTotalPages(Math.ceil((res.total || 0) / pageSize));
+          updateSearchState({
+            songs: res.songs!,
+            totalPages: Math.ceil((res.total || 0) / searchState.pageSize),
+            hasSearched: true,
+          });
         })
         .catch(console.error)
         .finally(() => {
           setSearching(false);
         });
     }
-  }, [searching, query, libraryApi, pageSize, currentPage]);
+  }, [searching, searchState.query, libraryApi, searchState.pageSize, searchState.currentPage]);
 
   if (!libraryApi) {
     return <div>Loading...</div>;
@@ -52,7 +52,8 @@ function Search() {
           <TextInput
             name="query"
             placeholder="Search by Title or Artist"
-            onChange={(event) => setQuery(event.target.value)}
+            value={searchState.query}
+            onChange={(event) => updateSearchState({ query: event.target.value })}
           />
           <Button onClick={() => setSearching(true)} disabled={searching} loading={searching}>
             Find
@@ -61,18 +62,18 @@ function Search() {
 
         <Space h="xl" />
 
-        {!searching && songs && (
+        {!searching && searchState.songs && searchState.hasSearched && (
           <>
             <Stack>
-              {songs.map((song) => (
+              {searchState.songs.map((song) => (
                 <SearchSongListItem key={song.id} song={song} />
               ))}
             </Stack>
             <Pagination
-              total={totalPages}
-              value={currentPage}
+              total={searchState.totalPages}
+              value={searchState.currentPage}
               onChange={(page) => {
-                setCurrentPage(page);
+                updateSearchState({ currentPage: page });
                 setSearching(true);
               }}
               mt="sm"
