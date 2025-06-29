@@ -40,27 +40,40 @@ func (s *PublicLibraryService) EnsurePublicLibrary(ctx context.Context, name str
 
 func (s *PublicLibraryService) SearchSongs(ctx context.Context, req *entity.SearchSongRequest) (*entity.SearchSongResponse, error) {
 	tx := orm.GetDB(ctx)
-	var songs []*entity.SongInfo
-
-	query := "%" + strings.ToLower(req.Query) + "%"
 
 	if req.Limit <= 0 {
 		req.Limit = -1 // Default to no limit
 	}
 
-	err := tx.Model(&entity.Song{}).
+	query := "%" + strings.ToLower(req.Query) + "%"
+	q := tx.Model(&entity.Song{}).
 		Where("(LOWER(title) LIKE ?) OR (LOWER(artist) LIKE ?)", query, query).
-		Joins("JOIN public_library_songs pls ON pls.song_id = songs.id").
-		Order("id ASC").
-		Offset(req.Offset).
-		Limit(req.Limit).
-		Select("id", "title", "artist", "format").
-		Find(&songs).Error
-	if err != nil {
-		return nil, err
+		Joins("JOIN public_library_songs pls ON pls.song_id = songs.id")
+
+	// Count total number of matching songs
+	var total int64
+	if req.ReturnTotal {
+		err := q.Count(&total).Error
+		if err != nil {
+			return nil, err
+		}
 	}
 
-	return &entity.SearchSongResponse{Songs: songs}, nil
+	var songs []*entity.SongInfo
+	if req.ReturnRows {
+		// Find songs with pagination
+		err := q.
+			Order("id ASC").
+			Offset(req.Offset).
+			Limit(req.Limit).
+			Select("id", "title", "artist", "format").
+			Find(&songs).Error
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return &entity.SearchSongResponse{Songs: songs, Total: total}, nil
 }
 
 func (s *PublicLibraryService) UploadSong(ctx context.Context, library *entity.PublicLibrary, song *entity.Song) error {

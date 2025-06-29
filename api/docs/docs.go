@@ -462,6 +462,14 @@ const docTemplate = `{
                 },
                 "query": {
                     "type": "string"
+                },
+                "return_rows": {
+                    "type": "boolean",
+                    "default": true
+                },
+                "return_total": {
+                    "type": "boolean",
+                    "default": true
                 }
             }
         },

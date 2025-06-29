@@ -36,6 +36,12 @@ definitions:
         type: integer
       query:
         type: string
+      return_rows:
+        default: true
+        type: boolean
+      return_total:
+        default: true
+        type: boolean
     type: object
   chords_com_api_internal_entity.SearchSongResponse:
     properties:

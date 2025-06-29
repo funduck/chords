@@ -7,12 +7,14 @@ type PublicLibrary struct {
 }
 
 type SearchSongRequest struct {
-	Query  string `json:"query"`
-	Limit  int    `json:"limit" validate:"min=1,max=100"`
-	Offset int    `json:"offset" validate:"min=0"`
+	Query       string `json:"query"`
+	Limit       int    `json:"limit" validate:"min=1,max=100"`
+	Offset      int    `json:"offset" validate:"min=0"`
+	ReturnRows  bool   `json:"return_rows" default:"true"`
+	ReturnTotal bool   `json:"return_total" default:"true"`
 }
 
 type SearchSongResponse struct {
 	Songs []*SongInfo `json:"songs"`
-	Total int         `json:"total"`
+	Total int64       `json:"total"`
 }
