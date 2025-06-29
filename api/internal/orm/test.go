@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"fmt"
 
-	"chords.com/api/internal/entity"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
@@ -39,7 +38,7 @@ func InitForTest() (*gorm.DB, *sql.DB) {
 	if err != nil {
 		panic(err)
 	}
-	if err := gormdb.AutoMigrate(entity.Room{}, entity.User{}); err != nil {
+	if err := gormdb.AutoMigrate(entities...); err != nil {
 		panic(err)
 	}
 

@@ -6,13 +6,17 @@ import (
 )
 
 type App struct {
-	logger      logger.Logger
-	roomService *service.RoomService
+	logger               logger.Logger
+	publicLibraryService *service.PublicLibraryService
+	roomService          *service.RoomService
+	songService          *service.SongService
 }
 
 func NewApp() *App {
 	return &App{
-		logger:      logger.NewLogger("app"),
-		roomService: service.NewRoomService(),
+		logger:               logger.NewLogger("app"),
+		publicLibraryService: service.NewPublicLibraryService(),
+		roomService:          service.NewRoomService(),
+		songService:          service.NewSongService(),
 	}
 }

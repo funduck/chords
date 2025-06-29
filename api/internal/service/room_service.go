@@ -20,19 +20,19 @@ type RoomService struct {
 	userListeners map[uint]map[uint]string      // Maps room ID to user ID and listener ID
 }
 
-var instance *RoomService
+var roomServiceInstance *RoomService
 
 func NewRoomService() *RoomService {
-	if instance != nil {
-		return instance
+	if roomServiceInstance != nil {
+		return roomServiceInstance
 	}
-	instance = &RoomService{
+	roomServiceInstance = &RoomService{
 		log:           logger.NewForModule("RoomService"),
 		roomChans:     make(map[uint]chan *eventbus.Event),
 		roomUserIDs:   make(map[uint]map[uint]bool),
 		userListeners: make(map[uint]map[uint]string),
 	}
-	return instance
+	return roomServiceInstance
 }
 
 // generateRoomCode generates a random 6-character alphanumeric string.
