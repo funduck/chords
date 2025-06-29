@@ -1,11 +1,11 @@
 import { Box, Divider, Group, ScrollArea, Space } from "@mantine/core";
 import { useSignal } from "@telegram-apps/sdk-react";
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { useParams } from "react-router";
 
+import { SongEntity, SongsApiContext } from "@src/hooks/Api";
 import { SettingsService } from "@src/services/settings.service";
 import { Signals } from "@src/services/signals-registry";
-import { SongDto, SongService } from "@src/services/song.service";
 
 import Chordpro from "@components/Chordpro";
 import Dropdown from "@components/Dropdown";
@@ -35,7 +35,7 @@ function Song() {
   const settings = useSignal(Signals.applySongSettings);
 
   const songViewportRef = useRef<HTMLDivElement>(null);
-  const [song, setSong] = useState<SongDto | null>(null);
+  const [song, setSong] = useState<SongEntity | null>(null);
   const applySongSettings = useSignal(Signals.applySongSettings);
   const applySongScroll = useSignal(Signals.applySongScroll);
 
@@ -45,11 +45,17 @@ function Song() {
   // This is used to debounce the scroll events when user scrolls manually
   const emittingScrollTimeout = useRef(null as ReturnType<typeof setTimeout> | null);
 
+  const songsApi = useContext(SongsApiContext);
+
   useEffect(() => {
-    if (songId) {
-      SongService.getSong(songId).then(setSong).catch(console.error);
+    console.debug("Song component mounted, fetching song with ID:", songId);
+    if (songId && songsApi) {
+      songsApi
+        .getSongByID({ id: parseInt(songId, 10) })
+        .then(setSong)
+        .catch(console.error);
     }
-  }, [songId]);
+  }, [songsApi, songId]);
 
   useEffect(() => {
     if (!settings) {
@@ -198,7 +204,7 @@ function Song() {
           </Box>
 
           <Box>
-            <Chordpro sheet={song.sheet} />
+            <Chordpro sheet={song.sheet!} />
           </Box>
           <Box>
             <Divider />

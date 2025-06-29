@@ -149,7 +149,7 @@ export function EventsPublisher() {
       if (!isEqual(roomState, room.state)) {
         console.debug("Updating room state:", roomState);
         roomsApi
-          ?.apiRoomsIdPatch({
+          ?.updateRoom({
             id: room.id!,
             request: {
               state: roomState,

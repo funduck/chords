@@ -28,6 +28,7 @@ const docTemplate = `{
                     "auth"
                 ],
                 "summary": "Anonymous Log In",
+                "operationId": "anonymousLogIn",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -48,6 +49,7 @@ const docTemplate = `{
                     "auth"
                 ],
                 "summary": "Refresh Access Token",
+                "operationId": "refreshToken",
                 "parameters": [
                     {
                         "description": "Refresh Token Request",
@@ -64,6 +66,53 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/internal_app.LoginResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/library/public": {
+            "post": {
+                "description": "Search for songs in the public library using various parameters.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "library"
+                ],
+                "summary": "Search public library for songs",
+                "operationId": "searchPublicLibrary",
+                "parameters": [
+                    {
+                        "description": "Search Song Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/chords_com_api_internal_entity.SearchSongRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Search results",
+                        "schema": {
+                            "$ref": "#/definitions/chords_com_api_internal_entity.SearchSongResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
                         }
                     }
                 }
@@ -87,6 +136,7 @@ const docTemplate = `{
                     "rooms"
                 ],
                 "summary": "Create a new room",
+                "operationId": "createRoom",
                 "responses": {
                     "201": {
                         "description": "Room created successfully",
@@ -127,6 +177,7 @@ const docTemplate = `{
                     "rooms"
                 ],
                 "summary": "Join a room",
+                "operationId": "joinRoom",
                 "parameters": [
                     {
                         "description": "Join Room Request",
@@ -184,6 +235,7 @@ const docTemplate = `{
                     "rooms"
                 ],
                 "summary": "Update a room",
+                "operationId": "updateRoom",
                 "parameters": [
                     {
                         "type": "integer",
@@ -248,6 +300,7 @@ const docTemplate = `{
                     "rooms"
                 ],
                 "summary": "Leave a room",
+                "operationId": "leaveRoom",
                 "parameters": [
                     {
                         "type": "integer",
@@ -277,6 +330,39 @@ const docTemplate = `{
                         "description": "Internal Server Error",
                         "schema": {
                             "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/songs/{id}": {
+            "get": {
+                "description": "Retrieve a song by its ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Songs"
+                ],
+                "summary": "Get song by ID",
+                "operationId": "getSongByID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Song ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/chords_com_api_internal_entity.Song"
                         }
                     }
                 }
@@ -359,6 +445,93 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/chords_com_api_internal_entity.User"
                     }
+                }
+            }
+        },
+        "chords_com_api_internal_entity.SearchSongRequest": {
+            "type": "object",
+            "properties": {
+                "limit": {
+                    "type": "integer",
+                    "maximum": 100,
+                    "minimum": 1
+                },
+                "offset": {
+                    "type": "integer",
+                    "minimum": 0
+                },
+                "query": {
+                    "type": "string"
+                }
+            }
+        },
+        "chords_com_api_internal_entity.SearchSongResponse": {
+            "type": "object",
+            "properties": {
+                "songs": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/chords_com_api_internal_entity.SongInfo"
+                    }
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
+        "chords_com_api_internal_entity.SheetFormat": {
+            "type": "string",
+            "enum": [
+                "chordpro"
+            ],
+            "x-enum-varnames": [
+                "SheetFormat_Chordpro"
+            ]
+        },
+        "chords_com_api_internal_entity.Song": {
+            "type": "object",
+            "properties": {
+                "artist": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "deleted_at": {
+                    "type": "string",
+                    "example": "2025-06-18T15:04:05Z"
+                },
+                "format": {
+                    "$ref": "#/definitions/chords_com_api_internal_entity.SheetFormat"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "sheet": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "chords_com_api_internal_entity.SongInfo": {
+            "type": "object",
+            "properties": {
+                "artist": {
+                    "type": "string"
+                },
+                "format": {
+                    "$ref": "#/definitions/chords_com_api_internal_entity.SheetFormat"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "title": {
+                    "type": "string"
                 }
             }
         },

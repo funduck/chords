@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 
-import { SongDescrDto, SongService } from "@src/services/song.service";
+import { LibraryApiContext, SongInfoEntity } from "@src/hooks/Api";
 
 import Stack from "@components/Stack";
 import Section from "@components/section";
@@ -8,11 +8,22 @@ import Section from "@components/section";
 import SearchSongListItem from "./SearchSongListItem";
 
 function Search() {
-  let [songs, setSongs] = useState<SongDescrDto[] | null>(null);
+  let [songs, setSongs] = useState<SongInfoEntity[] | null>(null);
+  const libraryApi = useContext(LibraryApiContext);
 
   useEffect(() => {
     if (!songs) {
-      SongService.listSongs().then(setSongs);
+      libraryApi
+        ?.searchPublicLibrary({
+          request: {
+            query: "",
+            limit: 100,
+            offset: 0,
+          },
+        })
+        .then((res) => {
+          setSongs(res.songs!);
+        });
     }
   }, []);
 

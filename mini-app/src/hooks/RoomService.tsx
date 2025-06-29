@@ -59,7 +59,7 @@ class RoomService {
       throw new Error("Rooms API is not available");
     }
     return this.roomsApi
-      .apiRoomsPost()
+      .createRoom()
       .then((r) => this.handle(r))
       .catch(console.error);
   }
@@ -69,7 +69,7 @@ class RoomService {
       throw new Error("Rooms API is not available");
     }
     return this.roomsApi
-      .apiRoomsJoinPost({ request: { room_code: roomCode } })
+      .joinRoom({ request: { room_code: roomCode } })
       .then((r) => this.handle(r))
       .catch(console.error);
   }
@@ -79,7 +79,7 @@ class RoomService {
       throw new Error("Rooms API is not available");
     }
     return this.roomsApi
-      .apiRoomsIdLeavePost({ id: room.id! })
+      .leaveRoom({ id: room.id! })
       .then(() => {
         this.handle();
       })

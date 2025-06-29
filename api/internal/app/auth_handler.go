@@ -18,6 +18,7 @@ type LoginResponse struct {
 }
 
 // AnonymousLogIn godoc
+// @ID anonymousLogIn
 // @Summary      Anonymous Log In
 // @Description  Create an anonymous access token
 // @Tags         auth
@@ -59,6 +60,7 @@ type RefreshTokenRequest struct {
 }
 
 // RefreshToken godoc
+// @ID refreshToken
 // @Summary      Refresh Access Token
 // @Description  Refresh an access token using a refresh token
 // @Tags         auth

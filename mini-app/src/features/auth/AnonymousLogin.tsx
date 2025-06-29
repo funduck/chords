@@ -40,7 +40,7 @@ function AnonymousLogin() {
       if (refreshToken) {
         try {
           await authApi
-            .apiAuthRefreshTokenPost({ data: { refresh_token: refreshToken } })
+            .refreshToken({ data: { refresh_token: refreshToken } })
             .then(handleTokens)
             .then(() => {
               console.log("Refreshed access token successfully");
@@ -53,7 +53,7 @@ function AnonymousLogin() {
       }
 
       await authApi
-        .apiAuthAnonymousPost()
+        .anonymousLogIn()
         .then(handleTokens)
         .then(() => {
           console.log("Logged in anonymously successfully");

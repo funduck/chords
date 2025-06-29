@@ -7,6 +7,7 @@ import (
 )
 
 // SearchPublicLibrary godoc
+// @ID searchPublicLibrary
 // @Summary      Search public library for songs
 // @Description  Search for songs in the public library using various parameters.
 // @Tags         library

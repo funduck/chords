@@ -9,6 +9,7 @@ import (
 )
 
 // CreateRoom godoc
+// @ID createRoom
 // @Summary      Create a new room
 // @Description  Create a new room with a unique code and add the user to it.
 // @Tags         rooms
@@ -41,6 +42,7 @@ func (a *App) CreateRoom(w http.ResponseWriter, r *http.Request) {
 }
 
 // JoinRoom godoc
+// @ID joinRoom
 // @Summary      Join a room
 // @Description  Join a room using the room code.
 // @Tags         rooms
@@ -72,6 +74,7 @@ func (a *App) JoinRoom(w http.ResponseWriter, r *http.Request) {
 }
 
 // LeaveRoom godoc
+// @ID leaveRoom
 // @Summary      Leave a room
 // @Description  Leave a room using the room ID.
 // @Tags         rooms
@@ -102,6 +105,7 @@ func (a *App) LeaveRoom(w http.ResponseWriter, r *http.Request) {
 }
 
 // UpdateRoom godoc
+// @ID updateRoom
 // @Summary      Update a room
 // @Description  Update the state of a room.
 // @Tags         rooms

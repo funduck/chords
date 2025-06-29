@@ -25,6 +25,64 @@ definitions:
           $ref: '#/definitions/chords_com_api_internal_entity.User'
         type: array
     type: object
+  chords_com_api_internal_entity.SearchSongRequest:
+    properties:
+      limit:
+        maximum: 100
+        minimum: 1
+        type: integer
+      offset:
+        minimum: 0
+        type: integer
+      query:
+        type: string
+    type: object
+  chords_com_api_internal_entity.SearchSongResponse:
+    properties:
+      songs:
+        items:
+          $ref: '#/definitions/chords_com_api_internal_entity.SongInfo'
+        type: array
+      total:
+        type: integer
+    type: object
+  chords_com_api_internal_entity.SheetFormat:
+    enum:
+    - chordpro
+    type: string
+    x-enum-varnames:
+    - SheetFormat_Chordpro
+  chords_com_api_internal_entity.Song:
+    properties:
+      artist:
+        type: string
+      created_at:
+        type: string
+      deleted_at:
+        example: "2025-06-18T15:04:05Z"
+        type: string
+      format:
+        $ref: '#/definitions/chords_com_api_internal_entity.SheetFormat'
+      id:
+        type: integer
+      sheet:
+        type: string
+      title:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  chords_com_api_internal_entity.SongInfo:
+    properties:
+      artist:
+        type: string
+      format:
+        $ref: '#/definitions/chords_com_api_internal_entity.SheetFormat'
+      id:
+        type: integer
+      title:
+        type: string
+    type: object
   chords_com_api_internal_entity.UpdateRoomRequest:
     properties:
       state: {}
@@ -86,6 +144,7 @@ paths:
       consumes:
       - application/json
       description: Create an anonymous access token
+      operationId: anonymousLogIn
       produces:
       - application/json
       responses:
@@ -99,6 +158,7 @@ paths:
   /api/auth/refresh-token:
     post:
       description: Refresh an access token using a refresh token
+      operationId: refreshToken
       parameters:
       - description: Refresh Token Request
         in: body
@@ -116,11 +176,43 @@ paths:
       summary: Refresh Access Token
       tags:
       - auth
+  /api/library/public:
+    post:
+      consumes:
+      - application/json
+      description: Search for songs in the public library using various parameters.
+      operationId: searchPublicLibrary
+      parameters:
+      - description: Search Song Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/chords_com_api_internal_entity.SearchSongRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Search results
+          schema:
+            $ref: '#/definitions/chords_com_api_internal_entity.SearchSongResponse'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Search public library for songs
+      tags:
+      - library
   /api/rooms:
     post:
       consumes:
       - application/json
       description: Create a new room with a unique code and add the user to it.
+      operationId: createRoom
       produces:
       - application/json
       responses:
@@ -146,6 +238,7 @@ paths:
       consumes:
       - application/json
       description: Update the state of a room.
+      operationId: updateRoom
       parameters:
       - description: Room ID
         in: path
@@ -187,6 +280,7 @@ paths:
       consumes:
       - application/json
       description: Leave a room using the room ID.
+      operationId: leaveRoom
       parameters:
       - description: Room ID
         in: path
@@ -220,6 +314,7 @@ paths:
       consumes:
       - application/json
       description: Join a room using the room code.
+      operationId: joinRoom
       parameters:
       - description: Join Room Request
         in: body
@@ -251,6 +346,28 @@ paths:
       summary: Join a room
       tags:
       - rooms
+  /api/songs/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a song by its ID
+      operationId: getSongByID
+      parameters:
+      - description: Song ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/chords_com_api_internal_entity.Song'
+      summary: Get song by ID
+      tags:
+      - Songs
   /ws:
     post:
       consumes:
