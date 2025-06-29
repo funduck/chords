@@ -1,4 +1,4 @@
-import { Button, Flex, Pagination, Space, TextInput } from "@mantine/core";
+import { Button, CloseButton, Flex, Pagination, Space, TextInput } from "@mantine/core";
 import { useContext, useEffect, useState } from "react";
 
 import { LibraryApiContext } from "@src/hooks/Api";
@@ -54,6 +54,17 @@ function Search() {
             placeholder="Search by Title or Artist"
             value={searchState.query}
             onChange={(event) => updateSearchState({ query: event.target.value })}
+            rightSection={
+              <CloseButton
+                aria-label="Clear input"
+                onClick={() =>
+                  updateSearchState({
+                    query: "",
+                  })
+                }
+                style={{ display: searchState.query ? undefined : "none" }}
+              />
+            }
           />
           <Button onClick={() => setSearching(true)} disabled={searching} loading={searching}>
             Find
