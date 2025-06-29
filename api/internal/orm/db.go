@@ -95,3 +95,13 @@ func Close() {
 		}
 	}
 }
+
+func IsRecordNotFoundError(err error) bool {
+	if err == nil {
+		return false
+	}
+	if err == gorm.ErrRecordNotFound {
+		return true
+	}
+	return false
+}

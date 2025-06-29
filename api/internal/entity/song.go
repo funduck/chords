@@ -3,7 +3,7 @@ package entity
 type SheetFormat string
 
 const (
-	Format_Chordpro SheetFormat = "chordpro"
+	SheetFormat_Chordpro SheetFormat = "chordpro"
 )
 
 type Song struct {

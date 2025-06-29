@@ -28,3 +28,14 @@ func (s *SongService) GetSongByID(ctx context.Context, id uint) (*entity.Song, e
 
 	return &song, err
 }
+
+func (s *SongService) ParseChordpro(sheet string) (*entity.Song, error) {
+
+	// TODO implement parsing logic
+	// This is a placeholder for the actual parsing logic
+	return &entity.Song{
+		Title:  "Sample Title",
+		Artist: "Sample Artist",
+		Format: entity.SheetFormat_Chordpro,
+	}, nil
+}
