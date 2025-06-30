@@ -13,10 +13,3 @@ type Song struct {
 	Sheet  string      `gorm:"not null" json:"sheet"`
 	Format SheetFormat `gorm:"not null" json:"format"`
 }
-
-type SongInfo struct {
-	ID     uint        `json:"id"`
-	Title  string      `json:"title"`
-	Artist string      `json:"artist"`
-	Format SheetFormat `json:"format"`
-}

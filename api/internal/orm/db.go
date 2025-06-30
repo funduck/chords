@@ -3,6 +3,7 @@ package orm
 import (
 	"context"
 	"database/sql"
+	"fmt"
 
 	"chords.com/api/internal/config"
 	"chords.com/api/internal/logger"
@@ -56,8 +57,9 @@ func GetDB(ctx context.Context) *gorm.DB {
 
 func InitSQLite() (*gorm.DB, *sql.DB) {
 	file := config.New().SQLiteFile
+	log := NewGormLogger()
 	gormdb, err := gorm.Open(sqlite.Open(file), &gorm.Config{
-		Logger: NewGormLogger(),
+		Logger: log,
 	})
 	if err != nil {
 		panic(err)
@@ -69,13 +71,18 @@ func InitSQLite() (*gorm.DB, *sql.DB) {
 		panic(err)
 	}
 
-	log := logger.NewForModule("db")
-	log.Info("Connected to SQLite database ", file)
+	log.Infof("Connected to SQLite database %s", file)
 
 	if err := gormdb.AutoMigrate(entities...); err != nil {
 		panic(err)
 	}
-	log.Info("Auto-migrated entities")
+	log.Infoln("Auto-migrated entities")
+
+	if err := initFTS(gormdb); err != nil {
+		log.Errorf("Failed to initialize FTS: %v", err)
+	} else {
+		log.Infoln("Initialized FTS tables")
+	}
 
 	return gormdb, db
 }
@@ -104,4 +111,62 @@ func IsRecordNotFoundError(err error) bool {
 		return true
 	}
 	return false
+}
+
+// initFTS creates FTS virtual tables and triggers
+func initFTS(db *gorm.DB) error {
+	// Example FTS table for songs/chords - adjust table name and columns as needed
+	ftsQueries := []string{
+		// `DROP TABLE IF EXISTS songs_fts`,
+		// `DROP TRIGGER IF EXISTS songs_ai`,
+		// `DROP TRIGGER IF EXISTS songs_au`,
+		// `DROP TRIGGER IF EXISTS songs_ad`,
+
+		// Create FTS5 virtual table
+		`CREATE VIRTUAL TABLE IF NOT EXISTS songs_fts USING fts5(
+			title, artist, sheet, content='songs', content_rowid='id'
+		)`,
+
+		// Trigger to keep FTS table in sync when inserting
+		`CREATE TRIGGER IF NOT EXISTS songs_ai AFTER INSERT ON songs BEGIN
+			INSERT INTO songs_fts(rowid, title, artist, sheet) 
+			VALUES (new.id, new.title, new.artist, new.sheet);
+		END`,
+
+		// Trigger to keep FTS table in sync when updating
+		`CREATE TRIGGER IF NOT EXISTS songs_au AFTER UPDATE ON songs BEGIN
+			INSERT INTO songs_fts(songs_fts, rowid, title, artist, sheet) 
+			VALUES('delete', old.id, old.title, old.artist, old.sheet);
+			INSERT INTO songs_fts(rowid, title, artist, sheet) 
+			VALUES (new.id, new.title, new.artist, new.sheet);
+		END`,
+
+		// Trigger to keep FTS table in sync when deleting
+		`CREATE TRIGGER IF NOT EXISTS songs_ad AFTER DELETE ON songs BEGIN
+			INSERT INTO songs_fts(songs_fts, rowid, title, artist, sheet) 
+			VALUES('delete', old.id, old.title, old.artist, old.sheet);
+		END`,
+	}
+
+	for _, query := range ftsQueries {
+		if err := db.Exec(query).Error; err != nil {
+			return fmt.Errorf("failed to execute FTS query: %w", err)
+		}
+	}
+
+	return nil
+}
+
+// SearchFTS performs full-text search on the specified table
+func SearchFTS(tx *gorm.DB, table string, query string) *gorm.DB {
+	ftsTable := fmt.Sprintf("%s_fts", table)
+	return tx.Joins(fmt.Sprintf("JOIN %s ON %s.rowid = %s.id", ftsTable, ftsTable, table)).
+		Where(fmt.Sprintf("%s MATCH ?", ftsTable), query)
+}
+
+// RebuildFTS rebuilds the FTS index for a specific table
+func RebuildFTS(ctx context.Context, table string) error {
+	db := GetDB(ctx)
+	ftsTable := fmt.Sprintf("%s_fts", table)
+	return db.Exec(fmt.Sprintf("INSERT INTO %s(%s) VALUES('rebuild')", ftsTable, ftsTable)).Error
 }

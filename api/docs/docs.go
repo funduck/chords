@@ -92,7 +92,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/chords_com_api_internal_entity.SearchSongRequest"
+                            "$ref": "#/definitions/chords_com_api_internal_dto.SearchSongRequest"
                         }
                     }
                 ],
@@ -100,7 +100,7 @@ const docTemplate = `{
                     "200": {
                         "description": "Search results",
                         "schema": {
-                            "$ref": "#/definitions/chords_com_api_internal_entity.SearchSongResponse"
+                            "$ref": "#/definitions/chords_com_api_internal_dto.SearchSongResponse"
                         }
                     },
                     "400": {
@@ -409,6 +409,65 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "chords_com_api_internal_dto.SearchSongRequest": {
+            "type": "object",
+            "properties": {
+                "limit": {
+                    "type": "integer",
+                    "maximum": 100,
+                    "minimum": 1
+                },
+                "offset": {
+                    "type": "integer",
+                    "minimum": 0
+                },
+                "query": {
+                    "type": "string"
+                },
+                "query_lyrics": {
+                    "type": "string"
+                },
+                "return_rows": {
+                    "type": "boolean",
+                    "default": true
+                },
+                "return_total": {
+                    "type": "boolean",
+                    "default": true
+                }
+            }
+        },
+        "chords_com_api_internal_dto.SearchSongResponse": {
+            "type": "object",
+            "properties": {
+                "songs": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/chords_com_api_internal_dto.SongInfo"
+                    }
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
+        "chords_com_api_internal_dto.SongInfo": {
+            "type": "object",
+            "properties": {
+                "artist": {
+                    "type": "string"
+                },
+                "format": {
+                    "$ref": "#/definitions/chords_com_api_internal_entity.SheetFormat"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
         "chords_com_api_internal_entity.JoinRoomRequest": {
             "type": "object",
             "properties": {
@@ -448,45 +507,6 @@ const docTemplate = `{
                 }
             }
         },
-        "chords_com_api_internal_entity.SearchSongRequest": {
-            "type": "object",
-            "properties": {
-                "limit": {
-                    "type": "integer",
-                    "maximum": 100,
-                    "minimum": 1
-                },
-                "offset": {
-                    "type": "integer",
-                    "minimum": 0
-                },
-                "query": {
-                    "type": "string"
-                },
-                "return_rows": {
-                    "type": "boolean",
-                    "default": true
-                },
-                "return_total": {
-                    "type": "boolean",
-                    "default": true
-                }
-            }
-        },
-        "chords_com_api_internal_entity.SearchSongResponse": {
-            "type": "object",
-            "properties": {
-                "songs": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/chords_com_api_internal_entity.SongInfo"
-                    }
-                },
-                "total": {
-                    "type": "integer"
-                }
-            }
-        },
         "chords_com_api_internal_entity.SheetFormat": {
             "type": "string",
             "enum": [
@@ -522,23 +542,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "updated_at": {
-                    "type": "string"
-                }
-            }
-        },
-        "chords_com_api_internal_entity.SongInfo": {
-            "type": "object",
-            "properties": {
-                "artist": {
-                    "type": "string"
-                },
-                "format": {
-                    "$ref": "#/definitions/chords_com_api_internal_entity.SheetFormat"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "title": {
                     "type": "string"
                 }
             }

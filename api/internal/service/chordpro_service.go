@@ -5,6 +5,7 @@ import (
 	"regexp"
 	"strings"
 
+	"chords.com/api/internal/dto"
 	"chords.com/api/internal/entity"
 )
 
@@ -18,8 +19,8 @@ func NewChordProService() *ChordProService {
 var titleRe = regexp.MustCompile(`(?i)\{title:\s*([^\}]*)\}`)
 var artistRe = regexp.MustCompile(`(?i)\{artist:\s*([^\}]*)\}`)
 
-func (s *ChordProService) ParseChordPro(sheet string) (*entity.SongInfo, error) {
-	songInfo := &entity.SongInfo{
+func (s *ChordProService) ParseChordPro(sheet string) (*dto.SongInfo, error) {
+	songInfo := &dto.SongInfo{
 		Format: entity.SheetFormat_Chordpro,
 	}
 

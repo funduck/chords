@@ -9,5 +9,5 @@ test:
 	go test -v ./...
 
 build:
-	go build -o bin/api ./cmd/api/main.go
+	go build --tag fts5 -o bin/api ./cmd/api/main.go
 	go build -o bin/uploader ./cmd/uploader/main.go

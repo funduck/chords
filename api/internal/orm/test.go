@@ -2,7 +2,6 @@ package orm
 
 import (
 	"database/sql"
-	"fmt"
 
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -18,17 +17,10 @@ func InitForTest() (*gorm.DB, *sql.DB) {
 
 	file := "file::memory:?cache=shared"
 
+	log := NewGormLogger()
+
 	gormdb, err := gorm.Open(sqlite.Open(file), &gorm.Config{
-		Logger: NewGormLogger(),
-		// Logger: logger.New(
-		// 	log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer
-		// 	logger.Config{
-		// 		SlowThreshold:             time.Second,
-		// 		LogLevel:                  logger.Info,
-		// 		IgnoreRecordNotFoundError: true,
-		// 		ParameterizedQueries:      false, // Don't include params in the SQL log
-		// 		Colorful:                  true,
-		// 	}),
+		Logger: log,
 	},
 	)
 	if err != nil {
@@ -41,10 +33,13 @@ func InitForTest() (*gorm.DB, *sql.DB) {
 	if err := gormdb.AutoMigrate(entities...); err != nil {
 		panic(err)
 	}
+	if err := initFTS(gormdb); err != nil {
+		panic(err)
+	}
 
 	SetDBInstance(gormdb)
 
-	fmt.Println("Connected to SQLite in-memory database")
+	log.Infof("Connected to SQLite in-memory database at %s", file)
 
 	return gormdb, db
 }

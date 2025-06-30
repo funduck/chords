@@ -11,6 +11,8 @@ import { useSearchContext } from "./SearchContext";
 import SearchSongListItem from "./SearchSongListItem";
 
 function Search() {
+  const byLyrics = true; // This can be set based on tier
+
   const libraryApi = useContext(LibraryApiContext);
   const { searchState, updateSearchState } = useSearchContext();
   const [searching, setSearching] = useState<boolean>(false);
@@ -29,7 +31,8 @@ function Search() {
       libraryApi
         .searchPublicLibrary({
           request: {
-            query: searchState.query,
+            query: byLyrics ? undefined : searchState.query,
+            query_lyrics: byLyrics ? searchState.query : undefined,
             limit: searchState.pageSize,
             offset: searchState.pageSize * (searchState.currentPage - 1) || 0,
             return_rows: true,
@@ -69,10 +72,10 @@ function Search() {
             query={searchState.query}
             onQueryChange={(query) => updateSearchState({ query })}
             onSubmit={handleSearch}
-            placeholder="Search by Title or Artist"
+            placeholder={byLyrics ? "Search by Title, Artist or Lyrics" : "Search by Title or Artist"}
           />
 
-          <Button onClick={handleSearch} disabled={searching} loading={searching}>
+          <Button variant="outline" onClick={handleSearch} disabled={searching} loading={searching}>
             Find
           </Button>
         </Flex>

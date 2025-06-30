@@ -1,4 +1,44 @@
 definitions:
+  chords_com_api_internal_dto.SearchSongRequest:
+    properties:
+      limit:
+        maximum: 100
+        minimum: 1
+        type: integer
+      offset:
+        minimum: 0
+        type: integer
+      query:
+        type: string
+      query_lyrics:
+        type: string
+      return_rows:
+        default: true
+        type: boolean
+      return_total:
+        default: true
+        type: boolean
+    type: object
+  chords_com_api_internal_dto.SearchSongResponse:
+    properties:
+      songs:
+        items:
+          $ref: '#/definitions/chords_com_api_internal_dto.SongInfo'
+        type: array
+      total:
+        type: integer
+    type: object
+  chords_com_api_internal_dto.SongInfo:
+    properties:
+      artist:
+        type: string
+      format:
+        $ref: '#/definitions/chords_com_api_internal_entity.SheetFormat'
+      id:
+        type: integer
+      title:
+        type: string
+    type: object
   chords_com_api_internal_entity.JoinRoomRequest:
     properties:
       room_code:
@@ -25,33 +65,6 @@ definitions:
           $ref: '#/definitions/chords_com_api_internal_entity.User'
         type: array
     type: object
-  chords_com_api_internal_entity.SearchSongRequest:
-    properties:
-      limit:
-        maximum: 100
-        minimum: 1
-        type: integer
-      offset:
-        minimum: 0
-        type: integer
-      query:
-        type: string
-      return_rows:
-        default: true
-        type: boolean
-      return_total:
-        default: true
-        type: boolean
-    type: object
-  chords_com_api_internal_entity.SearchSongResponse:
-    properties:
-      songs:
-        items:
-          $ref: '#/definitions/chords_com_api_internal_entity.SongInfo'
-        type: array
-      total:
-        type: integer
-    type: object
   chords_com_api_internal_entity.SheetFormat:
     enum:
     - chordpro
@@ -76,17 +89,6 @@ definitions:
       title:
         type: string
       updated_at:
-        type: string
-    type: object
-  chords_com_api_internal_entity.SongInfo:
-    properties:
-      artist:
-        type: string
-      format:
-        $ref: '#/definitions/chords_com_api_internal_entity.SheetFormat'
-      id:
-        type: integer
-      title:
         type: string
     type: object
   chords_com_api_internal_entity.UpdateRoomRequest:
@@ -194,14 +196,14 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/chords_com_api_internal_entity.SearchSongRequest'
+          $ref: '#/definitions/chords_com_api_internal_dto.SearchSongRequest'
       produces:
       - application/json
       responses:
         "200":
           description: Search results
           schema:
-            $ref: '#/definitions/chords_com_api_internal_entity.SearchSongResponse'
+            $ref: '#/definitions/chords_com_api_internal_dto.SearchSongResponse'
         "400":
           description: Bad Request
           schema:

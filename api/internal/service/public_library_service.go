@@ -4,6 +4,7 @@ import (
 	"context"
 	"strings"
 
+	"chords.com/api/internal/dto"
 	"chords.com/api/internal/entity"
 	"chords.com/api/internal/logger"
 	"chords.com/api/internal/orm"
@@ -38,17 +39,24 @@ func (s *PublicLibraryService) EnsurePublicLibrary(ctx context.Context, name str
 	return &library, err
 }
 
-func (s *PublicLibraryService) SearchSongs(ctx context.Context, req *entity.SearchSongRequest) (*entity.SearchSongResponse, error) {
+func (s *PublicLibraryService) SearchSongs(ctx context.Context, req *dto.SearchSongRequest) (*dto.SearchSongResponse, error) {
 	tx := orm.GetDB(ctx)
 
 	if req.Limit <= 0 {
 		req.Limit = -1 // Default to no limit
 	}
 
-	query := "%" + strings.ToLower(req.Query) + "%"
 	q := tx.Model(&entity.Song{}).
-		Where("(LOWER(title) LIKE ?) OR (LOWER(artist) LIKE ?)", query, query).
 		Joins("JOIN public_library_songs pls ON pls.song_id = songs.id")
+
+	if req.Query != "" {
+		query := "%" + strings.ToLower(req.Query) + "%"
+		q = q.
+			Where("(LOWER(title) LIKE ?) OR (LOWER(artist) LIKE ?)", query, query)
+	}
+	if req.QueryLyrics != "" {
+		q = orm.SearchFTS(q, "songs", req.QueryLyrics)
+	}
 
 	// Count total number of matching songs
 	var total int64
@@ -59,21 +67,21 @@ func (s *PublicLibraryService) SearchSongs(ctx context.Context, req *entity.Sear
 		}
 	}
 
-	var songs []*entity.SongInfo
+	var songs []*dto.SongInfo
 	if req.ReturnRows {
 		// Find songs with pagination
 		err := q.
-			Order("id ASC").
+			Order("songs.id ASC").
 			Offset(req.Offset).
 			Limit(req.Limit).
-			Select("id", "title", "artist", "format").
+			Select("songs.id", "songs.title", "songs.artist", "songs.format").
 			Find(&songs).Error
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	return &entity.SearchSongResponse{Songs: songs, Total: total}, nil
+	return &dto.SearchSongResponse{Songs: songs, Total: total}, nil
 }
 
 func (s *PublicLibraryService) UploadSong(ctx context.Context, library *entity.PublicLibrary, song *entity.Song) error {
