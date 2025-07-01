@@ -1,6 +1,5 @@
 import { Anchor, AppShell, Burger, Group, Space } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { useState } from "react";
 import { Route, Routes, useNavigate } from "react-router";
 
 import Image from "@components/Image";
