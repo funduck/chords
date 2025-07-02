@@ -36,11 +36,11 @@ find . -name "*.html" | while read file; do
     parse_html "$file"
 done
 
-mkdir -p data/chordpro-specification
+mkdir -p docs/chordpro-specification
 # Copy markdown files to specification directory
 # All markdown files are named index.md so we have to prepend the parent directory name
 find . -name "index.md" | while read file; do
     parent_dir=$(dirname "$file")
     dir="$(basename "$parent_dir")"
-    cp "$file" "data/chordpro-specification/${dir}.md"
+    cp "$file" "docs/chordpro-specification/${dir}.md"
 done

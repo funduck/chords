@@ -1,0 +1,169 @@
+![](../images/chordpro-icon.png)
+[ChordPro](https://www.chordpro.org/chordpro/home/)
+
+The Specification
+
+[Overview](https://www.chordpro.org/chordpro/chordpro-introduction/)
+[ChordPro Directives](./chordpro-directives.md)
+[ChordPro Chords](./chordpro-chords.md)
+
+
+The Program
+
+[Overview](https://www.chordpro.org/chordpro/chordpro-reference-implementation/)
+
+[Installation](https://www.chordpro.org/chordpro/chordpro-installation/)
+[Getting Started](https://www.chordpro.org/chordpro/chordpro-getting-started/)
+
+[Configuration](https://www.chordpro.org/chordpro/chordpro-configuration/)
+[CLI User guide](https://www.chordpro.org/chordpro/using-chordpro/)
+
+
+Support
+[Forum, Hints and FAQ](https://www.chordpro.org/chordpro/support/)
+
+[Links](https://www.chordpro.org/chordpro/links/)
+
+[ROADMAP](https://www.chordpro.org/chordpro/roadmap/)
+[All Pages](https://www.chordpro.org/chordpro/allpages/)
+
+
+Toggle Sidebar
+
+-   [ChordPro Home](https://www.chordpro.org/chordpro/){.nav-link}
+
+Directives: start\_of\_grid
+===========================
+
+Abbreviation: `sog`.
+
+This directive indicates that the lines that follow define a chord grid
+in the style of [Jazz
+Grilles](https://fr.wikipedia.org/wiki/Grille_harmonique).
+
+Note: Grids must not be confused with *chord diagrams* that,
+unfortunately, in some parts of the documentation and implementation
+also are referred to as 'chord grids'.
+
+In a grid only chords are used, no lyrics, and the chords are arranged
+in a rectangular pattern for a quick view on the structure of the song.
+Symbols for bar lines and repeats can also be included in a grid. The
+chords are subject to transposition.
+
+For example, to create a grid for 'The House of the Rising Sun':
+
+    {start_of_grid}
+    || Am . . . | C . . . | D  . . . | F  . . . |
+    |  Am . . . | C . . . | E  . . . | E  . . . |
+    |  Am . . . | C . . . | D  . . . | F  . . . |
+    |  Am . . . | E . . . | Am . . . | Am . . . ||
+    {end_of_grid}
+
+The result could look like:
+
+![](../images/ex_grid1.png){.img-responsive .img-fluid}
+
+The grid consists of a number of cells that can contain chords. The
+desired number of cells per line can be specified as a `shape` property
+to the `start_of_grid` directive:
+
+`{start_of_grid: shape="`*cells*`"}`\
+`{start_of_grid: shape="`*measures*`x`*beats*`"}`
+
+There is no semantic difference between the two forms, just pick the one
+that is most convenient.
+
+*For legacy purposes you can leave out the `shape` property and just
+include the shape, optionally followed by label text:*
+
+`{start_of_grid:` *cells*`}`\
+`{start_of_grid:` *measures*`x`*beats*`}`
+
+*However, in this form you cannot use other properties.*
+
+It is possible to specify room for margin notes, both left side and
+right side, by adding the desired number of cells in the shape:
+
+*left*`+`*cells*`+`*right*\
+*left*`+`*measures*`x`*beats*`+`*right*
+
+Both margins are optional and may be omitted together with their `+`
+symbols.
+
+If no shape is supplied to `start_of_grid` then the values from the
+preceding grid, if any, are used. If the first `start_of_grid` does not
+have a shape, a default value `1+4x4+1` is used.
+
+The grid input lines consist of space-separated tokens, which are either
+valid chords or special symbols. Spaces are not significant but can be
+used e.g. to align chords in the input lines.
+
+Chords are put into the cells. If a cell does not need to contain a
+chord, the placeholder `.` (period) can be used to designate an empty
+cell.
+
+Alternatively, a slash `/` can be used to designate that a chord must be
+played here. Multiple chords can be put in a single cell by separating
+the chord names with a `~` (tilde).
+
+Between the cells bar lines can be placed. In the above example, each
+line contains 16 cells and the bar lines divide the cells into 4 groups
+(measures) of 4 cells (beats).
+
+The following bar line symbols are valid:
+
+-   `|` single bar line
+-   `||` double bar line
+-   `|.` end bar line
+-   `|:` start repeat bar line
+-   `:|` stop repeat bar line
+-   `:|:` combined stop/start repeat bar line
+-   `|1`, `|2`, etc, start of a volta
+-   `|2>` start of a volta, align under the first volta of the previous
+    line
+
+Each line should contain at least one bar line symbol. Everything before
+the first bar line will be put in the left margin, and everything
+following the last bar symbol will be put in the right margin. If the
+line doesn't contain a bar symbol it is printed completely in the left
+margin.
+
+Other symbols that can be used:
+
+-   `%` denotes that this measure should be played just like the
+    previous measure. The rest of the measure must remain blank.
+-   `%%` denotes that the last two measures must be repeated. The rest
+    of this measure and the following measure must remain blank.
+
+Example:
+
+    {start_of_grid: shape="1+4x2+4"}
+    A    || G7 . | % . | %% . | . . |
+         | C7 . | %  . || G7 . | % . ||
+         |: C7 . | %  . :|: G7 . | % . :| repeat 4 times
+    Coda | D7 . | Eb7 | D7 | G7 . | % . |.
+    {end_of_grid}
+
+The result will be similar to:
+
+![](../images/ex_grid2.png){.img-responsive .img-fluid}
+
+See [PDF configuration - grid
+lines](https://www.chordpro.org/chordpro/chordpro-configuration-pdf/#grid-lines)
+for more configuration settings.
+
+This directive may include an optional label, to be printed in the left
+margin. For example:,
+
+    {start_of_grid: label="Intro"}
+
+The ChordPro reference implementation prints the label in the left
+margin, see
+[labels](https://www.chordpro.org/chordpro/chordpro-configuration-pdf/#labels).
+
+Directives: end\_of\_grid
+=========================
+
+Abbreviation: `eog`.
+
+This directive indicates the end of the grid.
