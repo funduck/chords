@@ -12,4 +12,4 @@ build-api:
 	go build --tags fts5 -o bin/api ./cmd/api/main.go
 
 build-uploader:
-	go build -o bin/uploader ./cmd/uploader/main.go
+	go build --tags fts5 -o bin/uploader ./cmd/uploader/main.go

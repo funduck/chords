@@ -3,7 +3,8 @@ package chordpro
 type Song struct {
 	Title    string    `json:"title"`
 	Subtitle string    `json:"subtitle"`
-	Artist   string    `json:"artist"`
+	Artist   string    `json:"artist,omitempty"`
+	Composer string    `json:"composer,omitempty"`
 	Album    string    `json:"album,omitempty"`
 	Key      string    `json:"key,omitempty"`
 	Capo     string    `json:"capo,omitempty"`

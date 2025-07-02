@@ -75,6 +75,8 @@ definitions:
     properties:
       artist:
         type: string
+      composer:
+        type: string
       created_at:
         type: string
       deleted_at:

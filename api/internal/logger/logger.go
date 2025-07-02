@@ -23,37 +23,40 @@ func NewLogger(packageName string) *zap.SugaredLogger {
 	}
 
 	var logger *zap.Logger
+	var cfg zap.Config
 	conf := config.New()
 
 	if Env(conf.LoggerEnv) != EnvProd {
-		cfg := zap.NewDevelopmentConfig()
+		cfg = zap.NewDevelopmentConfig()
 		cfg.EncoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
-		levelStr := conf.LoggerLevel
-		var ok bool
-		if packageName != "" {
-			if levelStr, ok = conf.LoggerLevels[strings.ToLower(packageName)]; ok {
-				fmt.Printf("Logger level for %s not found, using global %s level\n", packageName, levelStr)
-			} else {
-				levelStr = conf.LoggerLevel
-				fmt.Printf("Logger level for %s: %s\n", packageName, levelStr)
-			}
-		}
-		levelStr = strings.ToLower(levelStr)
-		switch levelStr {
-		case "debug":
-			cfg.Level = zap.NewAtomicLevelAt(zapcore.DebugLevel)
-		case "info":
-			cfg.Level = zap.NewAtomicLevelAt(zapcore.InfoLevel)
-		case "warn":
-			cfg.Level = zap.NewAtomicLevelAt(zapcore.WarnLevel)
-		case "error":
-			cfg.Level = zap.NewAtomicLevelAt(zapcore.ErrorLevel)
-		}
-
-		logger, _ = cfg.Build()
 	} else {
-		logger, _ = zap.NewProduction()
+		cfg = zap.NewProductionConfig()
 	}
+
+	levelStr := conf.LoggerLevel
+	var ok bool
+	if packageName != "" {
+		if levelStr, ok = conf.LoggerLevels[strings.ToLower(packageName)]; ok {
+			fmt.Printf("Logger level for %s not found, using global %s level\n", packageName, levelStr)
+		} else {
+			levelStr = conf.LoggerLevel
+			fmt.Printf("Logger level for %s: %s\n", packageName, levelStr)
+		}
+	}
+	levelStr = strings.ToLower(levelStr)
+	switch levelStr {
+	case "debug":
+		cfg.Level = zap.NewAtomicLevelAt(zapcore.DebugLevel)
+	case "info":
+		cfg.Level = zap.NewAtomicLevelAt(zapcore.InfoLevel)
+	case "warn":
+		cfg.Level = zap.NewAtomicLevelAt(zapcore.WarnLevel)
+	case "error":
+		cfg.Level = zap.NewAtomicLevelAt(zapcore.ErrorLevel)
+	}
+
+	logger, _ = cfg.Build()
+
 	defer logger.Sync()
 
 	sugared := logger.Sugar()

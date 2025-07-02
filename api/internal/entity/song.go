@@ -8,8 +8,9 @@ const (
 
 type Song struct {
 	BaseEntity
-	Title  string      `gorm:"not null" json:"title"`
-	Artist string      `gorm:"not null" json:"artist"`
-	Sheet  string      `gorm:"not null" json:"sheet"`
-	Format SheetFormat `gorm:"not null" json:"format"`
+	Title    string      `gorm:"not null" json:"title"`
+	Artist   string      `json:"artist"`
+	Composer string      `json:"composer"`
+	Sheet    string      `gorm:"not null" json:"sheet"`
+	Format   SheetFormat `gorm:"not null" json:"format"`
 }

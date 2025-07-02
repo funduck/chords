@@ -164,6 +164,7 @@ How sweet the sound`
 		content := `{title: Test Song}
 {subtitle: A Test}
 {artist: Test Artist}
+{composer: Test Composer}
 {album: Test Album}
 {key: C}
 {capo: 2}
@@ -184,6 +185,9 @@ Test line`
 		}
 		if song.Artist != "Test Artist" {
 			t.Errorf("Expected artist 'Test Artist', got '%s'", song.Artist)
+		}
+		if song.Composer != "Test Composer" {
+			t.Errorf("Expected composer 'Test Composer', got '%s'", song.Composer)
 		}
 		if song.Album != "Test Album" {
 			t.Errorf("Expected album 'Test Album', got '%s'", song.Album)
@@ -260,6 +264,60 @@ Verse line
 
 		if len(song.Sections) != 0 {
 			t.Errorf("Expected 0 sections for whitespace/comments only, got %d", len(song.Sections))
+		}
+	})
+
+	t.Run("meta directive", func(t *testing.T) {
+		content := `{meta: title Amazing Grace}
+{meta: artist John Newton}
+{meta: composer John Newton Third}
+{meta: key G}
+
+Amazing [G]grace how sweet the sound`
+
+		song, err := parser.Parse(content)
+		if err != nil {
+			t.Fatalf("Parse failed: %v", err)
+		}
+
+		if song.Title != "Amazing Grace" {
+			t.Errorf("Expected title 'Amazing Grace', got '%s'", song.Title)
+		}
+		if song.Artist != "John Newton" {
+			t.Errorf("Expected artist 'John Newton', got '%s'", song.Artist)
+		}
+		if song.Composer != "John Newton Third" {
+			t.Errorf("Expected composer 'John Newton Third', got '%s'", song.Composer)
+		}
+		if song.Key != "G" {
+			t.Errorf("Expected key 'G', got '%s'", song.Key)
+		}
+	})
+
+	t.Run("mixed meta and direct directives", func(t *testing.T) {
+		content := `{title: Direct Title}
+{meta: artist Meta Artist}
+{composer: Direct Composer}
+{meta: album Meta Album}
+
+Test line`
+
+		song, err := parser.Parse(content)
+		if err != nil {
+			t.Fatalf("Parse failed: %v", err)
+		}
+
+		if song.Title != "Direct Title" {
+			t.Errorf("Expected title 'Direct Title', got '%s'", song.Title)
+		}
+		if song.Artist != "Meta Artist" {
+			t.Errorf("Expected artist 'Meta Artist', got '%s'", song.Artist)
+		}
+		if song.Composer != "Direct Composer" {
+			t.Errorf("Expected composer 'Direct Composer', got '%s'", song.Composer)
+		}
+		if song.Album != "Meta Album" {
+			t.Errorf("Expected album 'Meta Album', got '%s'", song.Album)
 		}
 	})
 }

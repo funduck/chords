@@ -62,21 +62,7 @@ func (p *Parser) Parse(content string) (*Song, error) {
 	return song, nil
 }
 
-func (p *Parser) processDirective(line string, song *Song, currentSection *Section) {
-	matches := p.directiveRegex.FindStringSubmatch(line)
-	if len(matches) < 2 {
-		return
-	}
-
-	directive := strings.TrimSpace(matches[1])
-	parts := strings.SplitN(directive, ":", 2)
-
-	key := strings.TrimSpace(parts[0])
-	value := ""
-	if len(parts) > 1 {
-		value = strings.TrimSpace(parts[1])
-	}
-
+func (p *Parser) processDirectiveValue(line string, song *Song, currentSection *Section, key string, value string) {
 	switch strings.ToLower(key) {
 	case "title", "t":
 		song.Title = value
@@ -84,6 +70,8 @@ func (p *Parser) processDirective(line string, song *Song, currentSection *Secti
 		song.Subtitle = value
 	case "artist":
 		song.Artist = value
+	case "composer":
+		song.Composer = value
 	case "album":
 		song.Album = value
 	case "key":
@@ -110,7 +98,33 @@ func (p *Parser) processDirective(line string, song *Song, currentSection *Secti
 	case "end_of_bridge", "eob":
 		p.finishCurrentSection(song, currentSection)
 		*currentSection = Section{Type: "verse", Lines: []Line{}}
+	case "meta":
+		parts := strings.SplitN(value, " ", 2)
+		if len(parts) < 2 {
+			return
+		}
+		metaName := strings.TrimSpace(parts[0])
+		metaValue := strings.TrimSpace(parts[1])
+		p.processDirectiveValue(line, song, currentSection, metaName, metaValue)
 	}
+}
+
+func (p *Parser) processDirective(line string, song *Song, currentSection *Section) {
+	matches := p.directiveRegex.FindStringSubmatch(line)
+	if len(matches) < 2 {
+		return
+	}
+
+	directive := strings.TrimSpace(matches[1])
+	parts := strings.SplitN(directive, ":", 2)
+
+	key := strings.TrimSpace(parts[0])
+	value := ""
+	if len(parts) > 1 {
+		value = strings.TrimSpace(parts[1])
+	}
+
+	p.processDirectiveValue(line, song, currentSection, key, value)
 }
 
 func (p *Parser) finishCurrentSection(song *Song, currentSection *Section) {

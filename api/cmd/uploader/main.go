@@ -4,6 +4,7 @@ import (
 	"context"
 	"flag"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"chords.com/api/internal/chordpro"
@@ -15,7 +16,7 @@ import (
 
 var files = flag.String("f", "", "Comma-separated list of chordpro files to upload")
 var lib = flag.String("lib", "Public Library", "Name of the public library to upload to")
-var dryRun = flag.Bool("dry-run", true, "If true, only prints the files to be uploaded without actually uploading them")
+var dryRun = flag.Bool("dry-run", false, "If true, only prints the files to be uploaded without actually uploading them")
 
 // Command line tool to upload chordpro songs to the public library
 // Usage: uploader <file1> <file2> ...
@@ -39,31 +40,18 @@ func main() {
 
 	// If file list is 1 element, check if it is directory
 	if len(fileList) == 1 {
-		oneFile := strings.TrimSpace(fileList[0])
-		fileInfo, err := os.Stat(oneFile)
-		if err != nil {
-			log.Error("Failed to get file info: ", oneFile, " Error: ", err)
-			return
-		}
-		if fileInfo.IsDir() {
-			log.Info("Input is a directory: ", oneFile)
-			// If it is a directory, read all files in the directory
-			dirFiles, err := os.ReadDir(oneFile)
+		root := strings.TrimSpace(fileList[0])
+		fileList = []string{}
+		filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
 			if err != nil {
-				log.Error("Failed to read directory: ", oneFile, " Error: ", err)
-				return
+				log.Error("Failed to walk path: ", path, " Error: ", err)
+				return err
 			}
-			fileList = make([]string, 0, len(dirFiles))
-			for _, dirFile := range dirFiles {
-				if !dirFile.IsDir() {
-					fileList = append(fileList, oneFile+string(os.PathSeparator)+dirFile.Name())
-				}
+			if !info.IsDir() {
+				fileList = append(fileList, path)
 			}
-			if len(fileList) == 0 {
-				log.Error("No files found in directory: ", fileList[0])
-				return
-			}
-		}
+			return nil
+		})
 	}
 
 	log.Info("Library name: ", *lib)
@@ -75,6 +63,9 @@ func main() {
 		log.Error("Failed to ensure public library: ", err)
 		return
 	}
+
+	oks := 0
+	errs := []string{}
 
 	for _, file := range fileList {
 		file = strings.TrimSpace(file)
@@ -98,23 +89,47 @@ func main() {
 			log.Error("Failed to parse chordpro file: ", file, " Error: ", err)
 			continue
 		}
+		if songInfo.Title == "" || (songInfo.Artist == "" && songInfo.Composer == "") {
+			head := strings.Split(fileContent, "\n")[:10]
+			log.Error("Invalid chordpro file: ", file, " - missing title or artist and composer")
+			log.Error("File content head: ", strings.Join(head, "\n"))
+			continue
+		}
 
 		if *dryRun {
-			log.Infow("Dry run - would upload song", "Title", songInfo.Title, "Artist", songInfo.Artist)
+			log.Infow("Dry run - would upload song", "Title", songInfo.Title, "Artist", songInfo.Artist, "Composer", songInfo.Composer)
 			continue
 		}
 
 		// Save the song to the public library
 		song := &entity.Song{
-			Title:  songInfo.Title,
-			Artist: songInfo.Artist,
-			Format: entity.SheetFormat_Chordpro,
-			Sheet:  fileContent,
+			Title:    songInfo.Title,
+			Artist:   songInfo.Artist,
+			Composer: songInfo.Composer,
+			Format:   entity.SheetFormat_Chordpro,
+			Sheet:    fileContent,
 		}
 		if err := libraryService.UploadSong(ctx, library, song); err != nil {
 			log.Error("Failed to upload file: ", file, " Error: ", err)
+			errs = append(errs, file)
 			continue
 		}
+		oks++
 		log.Info("Successfully uploaded file: ", file)
+	}
+
+	log.Infow("Upload completed", "Total files", len(fileList))
+	if len(errs) > 0 {
+		log.Error("Failed to upload the following files:")
+		for _, errFile := range errs {
+			log.Error(errFile)
+		}
+	} else {
+		log.Info("All files uploaded successfully")
+	}
+	if oks == 0 {
+		log.Error("No files were successfully uploaded")
+	} else {
+		log.Info("Successfully uploaded ", oks, " files")
 	}
 }

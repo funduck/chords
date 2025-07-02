@@ -522,6 +522,9 @@ const docTemplate = `{
                 "artist": {
                     "type": "string"
                 },
+                "composer": {
+                    "type": "string"
+                },
                 "created_at": {
                     "type": "string"
                 },
