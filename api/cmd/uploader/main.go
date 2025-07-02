@@ -6,6 +6,7 @@ import (
 	"os"
 	"strings"
 
+	"chords.com/api/internal/chordpro"
 	"chords.com/api/internal/entity"
 	"chords.com/api/internal/logger"
 	"chords.com/api/internal/orm"
@@ -13,6 +14,8 @@ import (
 )
 
 var files = flag.String("f", "", "Comma-separated list of chordpro files to upload")
+var lib = flag.String("lib", "Public Library", "Name of the public library to upload to")
+var dryRun = flag.Bool("dry-run", true, "If true, only prints the files to be uploaded without actually uploading them")
 
 // Command line tool to upload chordpro songs to the public library
 // Usage: uploader <file1> <file2> ...
@@ -26,8 +29,8 @@ func main() {
 	log := logger.New()
 	orm.InitSQLite()
 
-	chordproService := service.NewChordProService()
 	libraryService := service.NewPublicLibraryService()
+	parser := chordpro.NewParser()
 
 	ctx := context.Background()
 	ctx = orm.SetDB(ctx, orm.GetDBInstance())
@@ -63,9 +66,11 @@ func main() {
 		}
 	}
 
+	log.Info("Library name: ", *lib)
+	log.Info("Dry run mode: ", *dryRun)
 	log.Info("Files to upload: ", fileList)
 
-	library, err := libraryService.EnsurePublicLibrary(ctx, "Public Library")
+	library, err := libraryService.EnsurePublicLibrary(ctx, *lib)
 	if err != nil {
 		log.Error("Failed to ensure public library: ", err)
 		return
@@ -88,19 +93,25 @@ func main() {
 		fileContent := string(bytes)
 
 		// Parse the chordpro file
-		songInfo, err := chordproService.ParseChordPro(fileContent)
+		songInfo, err := parser.Parse(fileContent)
 		if err != nil {
 			log.Error("Failed to parse chordpro file: ", file, " Error: ", err)
 			continue
 		}
 
+		if *dryRun {
+			log.Infow("Dry run - would upload song", "Title", songInfo.Title, "Artist", songInfo.Artist)
+			continue
+		}
+
 		// Save the song to the public library
-		if err := libraryService.UploadSong(ctx, library, &entity.Song{
+		song := &entity.Song{
 			Title:  songInfo.Title,
 			Artist: songInfo.Artist,
 			Format: entity.SheetFormat_Chordpro,
 			Sheet:  fileContent,
-		}); err != nil {
+		}
+		if err := libraryService.UploadSong(ctx, library, song); err != nil {
 			log.Error("Failed to upload file: ", file, " Error: ", err)
 			continue
 		}

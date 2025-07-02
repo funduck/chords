@@ -1,46 +1,31 @@
-![](../images/chordpro-icon.png)
-[ChordPro](https://www.chordpro.org/chordpro/home/)
+![](../images/chordpro-icon.png) [ChordPro](https://www.chordpro.org/chordpro/home/)
 
 The Specification
 
-[Overview](https://www.chordpro.org/chordpro/chordpro-introduction/)
-[ChordPro Directives](./chordpro-directives.md)
-[ChordPro Chords](./chordpro-chords.md)
-
+<a href="https://www.chordpro.org/chordpro/chordpro-introduction/" class="list-group-item list-group-item-action bg-light">Overview</a> <a href="https://www.chordpro.org/chordpro/chordpro-directives/" class="list-group-item list-group-item-action bg-light">ChordPro Directives</a> <a href="https://www.chordpro.org/chordpro/chordpro-chords/" class="list-group-item list-group-item-action bg-light">ChordPro Chords</a>
 
 The Program
 
-[Overview](https://www.chordpro.org/chordpro/chordpro-reference-implementation/)
-
-[Installation](https://www.chordpro.org/chordpro/chordpro-installation/)
-[Getting Started](https://www.chordpro.org/chordpro/chordpro-getting-started/)
-
-[Configuration](https://www.chordpro.org/chordpro/chordpro-configuration/)
-[CLI User guide](https://www.chordpro.org/chordpro/using-chordpro/)
-
+<a href="https://www.chordpro.org/chordpro/chordpro-reference-implementation/" class="list-group-item list-group-item-action bg-light">Overview</a> <a href="https://www.chordpro.org/chordpro/chordpro-installation/" class="list-group-item list-group-item-action bg-light">Installation</a> <a href="https://www.chordpro.org/chordpro/chordpro-getting-started/" class="list-group-item list-group-item-action bg-light">Getting Started</a> <a href="https://www.chordpro.org/chordpro/chordpro-configuration/" class="list-group-item list-group-item-action bg-light">Configuration</a> <a href="https://www.chordpro.org/chordpro/using-chordpro/" class="list-group-item list-group-item-action bg-light">CLI User guide</a>
 
 Support
-[Forum, Hints and FAQ](https://www.chordpro.org/chordpro/support/)
 
-[Links](https://www.chordpro.org/chordpro/links/)
-
-[ROADMAP](https://www.chordpro.org/chordpro/roadmap/)
-[All Pages](https://www.chordpro.org/chordpro/allpages/)
-
+<a href="https://www.chordpro.org/chordpro/support/" class="list-group-item list-group-item-action bg-light">Forum, Hints and FAQ</a> <a href="https://www.chordpro.org/chordpro/links/" class="list-group-item list-group-item-action bg-light">Links</a> <a href="https://www.chordpro.org/chordpro/roadmap/" class="list-group-item list-group-item-action bg-light">ROADMAP</a> <a href="https://www.chordpro.org/chordpro/allpages/" class="list-group-item list-group-item-action bg-light">All Pages</a>
 
 Toggle Sidebar
 
--   [ChordPro Home](https://www.chordpro.org/chordpro/){.nav-link}
+<span class="navbar-toggler-icon"></span>
+
+-   <a href="https://www.chordpro.org/chordpro/" class="nav-link">ChordPro Home</a>
 
 Directives: start\_of\_svg
 ==========================
 
-This directive indicates that the lines that follow define an image
-described in [Scalable Vector Graphics](https://...).
+This directive indicates that the lines that follow define an image described in [Scalable Vector Graphics](https://...).
 
 For example
 
-    {start_of_svg}
+`    {start_of_svg}`
     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="18" viewBox="0 0 20 18">
       <g stroke="red" fill="none" stroke-width="2">
         <polygon points="1 17 19 17 10 1" stroke-linejoin="round"/>
@@ -48,23 +33,20 @@ For example
         <polygon points="9 12 8.5 7 11.5 7 11 12" stroke="none" fill="red"/>
       </g>
     </svg>
-    {end_of_svg}
+`    {end_of_svg}`
 
 The result could look like:
 
-![](../images/ex_svg1.png){.img-responsive .img-fluid}
+<img src="../images/ex_svg1.png" class="img-responsive img-fluid" />
 
 Attributes
 ----------
 
-The SVG directive may contain the same formatting attributes as the
-image directive, for example:
+The SVG directive may contain the same formatting attributes as the image directive, for example:
 
-    {start_of_svg label="Alert" align="left"}
+`    {start_of_svg label="Alert" align="left"}`
 
-See [Directives:
-Image](./directives-image.md) for all
-possible attributes.
+See [Directives: Image](./directives-image.md) for all possible attributes.
 
 Directives: end\_of\_svg
 ========================

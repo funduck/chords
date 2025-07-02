@@ -1,6 +1,7 @@
 # Chordpro Specification
 ## Chords
 The lyrics of the song are interspersed with chords written between brackets [ and ].
+[Full spec](../../../docs/chordpro-specification/chordpro-chords.md)
 
 ## Directives
 Besides lyrics with chords, the ChordPro file contains directives, lines that start with { and end with }.

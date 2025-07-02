@@ -5,7 +5,7 @@ tmp_dir = "tmp"
 [build]
   args_bin = []
   bin = "./dist/api"
-  cmd = "go build --tags fts5 -o ./dist/api ./cmd/api"
+  cmd = "make build-api"
   delay = 1000
   exclude_dir = ["assets", "tmp", "vendor", "testdata", "dist"]
   exclude_file = []
