@@ -4,8 +4,6 @@ import { useContext, useEffect, useRef, useState } from "react";
 import { useParams } from "react-router";
 
 import { SongEntity, SongsApiContext } from "@src/hooks/Api";
-import { useHeader } from "@src/hooks/Header";
-import { SettingsService } from "@src/services/settings.service";
 import { Signals } from "@src/services/signals-registry";
 
 import Chordpro from "@components/Chordpro";
@@ -13,7 +11,6 @@ import Stack from "@components/Stack";
 import Text from "@components/Text";
 
 import SongSettings from "./SongSettings";
-import { SongSettingsDto } from "./settings";
 
 function Song() {
   const room = useSignal(Signals.room);
@@ -32,8 +29,6 @@ function Song() {
   } else {
     localStorage.setItem("songId", songId);
   }
-
-  const settings = useSignal(Signals.applySongSettings);
 
   const songViewportRef = useRef<HTMLDivElement>(null);
   const [song, setSong] = useState<SongEntity | null>(null);
@@ -58,24 +53,6 @@ function Song() {
     }
   }, [songsApi, songId]);
 
-  useEffect(() => {
-    if (!settings) {
-      SettingsService.load(SongSettingsDto)
-        .then((loadedSettings) => {
-          if (loadedSettings) {
-            console.log("Song settings loaded");
-            Signals.applySongSettings.set(loadedSettings);
-          } else {
-            console.log("Song settings created");
-            const newSettings = new SongSettingsDto();
-            Signals.applySongSettings.set(newSettings);
-            SettingsService.save(newSettings).catch(console.error);
-          }
-        })
-        .catch(console.error);
-    }
-  }, []);
-
   // HANDLE SYNC SCROLLING IN ROOM
   // Auto scrolling
   useEffect(() => {
@@ -91,7 +68,7 @@ function Song() {
       // Get font size in pixels
       const fontSize = parseFloat(getComputedStyle(document.documentElement).fontSize);
       // Convert scroll speed from percentage to pixels
-      scrollSpeed = 4 * Math.ceil((scrollSpeed / 100) * fontSize);
+      scrollSpeed = 8 * Math.ceil((scrollSpeed / 100) * fontSize);
 
       console.debug("Auto-scrolling is enabled, starting interval", { scrollInterval, scrollSpeed });
       const interval = setInterval(() => {

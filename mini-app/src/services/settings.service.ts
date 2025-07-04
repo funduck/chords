@@ -12,18 +12,20 @@ export abstract class BaseSettings {
 }
 
 export class SettingsService {
-  private static store: Map<string, BaseSettings> = new Map();
-
   static async save(settings: BaseSettings) {
-    const settingsKey = settings.constructor.name;
-    this.store.set(settingsKey, settings);
+    const settingsKey = "settings:" + settings.constructor.name;
+    console.debug("Saving settings for", settingsKey);
+    localStorage.setItem(settingsKey, JSON.stringify(settings));
   }
 
   static async load<T extends BaseSettings>(settingsClass: new () => T): Promise<T | null> {
-    const settingsKey = settingsClass.name;
-    const settings = this.store.get(settingsKey);
-    if (settings) {
-      return settings as T;
+    const settingsKey = "settings:" + settingsClass.name;
+    console.debug("Loading settings for", settingsKey);
+    const settingsJson = localStorage.getItem(settingsKey);
+    if (settingsJson) {
+      const settings = new settingsClass();
+      settings.fromJson(JSON.parse(settingsJson));
+      return settings;
     }
     return null;
   }
