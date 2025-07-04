@@ -18,14 +18,15 @@ type LoginResponse struct {
 }
 
 // AnonymousLogIn godoc
-// @ID anonymousLogIn
-// @Summary      Anonymous Log In
-// @Description  Create an anonymous access token
-// @Tags         auth
-// @Accept       json
-// @Produce      json
-// @Success      200  {object}  LoginResponse
-// @Router	     /api/auth/anonymous [post]
+//
+//	@ID				anonymousLogIn
+//	@Summary		Anonymous Log In
+//	@Description	Create an anonymous access token
+//	@Tags			Auth
+//	@Accept			json
+//	@Produce		json
+//	@Success		200	{object}	LoginResponse
+//	@Router			/api/auth/anonymous [post]
 func (a *App) AnonymousLogIn(w http.ResponseWriter, r *http.Request) {
 	tx := orm.GetDB(r.Context())
 	user := entity.User{
@@ -60,14 +61,15 @@ type RefreshTokenRequest struct {
 }
 
 // RefreshToken godoc
-// @ID refreshToken
-// @Summary      Refresh Access Token
-// @Description  Refresh an access token using a refresh token
-// @Tags         auth
-// @Produce      json
-// @Param        data  body      RefreshTokenRequest true "Refresh Token Request"
-// @Success      200  {object}  LoginResponse
-// @Router	     /api/auth/refresh-token [post]
+//
+//	@ID				refreshToken
+//	@Summary		Refresh Access Token
+//	@Description	Refresh an access token using a refresh token
+//	@Tags			Auth
+//	@Produce		json
+//	@Param			data	body		RefreshTokenRequest	true	"Refresh Token Request"
+//	@Success		200		{object}	LoginResponse
+//	@Router			/api/auth/refresh-token [post]
 func (a *App) RefreshToken(w http.ResponseWriter, r *http.Request) {
 	var req RefreshTokenRequest
 	if err := parseBody(w, r, &req); err != nil {

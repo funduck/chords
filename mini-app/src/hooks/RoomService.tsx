@@ -4,14 +4,14 @@ import { NavigateFunction, useNavigate } from "react-router";
 
 import { RoutesEnum } from "@src/Router";
 import { SongSettings } from "@src/features/song/settings";
-import { ChordsComApiInternalEntityRoom, RoomsApi } from "@src/generated/api";
+import { RoomsApi } from "@src/generated/api";
 import { Signals } from "@src/services/signals-registry";
 
-import { RoomsApiContext } from "./Api";
+import { RoomEntity, RoomsApiContext } from "./Api";
 import { WebSocketContext } from "./WebSocket";
 
 export type RoomState = {
-  song_id: string | null;
+  song_id: number | null;
   song_settings: SongSettings;
 };
 
@@ -36,7 +36,7 @@ class RoomService {
     }
   }
 
-  handle(room?: ChordsComApiInternalEntityRoom) {
+  handle(room?: RoomEntity) {
     if (room) {
       console.log("Joined room:", room);
 
@@ -74,7 +74,7 @@ class RoomService {
       .catch(console.error);
   }
 
-  leaveRoom(room: ChordsComApiInternalEntityRoom) {
+  leaveRoom(room: RoomEntity) {
     if (!this.roomsApi) {
       throw new Error("Rooms API is not available");
     }

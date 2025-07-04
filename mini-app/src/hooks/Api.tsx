@@ -4,14 +4,15 @@ import { ReactNode, createContext, useEffect, useState } from "react";
 import { ApiHttpUrl } from "@src/config";
 import {
   AuthApi,
+  ChordsComApiInternalDtoSongInfo,
   ChordsComApiInternalEntityRoom,
   ChordsComApiInternalEntitySong,
-  ChordsComApiInternalEntitySongInfo,
   Configuration,
   LibraryApi,
   RoomsApi,
   SongsApi,
 } from "@src/generated/api";
+import { Logger } from "@src/services/logger.service";
 import { Signals } from "@src/services/signals-registry";
 
 export const AuthApiContext = createContext<AuthApi | null>(null);
@@ -21,7 +22,7 @@ export const SongsApiContext = createContext<SongsApi | null>(null);
 
 export type RoomEntity = ChordsComApiInternalEntityRoom;
 export type SongEntity = ChordsComApiInternalEntitySong;
-export type SongInfoEntity = ChordsComApiInternalEntitySongInfo;
+export type SongInfoEntity = ChordsComApiInternalDtoSongInfo;
 
 export function ApiProvider({ children }: { children: ReactNode }) {
   const [authApi, setAuthApi] = useState<AuthApi | null>(null);
@@ -34,9 +35,28 @@ export function ApiProvider({ children }: { children: ReactNode }) {
     console.log("Connecting to public API...");
     const conf = new Configuration({
       basePath: ApiHttpUrl,
+      middleware: [
+        {
+          post: async (context) => {
+            if (!context.response.ok) {
+              Logger.error(
+                "API error:",
+                context.init.method,
+                context.url,
+                context.init.body,
+                context.response.status,
+                context.response.statusText,
+              );
+            }
+            return context.response;
+          },
+        },
+      ],
     });
     const authAPI = new AuthApi(conf);
     setAuthApi(authAPI);
+
+    Logger.log("Public API connected");
 
     return () => {
       console.log("Public API closing...");
@@ -56,6 +76,23 @@ export function ApiProvider({ children }: { children: ReactNode }) {
         authorization: `Bearer ${accessToken}`,
       },
       // TODO middleware to refresh access token
+      middleware: [
+        {
+          post: async (context) => {
+            if (!context.response.ok) {
+              Logger.error(
+                "API error:",
+                context.init.method,
+                context.url,
+                context.init.body,
+                context.response.status,
+                context.response.statusText,
+              );
+            }
+            return context.response;
+          },
+        },
+      ],
     });
     const roomsAPI = new RoomsApi(conf);
     setRoomsApi(roomsAPI);
@@ -63,6 +100,8 @@ export function ApiProvider({ children }: { children: ReactNode }) {
     setLibraryApi(libraryAPI);
     const songsAPI = new SongsApi(conf);
     setSongsApi(songsAPI);
+
+    Logger.log("Private API connected");
 
     return () => {
       console.log("Private API closing...");

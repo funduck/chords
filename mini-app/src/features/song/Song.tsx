@@ -11,12 +11,13 @@ import Chordpro from "@components/Chordpro";
 import Dropdown from "@components/Dropdown";
 import Stack from "@components/Stack";
 import Text from "@components/Text";
-import Title from "@components/Title";
 
 import SongSettingsControl from "./SongSettings";
 import { SongSettings } from "./settings";
 
 function Song() {
+  const room = useSignal(Signals.room);
+
   // GET SONG
   let { songId } = useParams();
 
@@ -118,6 +119,7 @@ function Song() {
       };
     }
   }, [
+    room,
     songViewportRef.current,
     applySongSettings?.auto_scroll,
     applySongSettings?.auto_scroll_interval,
@@ -125,6 +127,9 @@ function Song() {
   ]);
   // Emitting scroll events
   function onScrollPositionChange() {
+    if (!room) {
+      return;
+    }
     if (!songViewportRef.current) {
       console.error("Song container not found");
       return;
@@ -149,6 +154,9 @@ function Song() {
   }
   // Applying scroll events
   useEffect(() => {
+    if (!room) {
+      return;
+    }
     if (applySongScroll == null) {
       return;
     }
@@ -172,7 +180,7 @@ function Song() {
     songViewportRef.current.scrollTo({ top: scrollTop, behavior: "smooth" });
 
     Signals.applySongScroll.set(null); // Clear the signal after applying
-  }, [song, songViewportRef.current, applySongScroll, applySongSettings?.auto_scroll]);
+  }, [room, song, songViewportRef.current, applySongScroll, applySongSettings?.auto_scroll]);
 
   if (!song) {
     return <div>Loading...</div>;
@@ -197,11 +205,11 @@ function Song() {
         }}
       >
         <Stack gap="xl">
-          <Box>
+          {/* <Box>
             <Title>{`"${song.title}" by "${song.artist}"`}</Title>
             <Space h="md" />
             <Divider />
-          </Box>
+          </Box> */}
 
           <Box>
             <Chordpro sheet={song.sheet!} />

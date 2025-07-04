@@ -92,15 +92,15 @@ func (a *App) NewWSHandler() http.HandlerFunc {
 }
 
 // PostWSHandler godoc
-// @Summary Post WebSocket Handler
-// @Description This is a placeholder - only for OpenAPI documentation purposes.
-// @Tags WebSocket
-// @Accept json
-// @Produce json
-// @Param data body eventbus.Event true "Request body"
-// @Success 200 {object} eventbus.Event "WebSocket event"
-// @Router /ws [post]
-// @Security BearerAuth
+//	@Summary		Post WebSocket Handler
+//	@Description	This is a placeholder - only for OpenAPI documentation purposes.
+//	@Tags			WebSocket
+//	@Accept			json
+//	@Produce		json
+//	@Param			data	body		eventbus.Event	true	"Request body"
+//	@Success		200		{object}	eventbus.Event	"WebSocket event"
+//	@Router			/ws [post]
+//	@Security		BearerAuth
 func (a *App) PostWSHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }

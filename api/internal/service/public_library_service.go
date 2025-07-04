@@ -74,7 +74,7 @@ func (s *PublicLibraryService) SearchSongs(ctx context.Context, req *dto.SearchS
 			Order("songs.id ASC").
 			Offset(req.Offset).
 			Limit(req.Limit).
-			Select("songs.id", "songs.title", "songs.artist", "songs.format").
+			Select("songs.id", "songs.title", "songs.artist", "songs.composer", "songs.format").
 			Find(&songs).Error
 		if err != nil {
 			return nil, err

@@ -32,12 +32,18 @@ definitions:
     properties:
       artist:
         type: string
+      composer:
+        type: string
       format:
         $ref: '#/definitions/chords_com_api_internal_entity.SheetFormat'
       id:
         type: integer
       title:
         type: string
+    required:
+    - format
+    - id
+    - title
     type: object
   chords_com_api_internal_entity.JoinRoomRequest:
     properties:
@@ -148,6 +154,9 @@ definitions:
     type: object
 info:
   contact: {}
+  description: This is a Chords server.
+  title: Chords API
+  version: "1.0"
 paths:
   /api/auth/anonymous:
     post:
@@ -164,7 +173,7 @@ paths:
             $ref: '#/definitions/internal_app.LoginResponse'
       summary: Anonymous Log In
       tags:
-      - auth
+      - Auth
   /api/auth/refresh-token:
     post:
       description: Refresh an access token using a refresh token
@@ -185,7 +194,7 @@ paths:
             $ref: '#/definitions/internal_app.LoginResponse'
       summary: Refresh Access Token
       tags:
-      - auth
+      - Auth
   /api/library/public:
     post:
       consumes:
@@ -216,7 +225,7 @@ paths:
             type: string
       summary: Search public library for songs
       tags:
-      - library
+      - Library
   /api/rooms:
     post:
       consumes:
@@ -242,7 +251,7 @@ paths:
       - BearerAuth: []
       summary: Create a new room
       tags:
-      - rooms
+      - Rooms
   /api/rooms/{id}:
     patch:
       consumes:
@@ -284,7 +293,7 @@ paths:
       - BearerAuth: []
       summary: Update a room
       tags:
-      - rooms
+      - Rooms
   /api/rooms/{id}/leave:
     post:
       consumes:
@@ -318,7 +327,7 @@ paths:
       - BearerAuth: []
       summary: Leave a room
       tags:
-      - rooms
+      - Rooms
   /api/rooms/join:
     post:
       consumes:
@@ -355,7 +364,7 @@ paths:
       - BearerAuth: []
       summary: Join a room
       tags:
-      - rooms
+      - Rooms
   /api/songs/{id}:
     get:
       consumes:

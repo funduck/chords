@@ -14,7 +14,7 @@ import Song from "./features/song/Song";
 class RoutesEnum {
   static Search = "/";
   static Room = "/room";
-  static Song = function (songId?: string): string {
+  static Song = function (songId?: number): string {
     if (songId == null) {
       return "/song";
     }
@@ -86,7 +86,7 @@ function Router() {
       </AppShell.Navbar>
       {/* <AppShell.Aside>Aside</AppShell.Aside> */}
       <AppShell.Footer></AppShell.Footer>
-      <AppShell.Main id="appshelmain" style={{ display: "flex", flex: 1, flexDirection: "column" }}>
+      <AppShell.Main id="appshellmain" style={{ display: "flex", flex: 1, flexDirection: "column" }}>
         <Routes>
           <Route index element={<Search />} />
           <Route path="room" element={<Room />} />

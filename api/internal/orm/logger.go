@@ -2,9 +2,11 @@ package orm
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"chords.com/api/internal/logger"
+	"gorm.io/gorm"
 	gormLogger "gorm.io/gorm/logger"
 )
 
@@ -37,6 +39,10 @@ func (l dbLogger) Trace(ctx context.Context, begin time.Time, fc func() (sql str
 	if err == nil {
 		l.Debugf("trace duration %s, rows affected %d, sql: %s", duration, rowsAffected, sql)
 	} else {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			l.Debugf("trace duration %s, rows affected %d, sql: %s, error: %v", duration, rowsAffected, sql, err)
+			return
+		}
 		l.Errorf("trace duration %s, rows affected %d, sql: %s, error: %v", duration, rowsAffected, sql, err)
 	}
 }

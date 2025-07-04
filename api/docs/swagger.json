@@ -1,7 +1,10 @@
 {
     "swagger": "2.0",
     "info": {
-        "contact": {}
+        "description": "This is a Chords server.",
+        "title": "Chords API",
+        "contact": {},
+        "version": "1.0"
     },
     "paths": {
         "/api/auth/anonymous": {
@@ -14,7 +17,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "auth"
+                    "Auth"
                 ],
                 "summary": "Anonymous Log In",
                 "operationId": "anonymousLogIn",
@@ -35,7 +38,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "auth"
+                    "Auth"
                 ],
                 "summary": "Refresh Access Token",
                 "operationId": "refreshToken",
@@ -70,7 +73,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "library"
+                    "Library"
                 ],
                 "summary": "Search public library for songs",
                 "operationId": "searchPublicLibrary",
@@ -122,7 +125,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "rooms"
+                    "Rooms"
                 ],
                 "summary": "Create a new room",
                 "operationId": "createRoom",
@@ -163,7 +166,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "rooms"
+                    "Rooms"
                 ],
                 "summary": "Join a room",
                 "operationId": "joinRoom",
@@ -221,7 +224,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "rooms"
+                    "Rooms"
                 ],
                 "summary": "Update a room",
                 "operationId": "updateRoom",
@@ -286,7 +289,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "rooms"
+                    "Rooms"
                 ],
                 "summary": "Leave a room",
                 "operationId": "leaveRoom",
@@ -442,8 +445,16 @@
         },
         "chords_com_api_internal_dto.SongInfo": {
             "type": "object",
+            "required": [
+                "format",
+                "id",
+                "title"
+            ],
             "properties": {
                 "artist": {
+                    "type": "string"
+                },
+                "composer": {
                     "type": "string"
                 },
                 "format": {

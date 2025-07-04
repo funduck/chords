@@ -7,17 +7,18 @@ import (
 )
 
 // SearchPublicLibrary godoc
-// @ID searchPublicLibrary
-// @Summary      Search public library for songs
-// @Description  Search for songs in the public library using various parameters.
-// @Tags         library
-// @Accept       json
-// @Produce      json
-// @Param        request body dto.SearchSongRequest true "Search Song Request"
-// @Success      200 {object} dto.SearchSongResponse "Search results"
-// @Failure      400 {object} string "Bad Request"
-// @Failure      500 {object} string "Internal Server Error"
-// @Router       /api/library/public [post]
+//
+//	@ID				searchPublicLibrary
+//	@Summary		Search public library for songs
+//	@Description	Search for songs in the public library using various parameters.
+//	@Tags			Library
+//	@Accept			json
+//	@Produce		json
+//	@Param			request	body		dto.SearchSongRequest	true	"Search Song Request"
+//	@Success		200		{object}	dto.SearchSongResponse	"Search results"
+//	@Failure		400		{object}	string					"Bad Request"
+//	@Failure		500		{object}	string					"Internal Server Error"
+//	@Router			/api/library/public [post]
 func (a *App) SearchPublicLibrary(w http.ResponseWriter, r *http.Request) {
 	var req dto.SearchSongRequest
 	err := parseBody(w, r, &req)

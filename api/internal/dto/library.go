@@ -17,8 +17,9 @@ type SearchSongResponse struct {
 }
 
 type SongInfo struct {
-	ID     uint               `json:"id"`
-	Title  string             `json:"title"`
-	Artist string             `json:"artist"`
-	Format entity.SheetFormat `json:"format"`
+	ID       uint               `json:"id" validate:"required"`
+	Title    string             `json:"title" validate:"required"`
+	Artist   string             `json:"artist"`
+	Composer string             `json:"composer"`
+	Format   entity.SheetFormat `json:"format" validate:"required"`
 }

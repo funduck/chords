@@ -25,7 +25,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "auth"
+                    "Auth"
                 ],
                 "summary": "Anonymous Log In",
                 "operationId": "anonymousLogIn",
@@ -46,7 +46,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "auth"
+                    "Auth"
                 ],
                 "summary": "Refresh Access Token",
                 "operationId": "refreshToken",
@@ -81,7 +81,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "library"
+                    "Library"
                 ],
                 "summary": "Search public library for songs",
                 "operationId": "searchPublicLibrary",
@@ -133,7 +133,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "rooms"
+                    "Rooms"
                 ],
                 "summary": "Create a new room",
                 "operationId": "createRoom",
@@ -174,7 +174,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "rooms"
+                    "Rooms"
                 ],
                 "summary": "Join a room",
                 "operationId": "joinRoom",
@@ -232,7 +232,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "rooms"
+                    "Rooms"
                 ],
                 "summary": "Update a room",
                 "operationId": "updateRoom",
@@ -297,7 +297,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "rooms"
+                    "Rooms"
                 ],
                 "summary": "Leave a room",
                 "operationId": "leaveRoom",
@@ -453,8 +453,16 @@ const docTemplate = `{
         },
         "chords_com_api_internal_dto.SongInfo": {
             "type": "object",
+            "required": [
+                "format",
+                "id",
+                "title"
+            ],
             "properties": {
                 "artist": {
+                    "type": "string"
+                },
+                "composer": {
                     "type": "string"
                 },
                 "format": {
@@ -633,12 +641,12 @@ const docTemplate = `{
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "",
+	Version:          "1.0",
 	Host:             "",
 	BasePath:         "",
 	Schemes:          []string{},
-	Title:            "",
-	Description:      "",
+	Title:            "Chords API",
+	Description:      "This is a Chords server.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

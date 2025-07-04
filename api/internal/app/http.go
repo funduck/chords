@@ -2,6 +2,7 @@ package app
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -66,7 +67,7 @@ func (er ErrorResponse) writeError(w http.ResponseWriter, code int) {
 
 	e, err := json.Marshal(er)
 	if err != nil {
-		logger.GetLogger(nil).Errorf("failed to marshal error response: %v", err)
+		logger.GetLogger(context.TODO()).Errorf("failed to marshal error response: %v", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte("json marshal error"))
 		return

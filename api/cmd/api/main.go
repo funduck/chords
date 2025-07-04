@@ -9,6 +9,9 @@ import (
 	"chords.com/api/internal/orm"
 )
 
+// @title			Chords API
+// @version		1.0
+// @description	This is a Chords server.
 func main() {
 	log := logger.New()
 	c := config.New()
