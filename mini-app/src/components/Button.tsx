@@ -1,4 +1,4 @@
-import { Button as MantineButton } from "@mantine/core";
+import { ButtonVariant, Button as MantineButton } from "@mantine/core";
 import React from "react";
 
 type ButtonProps = {
@@ -6,11 +6,12 @@ type ButtonProps = {
   disabled?: boolean;
   onClick?: () => void;
   stretched?: boolean;
+  variant?: ButtonVariant;
 };
 
-const Button: React.FC<ButtonProps> = ({ children, disabled, onClick, stretched }) => {
+const Button: React.FC<ButtonProps> = ({ children, disabled, onClick, stretched, variant }) => {
   return (
-    <MantineButton w={stretched ? "100%" : ""} variant="outline" onClick={onClick} disabled={disabled}>
+    <MantineButton w={stretched ? "100%" : ""} variant={variant || "outline"} onClick={onClick} disabled={disabled}>
       {children}
     </MantineButton>
   );

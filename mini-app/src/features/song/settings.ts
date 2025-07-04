@@ -1,6 +1,6 @@
 import { BaseSettings } from "@src/services/settings.service";
 
-export class SongSettings extends BaseSettings {
+export class SongSettingsDto extends BaseSettings {
   show_chords: boolean = true;
   auto_scroll: boolean = false;
   auto_scroll_speed: number = 1;

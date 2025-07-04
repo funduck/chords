@@ -40,6 +40,14 @@ localhost:80 {
 		}
 	}
 
+	handle /log {
+		reverse_proxy localhost:9000 {
+			header_up Host {http.request.host}
+			header_up X-Real-IP {http.request.remote}
+			header_up X-Forwarded-For {http.request.remote}
+		}
+	}
+
 	handle /* {
 		reverse_proxy localhost:8080 {
 			header_up Host {http.request.host}

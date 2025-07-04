@@ -3,7 +3,7 @@ import { ReactNode, createContext, useContext, useEffect, useState } from "react
 import { NavigateFunction, useNavigate } from "react-router";
 
 import { RoutesEnum } from "@src/Router";
-import { SongSettings } from "@src/features/song/settings";
+import { SongSettingsDto } from "@src/features/song/settings";
 import { RoomsApi } from "@src/generated/api";
 import { Signals } from "@src/services/signals-registry";
 
@@ -12,7 +12,7 @@ import { WebSocketContext } from "./WebSocket";
 
 export type RoomState = {
   song_id: number | null;
-  song_settings: SongSettings;
+  song_settings: SongSettingsDto;
 };
 
 class RoomService {
@@ -32,7 +32,7 @@ class RoomService {
     }
     if (state.song_settings) {
       console.log("Applying room state:", state);
-      Signals.applySongSettings.set(new SongSettings().fromJson(state.song_settings));
+      Signals.applySongSettings.set(new SongSettingsDto().fromJson(state.song_settings));
     }
   }
 

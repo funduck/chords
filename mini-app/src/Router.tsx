@@ -10,6 +10,7 @@ import Title from "./components/Title";
 import Room from "./features/room/Room";
 import Search from "./features/search/Search";
 import Song from "./features/song/Song";
+import { useHeader } from "./hooks/Header";
 
 class RoutesEnum {
   static Search = "/";
@@ -25,6 +26,8 @@ class RoutesEnum {
 export { RoutesEnum };
 
 function Router() {
+  const { centerContent, rightContent } = useHeader();
+
   const navigate = useNavigate();
 
   const tabs = [
@@ -62,10 +65,15 @@ function Router() {
       style={{ display: "flex", flexDirection: "column", height: "100vh" }}
     >
       <AppShell.Header>
-        <Group justify="normal" m="sm">
-          <Burger hiddenFrom="sm" opened={mobileOpened} onClick={toggleMobile} />
+        <Group justify="space-between" m="sm">
+          <Group gap="sm">
+            <Burger hiddenFrom="sm" opened={mobileOpened} onClick={toggleMobile} />
+          </Group>
+          {centerContent && <Group gap="sm">{centerContent}</Group>}
+          <Group gap="sm">{rightContent}</Group>
         </Group>
       </AppShell.Header>
+
       <AppShell.Navbar p="lg">
         <Stack gap="lg">
           {tabs.map(({ id, link, text }) => (
@@ -84,8 +92,11 @@ function Router() {
         <Space h="xl" />
         <ThemeSwitch />
       </AppShell.Navbar>
+
       {/* <AppShell.Aside>Aside</AppShell.Aside> */}
+
       <AppShell.Footer></AppShell.Footer>
+
       <AppShell.Main id="appshellmain" style={{ display: "flex", flex: 1, flexDirection: "column" }}>
         <Routes>
           <Route index element={<Search />} />

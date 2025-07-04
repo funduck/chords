@@ -1,19 +1,19 @@
-import { Box, Divider, Group, ScrollArea, Space } from "@mantine/core";
+import { Box, Divider, ScrollArea, Space } from "@mantine/core";
 import { useSignal } from "@telegram-apps/sdk-react";
 import { useContext, useEffect, useRef, useState } from "react";
 import { useParams } from "react-router";
 
 import { SongEntity, SongsApiContext } from "@src/hooks/Api";
+import { useHeader } from "@src/hooks/Header";
 import { SettingsService } from "@src/services/settings.service";
 import { Signals } from "@src/services/signals-registry";
 
 import Chordpro from "@components/Chordpro";
-import Dropdown from "@components/Dropdown";
 import Stack from "@components/Stack";
 import Text from "@components/Text";
 
-import SongSettingsControl from "./SongSettings";
-import { SongSettings } from "./settings";
+import SongSettings from "./SongSettings";
+import { SongSettingsDto } from "./settings";
 
 function Song() {
   const room = useSignal(Signals.room);
@@ -60,14 +60,14 @@ function Song() {
 
   useEffect(() => {
     if (!settings) {
-      SettingsService.load(SongSettings)
+      SettingsService.load(SongSettingsDto)
         .then((loadedSettings) => {
           if (loadedSettings) {
             console.log("Song settings loaded");
             Signals.applySongSettings.set(loadedSettings);
           } else {
             console.log("Song settings created");
-            const newSettings = new SongSettings();
+            const newSettings = new SongSettingsDto();
             Signals.applySongSettings.set(newSettings);
             SettingsService.save(newSettings).catch(console.error);
           }
@@ -187,41 +187,38 @@ function Song() {
   }
 
   return (
-    <Box id="songbox" style={{ display: "flex", flex: 1, flexDirection: "column", height: "100%" }}>
-      <Group justify="space-between" style={{ position: "fixed", top: "10px", right: "10px", zIndex: 1000 }}>
-        <Dropdown title="Settings">
-          <SongSettingsControl />
-        </Dropdown>
-      </Group>
-
-      <ScrollArea
-        viewportRef={songViewportRef}
-        type="always"
-        onScrollPositionChange={onScrollPositionChange}
-        style={{
-          display: "flex",
-          flexGrow: 1,
-          paddingTop: "20px",
-        }}
-      >
-        <Stack gap="xl">
-          {/* <Box>
+    <>
+      <SongSettings />
+      <Box id="songbox" style={{ display: "flex", flex: 1, flexDirection: "column", height: "100%" }}>
+        <ScrollArea
+          viewportRef={songViewportRef}
+          type="always"
+          onScrollPositionChange={onScrollPositionChange}
+          style={{
+            display: "flex",
+            flexGrow: 1,
+            paddingTop: "20px",
+          }}
+        >
+          <Stack gap="xl">
+            {/* <Box>
             <Title>{`"${song.title}" by "${song.artist}"`}</Title>
             <Space h="md" />
             <Divider />
           </Box> */}
 
-          <Box>
-            <Chordpro sheet={song.sheet!} />
-          </Box>
-          <Box>
-            <Divider />
-            <Space h="md" />
-            <Text style={{ fontStyle: "italic" }}>End</Text>
-          </Box>
-        </Stack>
-      </ScrollArea>
-    </Box>
+            <Box>
+              <Chordpro sheet={song.sheet!} />
+            </Box>
+            <Box>
+              <Divider />
+              <Space h="md" />
+              <Text style={{ fontStyle: "italic" }}>End</Text>
+            </Box>
+          </Stack>
+        </ScrollArea>
+      </Box>
+    </>
   );
 }
 

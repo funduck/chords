@@ -8,7 +8,7 @@ import { RoomsApiContext } from "@src/hooks/Api";
 import { WebSocketContext } from "@src/hooks/WebSocket";
 import { Signals } from "@src/services/signals-registry";
 
-import { SongSettings } from "@features/song/settings";
+import { SongSettingsDto } from "@features/song/settings";
 
 import { RoomState } from "./RoomService";
 
@@ -193,7 +193,7 @@ export function EventsConsumer() {
       console.debug("Received event:", dto);
       switch (dto.type) {
         case "song_settings": {
-          Signals.applySongSettings.set(new SongSettings().fromJson(dto.data.songSettings));
+          Signals.applySongSettings.set(new SongSettingsDto().fromJson(dto.data.songSettings));
           break;
         }
         case "song_scroll": {
