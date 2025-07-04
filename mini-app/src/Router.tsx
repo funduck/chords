@@ -1,4 +1,4 @@
-import { Anchor, AppShell, Burger, Group, Space } from "@mantine/core";
+import { Anchor, AppShell, Burger, Button, Group, Space } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { Route, Routes, useNavigate } from "react-router";
 
@@ -77,20 +77,21 @@ function Router() {
       <AppShell.Navbar p="lg">
         <Stack gap="lg">
           {tabs.map(({ id, link, text }) => (
-            <Anchor
-              key={id}
-              id={id}
-              onClick={() => {
-                toggleMobile();
-                navigate(link);
-              }}
-            >
-              <Title>{text}</Title>
-            </Anchor>
+            <Button variant="subtle" justify="start">
+              <Anchor
+                key={id}
+                id={id}
+                onClick={() => {
+                  toggleMobile();
+                  navigate(link);
+                }}
+              >
+                <Title>{text}</Title>
+              </Anchor>
+            </Button>
           ))}
+          <ThemeSwitch />
         </Stack>
-        <Space h="xl" />
-        <ThemeSwitch />
       </AppShell.Navbar>
 
       {/* <AppShell.Aside>Aside</AppShell.Aside> */}

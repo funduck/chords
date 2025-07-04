@@ -7,13 +7,13 @@ export const theme = createTheme({
     chord: virtualColor({
       name: "chord",
       light: "blue",
-      dark: "light",
+      dark: "blue",
     }),
 
     lyrics: virtualColor({
       name: "lyrics",
       light: "dark",
-      dark: "light",
+      dark: "",
     }),
   },
 });

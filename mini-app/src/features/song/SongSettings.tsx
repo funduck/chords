@@ -1,21 +1,19 @@
-import { Image } from "@mantine/core";
+import { Button, Menu } from "@mantine/core";
+import { IconPlayerPlayFilled, IconPlayerStop, IconSettings, IconSettingsFilled } from "@tabler/icons-react";
 import { useSignal } from "@telegram-apps/sdk-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
-import Button from "@src/components/Button";
-import Dropdown from "@src/components/Dropdown";
 import { AutoScrollEnabled, AutoScrollInterval, AutoScrollSpeed } from "@src/config";
 import { useHeader } from "@src/hooks/Header";
 import { SettingsService } from "@src/services/settings.service";
 import { Signals } from "@src/services/signals-registry";
 
 import Slider from "@components/Slider";
-import Stack from "@components/Stack";
 import Switch from "@components/Switch";
 
 import { SongSettingsDto } from "./settings";
 
-function PlayStop() {
+function ShortcutSettings() {
   const settings = useSignal(Signals.applySongSettings);
 
   function setAutoScroll(value: boolean) {
@@ -32,28 +30,17 @@ function PlayStop() {
 
   return (
     <Button variant="subtle" disabled={!settings} onClick={() => setAutoScroll(!settings?.auto_scroll)}>
-      <Image
-        src={settings?.auto_scroll ? "/src/assets/player-stop.svg" : "/src/assets/player-play.svg"}
-        alt="Play/Stop Icon"
-      />
+      {settings?.auto_scroll ? (
+        <IconPlayerStop color="var(--mantine-color-text)" />
+      ) : (
+        <IconPlayerPlayFilled color="var(--mantine-color-text)" />
+      )}
     </Button>
   );
 }
 
 function FullSettings() {
   const settings = useSignal(Signals.applySongSettings);
-
-  function setShowChords(value: boolean) {
-    console.debug("setShowChords", value);
-    if (settings) {
-      const newSettings = settings.cloneWith({ show_chords: value });
-      Signals.applySongSettings.set(newSettings);
-      Signals.publishSongSettings.set(newSettings);
-      SettingsService.save(newSettings)
-        .then(() => console.log("Song settings updated"))
-        .catch(console.error);
-    }
-  }
 
   function setAutoScroll(value: boolean) {
     console.debug("setAutoScroll", value);
@@ -79,32 +66,47 @@ function FullSettings() {
     }
   }
 
+  const [opened, setOpened] = useState(false);
+
   return (
-    <Dropdown title={<Image src="/src/assets/settings.svg" alt="Settings Icon" />}>
-      <Stack gap="xl">
+    <Menu shadow="md" width={200} withArrow onChange={(e) => setOpened(e)}>
+      <Menu.Target>
+        <Button variant="subtle">
+          {opened ? (
+            <IconSettingsFilled color="var(--mantine-color-text)" />
+          ) : (
+            <IconSettings color="var(--mantine-color-text)" />
+          )}
+        </Button>
+      </Menu.Target>
+      <Menu.Dropdown>
         {/* <Switch
         label="Show chords"
         disabled={!settings}
         checked={settings?.show_chords ?? false}
         onChange={setShowChords}
         /> */}
-        <Switch
-          label="Auto scroll"
-          disabled={!settings}
-          checked={settings?.auto_scroll ?? false}
-          onChange={setAutoScroll}
-        />
-        <Slider
-          label="Auto scroll speed"
-          disabled={!settings}
-          onChange={(e) => {
-            const speed = e;
-            setAutoScrollSpeed(speed, AutoScrollInterval);
-          }}
-          value={settings?.auto_scroll_speed ?? 0}
-        />
-      </Stack>
-    </Dropdown>
+        <Menu.Item>
+          <Switch
+            label="Auto scroll"
+            disabled={!settings}
+            checked={settings?.auto_scroll ?? false}
+            onChange={setAutoScroll}
+          />
+        </Menu.Item>
+        <Menu.Item>
+          <Slider
+            label="Auto scroll speed"
+            disabled={!settings}
+            onChange={(e) => {
+              const speed = e;
+              setAutoScrollSpeed(speed, AutoScrollInterval);
+            }}
+            value={settings?.auto_scroll_speed ?? 0}
+          />
+        </Menu.Item>
+      </Menu.Dropdown>
+    </Menu>
   );
 }
 
@@ -138,7 +140,7 @@ function SongSettings() {
 
   // Set header content when component mounts
   useEffect(() => {
-    setCenterContent(<PlayStop />);
+    setCenterContent(<ShortcutSettings />);
     setRightContent(<FullSettings />);
 
     // Clean up when component unmounts

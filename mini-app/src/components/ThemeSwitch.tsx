@@ -1,4 +1,5 @@
 import { Button, MantineColorScheme, useMantineColorScheme } from "@mantine/core";
+import { IconMoon, IconSun } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 
 type Theme = MantineColorScheme;
@@ -20,8 +21,12 @@ function ThemeSwitch() {
   };
 
   return (
-    <Button variant="outline" color="gray" id="theme-switch" onClick={toggleTheme}>
-      {theme === "light" ? "Switch to Dark Mode" : "Switch to Light Mode"}
+    <Button variant="subtle" justify="start" id="theme-switch" onClick={toggleTheme}>
+      {theme === "light" ? (
+        <IconMoon color="var(--mantine-color-text)" />
+      ) : (
+        <IconSun color="var(--mantine-color-text)" />
+      )}
     </Button>
   );
 }
