@@ -86,14 +86,14 @@ function FullSettings() {
         checked={settings?.show_chords ?? false}
         onChange={setShowChords}
         /> */}
-        <Menu.Item>
+        {/* <Menu.Item>
           <Switch
             label="Auto scroll"
             disabled={!settings}
             checked={settings?.auto_scroll ?? false}
             onChange={setAutoScroll}
           />
-        </Menu.Item>
+        </Menu.Item> */}
         <Menu.Item>
           <Slider
             label="Auto scroll speed"
