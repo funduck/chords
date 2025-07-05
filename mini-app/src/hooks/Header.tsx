@@ -3,8 +3,8 @@ import { ReactNode, createContext, useContext, useState } from "react";
 interface HeaderContextType {
   centerContent: ReactNode;
   setCenterContent: (content: ReactNode) => void;
-  rightContent: ReactNode;
-  setRightContent: (content: ReactNode) => void;
+  settingsContent: ReactNode[];
+  setSettingsContent: (content: ReactNode[]) => void;
 }
 
 const HeaderContext = createContext<HeaderContextType | undefined>(undefined);
@@ -19,15 +19,15 @@ export const useHeader = () => {
 
 export const HeaderProvider = ({ children }: { children: ReactNode }) => {
   const [centerContent, setCenterContent] = useState<ReactNode>(null);
-  const [rightContent, setRightContent] = useState<ReactNode>(null);
+  const [settingsContent, setSettingsContent] = useState<ReactNode[]>([]);
 
   return (
     <HeaderContext.Provider
       value={{
         centerContent,
         setCenterContent,
-        rightContent,
-        setRightContent,
+        settingsContent,
+        setSettingsContent,
       }}
     >
       {children}

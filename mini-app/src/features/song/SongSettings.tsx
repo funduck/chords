@@ -1,7 +1,7 @@
-import { Button, Menu } from "@mantine/core";
-import { IconPlayerPlayFilled, IconPlayerStop, IconSettings, IconSettingsFilled } from "@tabler/icons-react";
+import { Button } from "@mantine/core";
+import { IconPlayerPlayFilled, IconPlayerStop } from "@tabler/icons-react";
 import { useSignal } from "@telegram-apps/sdk-react";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 import { AutoScrollEnabled, AutoScrollInterval, AutoScrollSpeed } from "@src/config";
 import { useHeader } from "@src/hooks/Header";
@@ -9,7 +9,6 @@ import { SettingsService } from "@src/services/settings.service";
 import { Signals } from "@src/services/signals-registry";
 
 import Slider from "@components/Slider";
-import Switch from "@components/Switch";
 
 import { SongSettingsDto } from "./settings";
 
@@ -39,20 +38,8 @@ function ShortcutSettings() {
   );
 }
 
-function FullSettings() {
+function AutoScrollSettings() {
   const settings = useSignal(Signals.applySongSettings);
-
-  function setAutoScroll(value: boolean) {
-    console.debug("setAutoScroll", value);
-    if (settings) {
-      const newSettings = settings.cloneWith({ auto_scroll: value });
-      Signals.applySongSettings.set(newSettings);
-      Signals.publishSongSettings.set(newSettings);
-      SettingsService.save(newSettings)
-        .then(() => console.log("Song settings updated"))
-        .catch(console.error);
-    }
-  }
 
   function setAutoScrollSpeed(speed: number, interval: number) {
     console.debug("setAutoScrollSpeed", speed, interval);
@@ -66,47 +53,17 @@ function FullSettings() {
     }
   }
 
-  const [opened, setOpened] = useState(false);
-
   return (
-    <Menu shadow="md" width={200} withArrow onChange={(e) => setOpened(e)}>
-      <Menu.Target>
-        <Button variant="subtle">
-          {opened ? (
-            <IconSettingsFilled color="var(--mantine-color-text)" />
-          ) : (
-            <IconSettings color="var(--mantine-color-text)" />
-          )}
-        </Button>
-      </Menu.Target>
-      <Menu.Dropdown>
-        {/* <Switch
-        label="Show chords"
-        disabled={!settings}
-        checked={settings?.show_chords ?? false}
-        onChange={setShowChords}
-        /> */}
-        {/* <Menu.Item>
-          <Switch
-            label="Auto scroll"
-            disabled={!settings}
-            checked={settings?.auto_scroll ?? false}
-            onChange={setAutoScroll}
-          />
-        </Menu.Item> */}
-        <Menu.Item>
-          <Slider
-            label="Auto scroll speed"
-            disabled={!settings}
-            onChange={(e) => {
-              const speed = e;
-              setAutoScrollSpeed(speed, AutoScrollInterval);
-            }}
-            value={settings?.auto_scroll_speed ?? 0}
-          />
-        </Menu.Item>
-      </Menu.Dropdown>
-    </Menu>
+    <Slider
+      label="Auto scroll speed"
+      min={1}
+      disabled={!settings}
+      onChange={(e) => {
+        const speed = e;
+        setAutoScrollSpeed(speed, AutoScrollInterval);
+      }}
+      value={settings?.auto_scroll_speed ?? 0}
+    />
   );
 }
 
@@ -136,19 +93,19 @@ function SongSettings() {
     }
   }, [settings]);
 
-  const { setCenterContent, setRightContent } = useHeader();
+  const { setCenterContent, setSettingsContent } = useHeader();
 
   // Set header content when component mounts
   useEffect(() => {
     setCenterContent(<ShortcutSettings />);
-    setRightContent(<FullSettings />);
+    setSettingsContent([<AutoScrollSettings />]);
 
     // Clean up when component unmounts
     return () => {
       setCenterContent(null);
-      setRightContent(null);
+      setSettingsContent([]);
     };
-  }, [setCenterContent, setRightContent]);
+  }, [setCenterContent, setSettingsContent]);
 
   return <></>;
 }

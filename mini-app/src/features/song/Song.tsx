@@ -5,6 +5,7 @@ import { useParams } from "react-router";
 
 import { SongEntity, SongsApiContext } from "@src/hooks/Api";
 import { Signals } from "@src/services/signals-registry";
+import { EstimateFontSize } from "@src/utils/font";
 
 import Chordpro from "@components/Chordpro";
 import Stack from "@components/Stack";
@@ -62,15 +63,20 @@ function Song() {
       applySongSettings?.auto_scroll_interval &&
       applySongSettings?.auto_scroll_speed
     ) {
-      const scrollInterval = applySongSettings.auto_scroll_interval;
-      let scrollSpeed = applySongSettings.auto_scroll_speed; // 1-100
-
       // Get font size in pixels
-      const fontSize = parseFloat(getComputedStyle(document.documentElement).fontSize);
-      // Convert scroll speed from percentage to pixels
-      scrollSpeed = 8 * Math.ceil((scrollSpeed / 100) * fontSize);
+      const { height } = EstimateFontSize({});
 
-      console.debug("Auto-scrolling is enabled, starting interval", { scrollInterval, scrollSpeed });
+      const scrollInterval = applySongSettings.auto_scroll_interval;
+      let scrollSpeed = Math.max(1, applySongSettings.auto_scroll_speed); // 1-100
+      // Convert scroll speed from percentage to pixels
+      scrollSpeed = Math.ceil((scrollSpeed * height) / 10);
+
+      console.debug(
+        "Auto-scrolling is enabled",
+        [applySongSettings.auto_scroll_interval, applySongSettings.auto_scroll_speed],
+        "starting interval",
+        { scrollInterval, scrollSpeed },
+      );
       const interval = setInterval(() => {
         if (!songViewportRef.current) {
           console.debug("Auto-scrolling: songViewportRef is null");

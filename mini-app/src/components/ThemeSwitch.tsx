@@ -21,7 +21,7 @@ function ThemeSwitch() {
   };
 
   return (
-    <Button variant="subtle" justify="start" id="theme-switch" onClick={toggleTheme}>
+    <Button variant="subtle" w={"100%"} onClick={toggleTheme}>
       {theme === "light" ? (
         <IconMoon color="var(--mantine-color-text)" />
       ) : (
