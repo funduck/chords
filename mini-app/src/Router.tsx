@@ -1,6 +1,7 @@
 import { Anchor, AppShell, Burger, Button, Group, Menu, em } from "@mantine/core";
 import { useDisclosure, useMediaQuery } from "@mantine/hooks";
 import { IconSettings, IconSettingsFilled } from "@tabler/icons-react";
+import { useEffect } from "react";
 import { Route, Routes, useNavigate } from "react-router";
 
 import Image from "@components/Image";
@@ -88,10 +89,18 @@ function Router() {
   ];
 
   // On mobile we close the navbar when navigating
+  // On desktop we open the navbar by default
   const isMobile = useMediaQuery(`(max-width: ${em(750)})`);
 
-  // TODO Sn desktop start with navbar opened
-  const [navbarOpened, { toggle: toggleNavbar }] = useDisclosure();
+  const [navbarOpened, { toggle: toggleNavbar, open: openNavbar, close: closeNavbar }] = useDisclosure();
+
+  useEffect(() => {
+    if (isMobile) {
+      closeNavbar(); // Close navbar on mobile
+    } else {
+      openNavbar(); // Open navbar on desktop
+    }
+  }, [isMobile]);
 
   return (
     <AppShell
