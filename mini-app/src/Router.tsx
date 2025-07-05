@@ -1,5 +1,5 @@
-import { Anchor, AppShell, Burger, Button, Group, Menu } from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
+import { Anchor, AppShell, Burger, Button, Group, Menu, em } from "@mantine/core";
+import { useDisclosure, useMediaQuery } from "@mantine/hooks";
 import { IconSettings, IconSettingsFilled } from "@tabler/icons-react";
 import { Route, Routes, useNavigate } from "react-router";
 
@@ -87,6 +87,10 @@ function Router() {
     },
   ];
 
+  // On mobile we close the navbar when navigating
+  const isMobile = useMediaQuery(`(max-width: ${em(750)})`);
+
+  // TODO Sn desktop start with navbar opened
   const [navbarOpened, { toggle: toggleNavbar }] = useDisclosure();
 
   return (
@@ -122,7 +126,7 @@ function Router() {
                 key={id}
                 id={id}
                 onClick={() => {
-                  toggleNavbar();
+                  isMobile && toggleNavbar();
                   navigate(link);
                 }}
               >
