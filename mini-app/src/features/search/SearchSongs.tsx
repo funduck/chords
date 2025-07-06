@@ -1,7 +1,7 @@
 import { Button, Flex, Space } from "@mantine/core";
 import { useContext, useEffect, useState } from "react";
 
-import { LibraryApiContext } from "@src/hooks/Api";
+import { SongsApiContext } from "@src/hooks/Api";
 
 import QueryInput from "@components/QueryInput";
 import Stack from "@components/Stack";
@@ -10,7 +10,7 @@ import { useSearchSongsContext } from "./SearchContext";
 import SearchSongListItem from "./SearchSongListItem";
 
 function SearchSongs() {
-  const libraryApi = useContext(LibraryApiContext);
+  const songsApi = useContext(SongsApiContext);
   const { searchState, updateSearchState } = useSearchSongsContext();
   const [searching, setSearching] = useState<boolean>(false);
 
@@ -24,9 +24,9 @@ function SearchSongs() {
 
   // Perform search when searching state changes and api is available
   useEffect(() => {
-    if (searching && libraryApi) {
-      libraryApi
-        .searchLibrarySongs({
+    if (searching && songsApi) {
+      songsApi
+        .searchSongs({
           request: {
             query: searchState.query,
             limit: searchState.pageSize,
@@ -38,7 +38,7 @@ function SearchSongs() {
         })
         .then((res) => {
           updateSearchState({
-            entities: res.songs!,
+            entities: res.entities!,
             totalPages: Math.ceil((res.total || 0) / searchState.pageSize),
             hasSearched: true,
           });
@@ -55,9 +55,9 @@ function SearchSongs() {
           setSearching(false);
         });
     }
-  }, [searching, libraryApi]);
+  }, [searching, songsApi]);
 
-  if (!libraryApi) {
+  if (!songsApi) {
     return <div>Loading...</div>;
   }
 

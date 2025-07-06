@@ -116,7 +116,8 @@ func (s *ArtistService) SearchArtists(ctx context.Context, req *dto.SearchArtist
 		}
 	}
 
-	var artists []*entity.ArtistInfo
+	artistsList := []*entity.ArtistInfo{}
+	var artists []*entity.Artist
 	if req.ReturnRows {
 		// Find artists with pagination
 		err := q.
@@ -128,9 +129,13 @@ func (s *ArtistService) SearchArtists(ctx context.Context, req *dto.SearchArtist
 		}
 		// Populate cursors for pagination
 		for _, artist := range artists {
-			artist.Cursor = artist.NameNormalized
+			listItem := &entity.ArtistInfo{
+				Artist: *artist,
+				Cursor: artist.NameNormalized,
+			}
+			artistsList = append(artistsList, listItem)
 		}
 	}
 
-	return &entity.ArtistsList{Artists: artists, Total: total}, nil
+	return &entity.ArtistsList{Artists: artistsList, Total: total}, nil
 }

@@ -118,53 +118,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/library/songs/search": {
-            "post": {
-                "description": "Search for songs in the public library using various parameters.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Library"
-                ],
-                "summary": "Search public library for songs",
-                "operationId": "searchLibrarySongs",
-                "parameters": [
-                    {
-                        "description": "Search Song Request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/chords_com_api_internal_dto.SearchSongRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Search results",
-                        "schema": {
-                            "$ref": "#/definitions/chords_com_api_internal_entity.SongsList"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
         "/api/rooms": {
             "post": {
                 "security": [
@@ -369,6 +322,53 @@ const docTemplate = `{
                     },
                     "401": {
                         "description": "Unauthorized",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/songs/search": {
+            "post": {
+                "description": "Search for songs using various parameters.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Songs"
+                ],
+                "summary": "Search songs",
+                "operationId": "searchSongs",
+                "parameters": [
+                    {
+                        "description": "Search Song Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/chords_com_api_internal_dto.SearchSongRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Search results",
+                        "schema": {
+                            "$ref": "#/definitions/chords_com_api_internal_entity.SongsList"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "type": "string"
                         }

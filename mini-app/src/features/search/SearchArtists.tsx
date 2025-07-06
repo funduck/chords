@@ -39,7 +39,7 @@ function SearchArtists() {
         })
         .then((res) => {
           updateSearchState({
-            entities: res.artists!,
+            entities: res.entities!,
             totalPages: Math.ceil((res.total || 0) / searchState.pageSize),
             hasSearched: true,
           });

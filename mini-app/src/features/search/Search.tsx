@@ -1,7 +1,6 @@
 import { Tabs } from "@mantine/core";
 
 import SearchArtists from "./SearchArtists";
-import SearchEverywhere from "./SearchEverywhere";
 import SearchSongs from "./SearchSongs";
 
 function Search() {
@@ -15,7 +14,8 @@ function Search() {
         </Tabs.List>
 
         <Tabs.Panel value="all">
-          <SearchEverywhere />
+          TODO
+          {/* <SearchEverywhere /> */}
         </Tabs.Panel>
 
         <Tabs.Panel value="artist">

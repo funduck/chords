@@ -9,7 +9,6 @@ import {
   ChordsComApiInternalEntityRoom,
   ChordsComApiInternalEntitySong,
   Configuration,
-  LibraryApi,
   RoomsApi,
   SongsApi,
 } from "@src/generated/api";
@@ -19,7 +18,6 @@ import { Signals } from "@src/services/signals-registry";
 export const AuthApiContext = createContext<AuthApi | null>(null);
 export const RoomsApiContext = createContext<RoomsApi | null>(null);
 export const ArtistsApiContext = createContext<ArtistsApi | null>(null);
-export const LibraryApiContext = createContext<LibraryApi | null>(null);
 export const SongsApiContext = createContext<SongsApi | null>(null);
 
 export type RoomEntity = ChordsComApiInternalEntityRoom;
@@ -31,7 +29,6 @@ export function ApiProvider({ children }: { children: ReactNode }) {
   const [authApi, setAuthApi] = useState<AuthApi | null>(null);
   const [roomsApi, setRoomsApi] = useState<RoomsApi | null>(null);
   const [artistsApi, setArtistsApi] = useState<ArtistsApi | null>(null);
-  const [libraryApi, setLibraryApi] = useState<LibraryApi | null>(null);
   const [songsApi, setSongsApi] = useState<SongsApi | null>(null);
   const accessToken = useSignal(Signals.accessToken);
 
@@ -102,8 +99,6 @@ export function ApiProvider({ children }: { children: ReactNode }) {
     setRoomsApi(roomsAPI);
     const artistsAPI = new ArtistsApi(conf);
     setArtistsApi(artistsAPI);
-    const libraryAPI = new LibraryApi(conf);
-    setLibraryApi(libraryAPI);
     const songsAPI = new SongsApi(conf);
     setSongsApi(songsAPI);
 
@@ -113,7 +108,6 @@ export function ApiProvider({ children }: { children: ReactNode }) {
       console.log("Private API closing...");
       setRoomsApi(null);
       setArtistsApi(null);
-      setLibraryApi(null);
       setSongsApi(null);
     };
   }, [accessToken]);
@@ -122,9 +116,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
     <AuthApiContext.Provider value={authApi}>
       <RoomsApiContext.Provider value={roomsApi}>
         <ArtistsApiContext.Provider value={artistsApi}>
-          <LibraryApiContext.Provider value={libraryApi}>
-            <SongsApiContext.Provider value={songsApi}>{children}</SongsApiContext.Provider>
-          </LibraryApiContext.Provider>
+          <SongsApiContext.Provider value={songsApi}>{children}</SongsApiContext.Provider>
         </ArtistsApiContext.Provider>
       </RoomsApiContext.Provider>
     </AuthApiContext.Provider>

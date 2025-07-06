@@ -12,7 +12,7 @@ import (
 //	@ID				searchSongs
 //	@Summary		Search songs
 //	@Description	Search for songs using various parameters.
-//	@Tags
+//	@Tags			Songs
 //	@Accept			json
 //	@Produce		json
 //	@Param			request	body		dto.SearchSongRequest	true	"Search Song Request"

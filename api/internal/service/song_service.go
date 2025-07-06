@@ -107,7 +107,8 @@ func (s *SongService) SearchSongs(ctx context.Context, req *dto.SearchSongReques
 		}
 	}
 
-	var songs []*entity.SongInfo
+	songsList := []*entity.SongInfo{}
+	var songs []*entity.Song
 	if req.ReturnRows {
 		// Find songs with pagination
 		err := q.
@@ -119,10 +120,14 @@ func (s *SongService) SearchSongs(ctx context.Context, req *dto.SearchSongReques
 		}
 		// Populate cursors for pagination
 		for _, song := range songs {
-			song.Cursor = song.Title // Use song title as cursor
+			listItem := &entity.SongInfo{
+				Song:   *song,
+				Cursor: song.Title, // Use song title as cursor
+			}
+			songsList = append(songsList, listItem)
 		}
 		// TODO preload other fields if needed
 	}
 
-	return &entity.SongsList{Songs: songs, Total: total}, nil
+	return &entity.SongsList{Songs: songsList, Total: total}, nil
 }
