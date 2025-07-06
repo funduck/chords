@@ -5,6 +5,7 @@ import (
 
 	"chords.com/api/internal/entity"
 	"chords.com/api/internal/orm"
+	"gorm.io/gorm/clause"
 )
 
 type SongService struct{}
@@ -22,20 +23,34 @@ func NewSongService() *SongService {
 func (s *SongService) GetSongByID(ctx context.Context, id uint) (*entity.Song, error) {
 	tx := orm.GetDB(ctx)
 	var song entity.Song
-	err := tx.Model(&entity.Song{}).First(&song, id).Error
+	err := tx.Model(&entity.Song{}).Preload(clause.Associations).First(&song, id).Error
 
 	// TODO check access rights when song is private
 
 	return &song, err
 }
 
-func (s *SongService) ParseChordpro(sheet string) (*entity.Song, error) {
+func (s *SongService) CreateIfNotExists(ctx context.Context, song *entity.Song) (*entity.Song, error) {
+	tx := orm.GetDB(ctx)
 
-	// TODO implement parsing logic
-	// This is a placeholder for the actual parsing logic
-	return &entity.Song{
-		Title:  "Sample Title",
-		Artist: "Sample Artist",
-		Format: entity.SheetFormat_Chordpro,
-	}, nil
+	// Check if song already exists
+	var existingSong entity.Song
+	err := tx.Model(&entity.Song{}).
+		Where("songs.title = ?", song.Title).
+		Where("songs.owner_id = ?", song.OwnerID).
+		First(&existingSong).Error
+	if err == nil {
+		return &existingSong, nil // Song already exists
+	}
+	if !orm.IsRecordNotFoundError(err) {
+		return nil, err // Some other error occurred
+	}
+
+	// Create new song
+	err = tx.Create(song).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return song, nil
 }

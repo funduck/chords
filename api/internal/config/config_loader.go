@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/spf13/viper"
 )
@@ -13,13 +14,20 @@ func Init() {
 		return
 	}
 	runtime_viper = viper.New()
-	runtime_viper.SetConfigName("api") // name of config file (without extension)
-	runtime_viper.SetConfigType("env") // or "json", "toml", etc.
-	runtime_viper.AddConfigPath(".")   // path to look for the config file in
+	runtime_viper.SetConfigName("api")  // name of config file (without extension)
+	runtime_viper.SetConfigType("json") // or "json", "toml", etc.
+	runtime_viper.AddConfigPath(".")    // path to look for the config file in
+
+	// Enable automatic key mapping
+	runtime_viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
+	runtime_viper.AutomaticEnv()
+
 	if err := runtime_viper.ReadInConfig(); err != nil {
 		panic(fmt.Errorf("fatal error config file: %w", err))
 	}
-	runtime_viper.AutomaticEnv() // read in environment variables that match
+
+	// Debug: Print all keys that Viper found
+	fmt.Printf("All Viper keys: %v\n", runtime_viper.AllKeys())
 }
 
 func Unmarshal(config interface{}) error {

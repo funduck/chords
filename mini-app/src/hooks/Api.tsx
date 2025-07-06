@@ -3,8 +3,9 @@ import { ReactNode, createContext, useEffect, useState } from "react";
 
 import { ApiHttpUrl } from "@src/config";
 import {
+  ArtistsApi,
   AuthApi,
-  ChordsComApiInternalDtoSongInfo,
+  ChordsComApiInternalEntityArtistInfo,
   ChordsComApiInternalEntityRoom,
   ChordsComApiInternalEntitySong,
   Configuration,
@@ -17,16 +18,19 @@ import { Signals } from "@src/services/signals-registry";
 
 export const AuthApiContext = createContext<AuthApi | null>(null);
 export const RoomsApiContext = createContext<RoomsApi | null>(null);
+export const ArtistsApiContext = createContext<ArtistsApi | null>(null);
 export const LibraryApiContext = createContext<LibraryApi | null>(null);
 export const SongsApiContext = createContext<SongsApi | null>(null);
 
 export type RoomEntity = ChordsComApiInternalEntityRoom;
 export type SongEntity = ChordsComApiInternalEntitySong;
-export type SongInfoEntity = ChordsComApiInternalDtoSongInfo;
+export type SongInfoEntity = ChordsComApiInternalEntitySong;
+export type ArtistInfoEntity = ChordsComApiInternalEntityArtistInfo;
 
 export function ApiProvider({ children }: { children: ReactNode }) {
   const [authApi, setAuthApi] = useState<AuthApi | null>(null);
   const [roomsApi, setRoomsApi] = useState<RoomsApi | null>(null);
+  const [artistsApi, setArtistsApi] = useState<ArtistsApi | null>(null);
   const [libraryApi, setLibraryApi] = useState<LibraryApi | null>(null);
   const [songsApi, setSongsApi] = useState<SongsApi | null>(null);
   const accessToken = useSignal(Signals.accessToken);
@@ -96,6 +100,8 @@ export function ApiProvider({ children }: { children: ReactNode }) {
     });
     const roomsAPI = new RoomsApi(conf);
     setRoomsApi(roomsAPI);
+    const artistsAPI = new ArtistsApi(conf);
+    setArtistsApi(artistsAPI);
     const libraryAPI = new LibraryApi(conf);
     setLibraryApi(libraryAPI);
     const songsAPI = new SongsApi(conf);
@@ -106,6 +112,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
     return () => {
       console.log("Private API closing...");
       setRoomsApi(null);
+      setArtistsApi(null);
       setLibraryApi(null);
       setSongsApi(null);
     };
@@ -114,9 +121,11 @@ export function ApiProvider({ children }: { children: ReactNode }) {
   return (
     <AuthApiContext.Provider value={authApi}>
       <RoomsApiContext.Provider value={roomsApi}>
-        <LibraryApiContext.Provider value={libraryApi}>
-          <SongsApiContext.Provider value={songsApi}>{children}</SongsApiContext.Provider>
-        </LibraryApiContext.Provider>
+        <ArtistsApiContext.Provider value={artistsApi}>
+          <LibraryApiContext.Provider value={libraryApi}>
+            <SongsApiContext.Provider value={songsApi}>{children}</SongsApiContext.Provider>
+          </LibraryApiContext.Provider>
+        </ArtistsApiContext.Provider>
       </RoomsApiContext.Provider>
     </AuthApiContext.Provider>
   );

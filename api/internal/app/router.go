@@ -70,7 +70,10 @@ func NewHttpRouter(a *App) *chi.Mux {
 				r.Patch("/rooms/{id}", a.UpdateRoom)
 				r.Post("/rooms/{id}/leave", a.LeaveRoom)
 
-				r.Post("/library/public", a.SearchPublicLibrary)
+				r.Post("/artists/search", a.SearchArtists)
+
+				r.Post("/library/songs/search", a.SearchLibrarySongs)
+
 				r.Get("/songs/{id}", a.GetSongByID)
 			})
 		})

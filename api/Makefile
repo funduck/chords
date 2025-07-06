@@ -12,10 +12,10 @@ dev:
 	air
 
 test:
-	go test -v ./...
+	go test --tags fts5 -v ./...
 
 build-api:
-	go build --tags fts5 -a -o bin/api ./cmd/api/main.go
+	go build --tags fts5 -o bin/api ./cmd/api/main.go
 
 build-uploader:
-	go build --tags fts5 -a -o bin/uploader ./cmd/uploader/main.go
+	go build --tags fts5 -o bin/uploader ./cmd/uploader/main.go

@@ -1,13 +1,15 @@
 package config
 
+import "fmt"
+
 type Config struct {
-	Port                        string            `mapstructure:"API_PORT"`
-	SQLiteFile                  string            `mapstructure:"SQLITE_FILE"`
-	Secret                      string            `mapstructure:"API_SECRET"`
-	AccessTokenExpiresInSeconds int64             `mapstructure:"ACCESS_TOKEN_EXPIRES_IN_SECONDS"`
-	LoggerEnv                   string            `mapstructure:"LOGGER_ENV"`
-	LoggerLevel                 string            `mapstructure:"LOGGER_LEVEL"`
-	LoggerLevels                map[string]string `mapstructure:"LOGGER_LEVELS"`
+	Port                        string            `mapstructure:"port"`
+	SQLiteFile                  string            `mapstructure:"sqlite_file"`
+	Secret                      string            `mapstructure:"secret"`
+	AccessTokenExpiresInSeconds int64             `mapstructure:"access_token_expires_in_seconds"`
+	LoggerEnv                   string            `mapstructure:"logger_env"`
+	LoggerLevel                 string            `mapstructure:"logger_level"`
+	LoggerLevels                map[string]string `mapstructure:"logger_levels"`
 }
 
 var config *Config
@@ -17,9 +19,12 @@ func New() *Config {
 		return config
 	}
 	config = &Config{}
+
 	if err := Unmarshal(config); err != nil {
 		panic(err)
 	}
+
+	fmt.Printf("Loaded config: %+v\n", config)
 	return config
 }
 

@@ -7,6 +7,53 @@
         "version": "1.0"
     },
     "paths": {
+        "/api/artists/search": {
+            "post": {
+                "description": "Search for artists using various parameters with pagination support.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Artists"
+                ],
+                "summary": "Search for artists",
+                "operationId": "searchArtists",
+                "parameters": [
+                    {
+                        "description": "Search Artist Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/chords_com_api_internal_dto.SearchArtistRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Search results",
+                        "schema": {
+                            "$ref": "#/definitions/chords_com_api_internal_entity.ArtistsList"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/api/auth/anonymous": {
             "post": {
                 "description": "Create an anonymous access token",
@@ -63,7 +110,7 @@
                 }
             }
         },
-        "/api/library/public": {
+        "/api/library/songs/search": {
             "post": {
                 "description": "Search for songs in the public library using various parameters.",
                 "consumes": [
@@ -76,7 +123,7 @@
                     "Library"
                 ],
                 "summary": "Search public library for songs",
-                "operationId": "searchPublicLibrary",
+                "operationId": "searchLibrarySongs",
                 "parameters": [
                     {
                         "description": "Search Song Request",
@@ -92,7 +139,7 @@
                     "200": {
                         "description": "Search results",
                         "schema": {
-                            "$ref": "#/definitions/chords_com_api_internal_dto.SearchSongResponse"
+                            "$ref": "#/definitions/chords_com_api_internal_entity.SongsList"
                         }
                     },
                     "400": {
@@ -401,22 +448,21 @@
         }
     },
     "definitions": {
-        "chords_com_api_internal_dto.SearchSongRequest": {
+        "chords_com_api_internal_dto.SearchArtistRequest": {
             "type": "object",
             "properties": {
+                "cursor_after": {
+                    "type": "string"
+                },
+                "cursor_before": {
+                    "type": "string"
+                },
                 "limit": {
                     "type": "integer",
                     "maximum": 100,
                     "minimum": 1
                 },
-                "offset": {
-                    "type": "integer",
-                    "minimum": 0
-                },
                 "query": {
-                    "type": "string"
-                },
-                "query_lyrics": {
                     "type": "string"
                 },
                 "return_rows": {
@@ -429,42 +475,123 @@
                 }
             }
         },
-        "chords_com_api_internal_dto.SearchSongResponse": {
+        "chords_com_api_internal_dto.SearchSongRequest": {
             "type": "object",
             "properties": {
-                "songs": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/chords_com_api_internal_dto.SongInfo"
-                    }
-                },
-                "total": {
+                "artist_id": {
                     "type": "integer"
+                },
+                "cursor_after": {
+                    "type": "string"
+                },
+                "cursor_before": {
+                    "type": "string"
+                },
+                "library_id": {
+                    "type": "integer"
+                },
+                "library_type": {
+                    "$ref": "#/definitions/chords_com_api_internal_entity.LibraryType"
+                },
+                "limit": {
+                    "type": "integer",
+                    "maximum": 100,
+                    "minimum": 1
+                },
+                "query": {
+                    "type": "string"
+                },
+                "return_rows": {
+                    "type": "boolean",
+                    "default": true
+                },
+                "return_total": {
+                    "type": "boolean",
+                    "default": true
                 }
             }
         },
-        "chords_com_api_internal_dto.SongInfo": {
+        "chords_com_api_internal_entity.Artist": {
             "type": "object",
-            "required": [
-                "format",
-                "id",
-                "title"
-            ],
             "properties": {
-                "artist": {
+                "compositions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/chords_com_api_internal_entity.Song"
+                    }
+                },
+                "created_at": {
                     "type": "string"
                 },
-                "composer": {
-                    "type": "string"
-                },
-                "format": {
-                    "$ref": "#/definitions/chords_com_api_internal_entity.SheetFormat"
+                "deleted_at": {
+                    "type": "string",
+                    "example": "2025-06-18T15:04:05Z"
                 },
                 "id": {
                     "type": "integer"
                 },
-                "title": {
+                "name": {
                     "type": "string"
+                },
+                "songs": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/chords_com_api_internal_entity.Song"
+                    }
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "chords_com_api_internal_entity.ArtistInfo": {
+            "type": "object",
+            "properties": {
+                "compositions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/chords_com_api_internal_entity.Song"
+                    }
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "cursor": {
+                    "description": "Used for pagination",
+                    "type": "string"
+                },
+                "deleted_at": {
+                    "type": "string",
+                    "example": "2025-06-18T15:04:05Z"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "songs": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/chords_com_api_internal_entity.Song"
+                    }
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "chords_com_api_internal_entity.ArtistsList": {
+            "type": "object",
+            "properties": {
+                "artists": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/chords_com_api_internal_entity.ArtistInfo"
+                    }
+                },
+                "total": {
+                    "type": "integer"
                 }
             }
         },
@@ -475,6 +602,57 @@
                     "type": "string"
                 }
             }
+        },
+        "chords_com_api_internal_entity.Library": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "deleted_at": {
+                    "type": "string",
+                    "example": "2025-06-18T15:04:05Z"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "ownerID": {
+                    "type": "integer"
+                },
+                "songs": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/chords_com_api_internal_entity.Song"
+                    }
+                },
+                "type": {
+                    "$ref": "#/definitions/chords_com_api_internal_entity.LibraryType"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "chords_com_api_internal_entity.LibraryType": {
+            "type": "string",
+            "enum": [
+                "public",
+                "favorites",
+                "private"
+            ],
+            "x-enum-comments": {
+                "LibraryType_Favorites": "user's favorite songs",
+                "LibraryType_Private": "only the owner can access",
+                "LibraryType_Public": "anyone can access"
+            },
+            "x-enum-varnames": [
+                "LibraryType_Public",
+                "LibraryType_Favorites",
+                "LibraryType_Private"
+            ]
         },
         "chords_com_api_internal_entity.Room": {
             "type": "object",
@@ -519,11 +697,17 @@
         "chords_com_api_internal_entity.Song": {
             "type": "object",
             "properties": {
-                "artist": {
-                    "type": "string"
+                "artists": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/chords_com_api_internal_entity.Artist"
+                    }
                 },
-                "composer": {
-                    "type": "string"
+                "composers": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/chords_com_api_internal_entity.Artist"
+                    }
                 },
                 "created_at": {
                     "type": "string"
@@ -538,6 +722,10 @@
                 "id": {
                     "type": "integer"
                 },
+                "owner_id": {
+                    "description": "ID of the user who uploaded this song",
+                    "type": "integer"
+                },
                 "sheet": {
                     "type": "string"
                 },
@@ -546,6 +734,67 @@
                 },
                 "updated_at": {
                     "type": "string"
+                }
+            }
+        },
+        "chords_com_api_internal_entity.SongInfo": {
+            "type": "object",
+            "properties": {
+                "artists": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/chords_com_api_internal_entity.Artist"
+                    }
+                },
+                "composers": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/chords_com_api_internal_entity.Artist"
+                    }
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "cursor": {
+                    "description": "Used for pagination",
+                    "type": "string"
+                },
+                "deleted_at": {
+                    "type": "string",
+                    "example": "2025-06-18T15:04:05Z"
+                },
+                "format": {
+                    "$ref": "#/definitions/chords_com_api_internal_entity.SheetFormat"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "owner_id": {
+                    "description": "ID of the user who uploaded this song",
+                    "type": "integer"
+                },
+                "sheet": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "chords_com_api_internal_entity.SongsList": {
+            "type": "object",
+            "properties": {
+                "songs": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/chords_com_api_internal_entity.SongInfo"
+                    }
+                },
+                "total": {
+                    "type": "integer"
                 }
             }
         },
@@ -571,10 +820,22 @@
                 "isAnonymous": {
                     "type": "boolean"
                 },
+                "myLibraries": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/chords_com_api_internal_entity.Library"
+                    }
+                },
                 "myRooms": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/chords_com_api_internal_entity.Room"
+                    }
+                },
+                "mySongs": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/chords_com_api_internal_entity.Song"
                     }
                 },
                 "rooms": {

@@ -19,11 +19,17 @@ func TestSongService(t *testing.T) {
 	tx := orm.GetDBInstance()
 	var err error
 
+	artist := entity.Artist{
+		Name: "Test Artist",
+	}
+	err = tx.Create(&artist).Error
+	assert.NoError(t, err, "failed to create test artist")
+
 	song := entity.Song{
-		Title:  "Test Song",
-		Artist: "Test Artist",
-		Format: "chordpro",
-		Sheet:  "{title: Test Song, artist: Test Artist, body: {chords: [C, G, Am, F]}}",
+		Title:   "Test Song",
+		Artists: []*entity.Artist{&artist},
+		Format:  "chordpro",
+		Sheet:   "{title: Test Song, artist: Test Artist, body: {chords: [C, G, Am, F]}}",
 	}
 	err = tx.Create(&song).Error
 	assert.NoError(t, err, "failed to create test song")
@@ -35,7 +41,7 @@ func TestSongService(t *testing.T) {
 
 		assert.Equal(t, song.ID, res.ID, "expected song ID to match")
 		assert.Equal(t, song.Title, res.Title, "expected song title to match")
-		assert.Equal(t, song.Artist, res.Artist, "expected song artist to match")
+		assert.Equal(t, song.Artists[0].Name, res.Artists[0].Name, "expected song artist to match")
 		assert.Equal(t, song.Format, res.Format, "expected song format to match")
 	})
 }

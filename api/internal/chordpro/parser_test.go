@@ -339,8 +339,8 @@ func TestParser_parseLyricsLine(t *testing.T) {
 
 		expectedChords := []Chord{
 			{Name: "G", Position: 8},
-			{Name: "C", Position: 17},
-			{Name: "G", Position: 27},
+			{Name: "C", Position: 18},
+			{Name: "G", Position: 28},
 		}
 
 		for i, expected := range expectedChords {

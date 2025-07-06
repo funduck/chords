@@ -1,16 +1,15 @@
 definitions:
-  chords_com_api_internal_dto.SearchSongRequest:
+  chords_com_api_internal_dto.SearchArtistRequest:
     properties:
+      cursor_after:
+        type: string
+      cursor_before:
+        type: string
       limit:
         maximum: 100
         minimum: 1
         type: integer
-      offset:
-        minimum: 0
-        type: integer
       query:
-        type: string
-      query_lyrics:
         type: string
       return_rows:
         default: true
@@ -19,37 +18,128 @@ definitions:
         default: true
         type: boolean
     type: object
-  chords_com_api_internal_dto.SearchSongResponse:
+  chords_com_api_internal_dto.SearchSongRequest:
     properties:
+      artist_id:
+        type: integer
+      cursor_after:
+        type: string
+      cursor_before:
+        type: string
+      library_id:
+        type: integer
+      library_type:
+        $ref: '#/definitions/chords_com_api_internal_entity.LibraryType'
+      limit:
+        maximum: 100
+        minimum: 1
+        type: integer
+      query:
+        type: string
+      return_rows:
+        default: true
+        type: boolean
+      return_total:
+        default: true
+        type: boolean
+    type: object
+  chords_com_api_internal_entity.Artist:
+    properties:
+      compositions:
+        items:
+          $ref: '#/definitions/chords_com_api_internal_entity.Song'
+        type: array
+      created_at:
+        type: string
+      deleted_at:
+        example: "2025-06-18T15:04:05Z"
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
       songs:
         items:
-          $ref: '#/definitions/chords_com_api_internal_dto.SongInfo'
+          $ref: '#/definitions/chords_com_api_internal_entity.Song'
+        type: array
+      updated_at:
+        type: string
+    type: object
+  chords_com_api_internal_entity.ArtistInfo:
+    properties:
+      compositions:
+        items:
+          $ref: '#/definitions/chords_com_api_internal_entity.Song'
+        type: array
+      created_at:
+        type: string
+      cursor:
+        description: Used for pagination
+        type: string
+      deleted_at:
+        example: "2025-06-18T15:04:05Z"
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      songs:
+        items:
+          $ref: '#/definitions/chords_com_api_internal_entity.Song'
+        type: array
+      updated_at:
+        type: string
+    type: object
+  chords_com_api_internal_entity.ArtistsList:
+    properties:
+      artists:
+        items:
+          $ref: '#/definitions/chords_com_api_internal_entity.ArtistInfo'
         type: array
       total:
         type: integer
-    type: object
-  chords_com_api_internal_dto.SongInfo:
-    properties:
-      artist:
-        type: string
-      composer:
-        type: string
-      format:
-        $ref: '#/definitions/chords_com_api_internal_entity.SheetFormat'
-      id:
-        type: integer
-      title:
-        type: string
-    required:
-    - format
-    - id
-    - title
     type: object
   chords_com_api_internal_entity.JoinRoomRequest:
     properties:
       room_code:
         type: string
     type: object
+  chords_com_api_internal_entity.Library:
+    properties:
+      created_at:
+        type: string
+      deleted_at:
+        example: "2025-06-18T15:04:05Z"
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      ownerID:
+        type: integer
+      songs:
+        items:
+          $ref: '#/definitions/chords_com_api_internal_entity.Song'
+        type: array
+      type:
+        $ref: '#/definitions/chords_com_api_internal_entity.LibraryType'
+      updated_at:
+        type: string
+    type: object
+  chords_com_api_internal_entity.LibraryType:
+    enum:
+    - public
+    - favorites
+    - private
+    type: string
+    x-enum-comments:
+      LibraryType_Favorites: user's favorite songs
+      LibraryType_Private: only the owner can access
+      LibraryType_Public: anyone can access
+    x-enum-varnames:
+    - LibraryType_Public
+    - LibraryType_Favorites
+    - LibraryType_Private
   chords_com_api_internal_entity.Room:
     properties:
       code:
@@ -79,10 +169,14 @@ definitions:
     - SheetFormat_Chordpro
   chords_com_api_internal_entity.Song:
     properties:
-      artist:
-        type: string
-      composer:
-        type: string
+      artists:
+        items:
+          $ref: '#/definitions/chords_com_api_internal_entity.Artist'
+        type: array
+      composers:
+        items:
+          $ref: '#/definitions/chords_com_api_internal_entity.Artist'
+        type: array
       created_at:
         type: string
       deleted_at:
@@ -92,12 +186,56 @@ definitions:
         $ref: '#/definitions/chords_com_api_internal_entity.SheetFormat'
       id:
         type: integer
+      owner_id:
+        description: ID of the user who uploaded this song
+        type: integer
       sheet:
         type: string
       title:
         type: string
       updated_at:
         type: string
+    type: object
+  chords_com_api_internal_entity.SongInfo:
+    properties:
+      artists:
+        items:
+          $ref: '#/definitions/chords_com_api_internal_entity.Artist'
+        type: array
+      composers:
+        items:
+          $ref: '#/definitions/chords_com_api_internal_entity.Artist'
+        type: array
+      created_at:
+        type: string
+      cursor:
+        description: Used for pagination
+        type: string
+      deleted_at:
+        example: "2025-06-18T15:04:05Z"
+        type: string
+      format:
+        $ref: '#/definitions/chords_com_api_internal_entity.SheetFormat'
+      id:
+        type: integer
+      owner_id:
+        description: ID of the user who uploaded this song
+        type: integer
+      sheet:
+        type: string
+      title:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  chords_com_api_internal_entity.SongsList:
+    properties:
+      songs:
+        items:
+          $ref: '#/definitions/chords_com_api_internal_entity.SongInfo'
+        type: array
+      total:
+        type: integer
     type: object
   chords_com_api_internal_entity.UpdateRoomRequest:
     properties:
@@ -114,9 +252,17 @@ definitions:
         type: integer
       isAnonymous:
         type: boolean
+      myLibraries:
+        items:
+          $ref: '#/definitions/chords_com_api_internal_entity.Library'
+        type: array
       myRooms:
         items:
           $ref: '#/definitions/chords_com_api_internal_entity.Room'
+        type: array
+      mySongs:
+        items:
+          $ref: '#/definitions/chords_com_api_internal_entity.Song'
         type: array
       rooms:
         items:
@@ -158,6 +304,37 @@ info:
   title: Chords API
   version: "1.0"
 paths:
+  /api/artists/search:
+    post:
+      consumes:
+      - application/json
+      description: Search for artists using various parameters with pagination support.
+      operationId: searchArtists
+      parameters:
+      - description: Search Artist Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/chords_com_api_internal_dto.SearchArtistRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Search results
+          schema:
+            $ref: '#/definitions/chords_com_api_internal_entity.ArtistsList'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Search for artists
+      tags:
+      - Artists
   /api/auth/anonymous:
     post:
       consumes:
@@ -195,12 +372,12 @@ paths:
       summary: Refresh Access Token
       tags:
       - Auth
-  /api/library/public:
+  /api/library/songs/search:
     post:
       consumes:
       - application/json
       description: Search for songs in the public library using various parameters.
-      operationId: searchPublicLibrary
+      operationId: searchLibrarySongs
       parameters:
       - description: Search Song Request
         in: body
@@ -214,7 +391,7 @@ paths:
         "200":
           description: Search results
           schema:
-            $ref: '#/definitions/chords_com_api_internal_dto.SearchSongResponse'
+            $ref: '#/definitions/chords_com_api_internal_entity.SongsList'
         "400":
           description: Bad Request
           schema:

@@ -1,53 +1,92 @@
 import { ReactNode, createContext, useContext, useState } from "react";
 
-import { SongInfoEntity } from "@src/hooks/Api";
+import { ArtistInfoEntity, SongInfoEntity } from "@src/hooks/Api";
 
-interface SearchState {
+interface SearchState<T> {
   query: string;
   pageSize: number;
-  songs: SongInfoEntity[] | null;
+  entities: T[] | null;
+  cursorAfter?: string | undefined; // For pagination, if needed
+  cursorBefore?: string | undefined; // For pagination, if needed
   totalPages: number;
-  currentPage: number;
   hasSearched: boolean;
 }
 
-interface SearchContextType {
-  searchState: SearchState;
-  updateSearchState: (updates: Partial<SearchState>) => void;
+interface SearchContextType<T> {
+  searchState: SearchState<T>;
+  updateSearchState: (updates: Partial<SearchState<T>>) => void;
   clearSearch: () => void;
 }
 
-const SearchContext = createContext<SearchContextType | undefined>(undefined);
+const SearchSongsContext = createContext<SearchContextType<SongInfoEntity> | undefined>(undefined);
+const SearchArtistsContext = createContext<SearchContextType<ArtistInfoEntity> | undefined>(undefined);
 
-const initialState: SearchState = {
+const initialStateSongs: SearchState<SongInfoEntity> = {
   query: "",
   pageSize: 10,
-  songs: null,
+  entities: null,
   totalPages: 0,
-  currentPage: 1,
+  hasSearched: false,
+};
+const initialStateArtists: SearchState<ArtistInfoEntity> = {
+  query: "",
+  pageSize: 10,
+  entities: null,
+  totalPages: 0,
   hasSearched: false,
 };
 
 export function SearchProvider({ children }: { children: ReactNode }) {
-  const [searchState, setSearchState] = useState<SearchState>(initialState);
+  const [searchSongsState, setSearchSongsState] = useState<SearchState<SongInfoEntity>>(initialStateSongs);
+  const [searchArtistsState, setSearchArtistsState] = useState<SearchState<ArtistInfoEntity>>(initialStateArtists);
 
-  const updateSearchState = (updates: Partial<SearchState>) => {
-    setSearchState((prev) => ({ ...prev, ...updates }));
+  const updateSearchSongsState = (updates: Partial<SearchState<SongInfoEntity>>) => {
+    setSearchSongsState((prev) => ({ ...prev, ...updates }));
+  };
+  const updateSearchArtistsState = (updates: Partial<SearchState<ArtistInfoEntity>>) => {
+    setSearchArtistsState((prev) => ({ ...prev, ...updates }));
   };
 
-  const clearSearch = () => {
-    setSearchState(initialState);
+  const clearSearchSongs = () => {
+    setSearchSongsState(initialStateSongs);
+  };
+  const clearSearchArtists = () => {
+    setSearchArtistsState(initialStateArtists);
   };
 
   return (
-    <SearchContext.Provider value={{ searchState, updateSearchState, clearSearch }}>{children}</SearchContext.Provider>
+    <SearchArtistsContext.Provider
+      value={{
+        searchState: searchArtistsState,
+        updateSearchState: updateSearchArtistsState,
+        clearSearch: clearSearchArtists,
+      }}
+    >
+      <SearchSongsContext.Provider
+        value={{
+          searchState: searchSongsState,
+          updateSearchState: updateSearchSongsState,
+          clearSearch: clearSearchSongs,
+        }}
+      >
+        {children}
+      </SearchSongsContext.Provider>
+    </SearchArtistsContext.Provider>
   );
 }
 
-export function useSearchContext() {
-  const context = useContext(SearchContext);
+export function useSearchSongsContext() {
+  const context = useContext(SearchSongsContext);
   if (!context) {
-    throw new Error("useSearchContext must be used within SearchProvider");
+    throw new Error("useSearchSongsContext must be used within SearchProvider");
+  }
+  return context;
+}
+
+export function useSearchArtistsContext() {
+  const context = useContext(SearchArtistsContext);
+  if (!context) {
+    throw new Error("useSearchArtistsContext must be used within SearchProvider");
   }
   return context;
 }

@@ -5,6 +5,7 @@ import "chords.com/api/internal/entity"
 var entities = []interface{}{
 	entity.Room{},
 	entity.User{},
-	entity.PublicLibrary{},
+	entity.Library{},
 	entity.Song{},
+	entity.Artist{},
 }

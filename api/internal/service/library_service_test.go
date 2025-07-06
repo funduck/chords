@@ -11,19 +11,25 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestPublicLibraryService(t *testing.T) {
+func TestLibraryService(t *testing.T) {
 	config.InitForTest()
 	orm.InitForTest()
 
-	svc := NewPublicLibraryService()
+	svc := NewLibraryService()
 
 	tx := orm.GetDBInstance()
 	var err error
 
+	artist := entity.Artist{
+		Name: "Test Artist",
+	}
+	err = tx.Create(&artist).Error
+	assert.NoError(t, err, "failed to create test artist")
+
 	song := entity.Song{
-		Title:  "Test Song",
-		Artist: "Test Artist",
-		Format: "chordpro",
+		Title:   "Test Song",
+		Artists: []*entity.Artist{&artist},
+		Format:  "chordpro",
 		Sheet: `
 		{title: Test Song}
 		{artist: Test Artist}
@@ -34,7 +40,7 @@ func TestPublicLibraryService(t *testing.T) {
 	err = tx.Create(&song).Error
 	assert.NoError(t, err, "failed to create test song")
 
-	library := entity.PublicLibrary{
+	library := entity.Library{
 		Name:  "Test Library",
 		Songs: []*entity.Song{&song},
 	}
@@ -45,7 +51,6 @@ func TestPublicLibraryService(t *testing.T) {
 		res, err := svc.SearchSongs(context.Background(), &dto.SearchSongRequest{
 			Query:       "Test",
 			Limit:       10,
-			Offset:      0,
 			ReturnRows:  true,
 			ReturnTotal: true,
 		})
@@ -59,9 +64,8 @@ func TestPublicLibraryService(t *testing.T) {
 
 	t.Run("Search by lyrics finds some", func(t *testing.T) {
 		res, err := svc.SearchSongs(context.Background(), &dto.SearchSongRequest{
-			QueryLyrics: "with some lyrics",
+			Query:       "with some lyrics",
 			Limit:       10,
-			Offset:      0,
 			ReturnRows:  true,
 			ReturnTotal: true,
 		})
@@ -73,10 +77,37 @@ func TestPublicLibraryService(t *testing.T) {
 		assert.Equal(t, "Test Song", res.Songs[0].Title, "expected song title to match")
 	})
 
+	t.Run("Search by artist finds some", func(t *testing.T) {
+		res, err := svc.SearchSongs(context.Background(), &dto.SearchSongRequest{
+			ArtistID:    artist.ID,
+			Limit:       10,
+			ReturnRows:  true,
+			ReturnTotal: true,
+		})
+		assert.NoError(t, err, "expected no error when searching by artist")
+		assert.NotNil(t, res, "expected search results to be returned")
+
+		assert.Equal(t, int64(1), res.Total, "expected total to be 1")
+		assert.Len(t, res.Songs, 1)
+		assert.Equal(t, "Test Song", res.Songs[0].Title, "expected song title to match")
+	})
+
+	t.Run("Search by non-existing artist is empty", func(t *testing.T) {
+		res, err := svc.SearchSongs(context.Background(), &dto.SearchSongRequest{
+			ArtistID:    999, // Non-existing artist ID
+			Limit:       10,
+			ReturnRows:  true,
+			ReturnTotal: true,
+		})
+		assert.NoError(t, err, "expected no error when searching by non-existing artist")
+		assert.NotNil(t, res, "expected search results to be returned")
+		assert.Equal(t, int64(0), res.Total, "expected total to be 0")
+		assert.Empty(t, res.Songs, "expected no songs to be returned for non-existing artist")
+	})
+
 	t.Run("Search is empty", func(t *testing.T) {
 		res, err := svc.SearchSongs(context.Background(), &dto.SearchSongRequest{
-			Query:  "Test",
-			Offset: 10, // Offset beyond the number of songs
+			Query: "Test",
 		})
 		assert.NoError(t, err, "expected no error when searching public library")
 		assert.NotNil(t, res, "expected search results to be returned")
@@ -85,7 +116,7 @@ func TestPublicLibraryService(t *testing.T) {
 
 	t.Run("Search by lyrics is empty", func(t *testing.T) {
 		res, err := svc.SearchSongs(context.Background(), &dto.SearchSongRequest{
-			QueryLyrics: "nonexistent lyrics",
+			Query: "nonexistent lyrics",
 		})
 		assert.NoError(t, err, "expected no error when searching public library")
 		assert.NotNil(t, res, "expected search results to be returned")

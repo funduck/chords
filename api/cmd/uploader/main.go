@@ -30,8 +30,10 @@ func main() {
 	log := logger.New()
 	orm.InitSQLite()
 
-	libraryService := service.NewPublicLibraryService()
-	parser := chordpro.NewParser()
+	artistService := service.NewArtistService()
+	songService := service.NewSongService()
+	libraryService := service.NewLibraryService()
+	chordproParser := chordpro.NewParser()
 
 	ctx := context.Background()
 	ctx = orm.SetDB(ctx, orm.GetDBInstance())
@@ -84,7 +86,7 @@ func main() {
 		fileContent := string(bytes)
 
 		// Parse the chordpro file
-		songInfo, err := parser.Parse(fileContent)
+		songInfo, err := chordproParser.Parse(fileContent)
 		if err != nil {
 			log.Error("Failed to parse chordpro file: ", file, " Error: ", err)
 			continue
@@ -101,15 +103,42 @@ func main() {
 			continue
 		}
 
+		// Create or find artists and composers
+		var artists []*entity.Artist
+		if songInfo.Artist != "" {
+			artist, err := artistService.CreateIfNotExists(ctx, songInfo.Artist)
+			if err != nil {
+				log.Error("Failed to create or find artist: ", songInfo.Artist, " Error: ", err)
+				errs = append(errs, file)
+				continue
+			}
+			artists = append(artists, artist)
+		}
+		var composers []*entity.Artist
+		if songInfo.Composer != "" {
+			com, err := artistService.CreateIfNotExists(ctx, songInfo.Composer)
+			if err != nil {
+				log.Error("Failed to create or find composer: ", songInfo.Composer, " Error: ", err)
+				errs = append(errs, file)
+				continue
+			}
+			composers = append(composers, com)
+		}
+
 		// Save the song to the public library
 		song := &entity.Song{
-			Title:    songInfo.Title,
-			Artist:   songInfo.Artist,
-			Composer: songInfo.Composer,
-			Format:   entity.SheetFormat_Chordpro,
-			Sheet:    fileContent,
+			Title:     songInfo.Title,
+			Artists:   artists,
+			Composers: composers,
+			Format:    entity.SheetFormat_Chordpro,
+			Sheet:     fileContent,
 		}
-		if err := libraryService.UploadSong(ctx, library, song); err != nil {
+		if song, err := songService.CreateIfNotExists(ctx, song); err != nil {
+			log.Error("Failed to create or find song: ", song.Title, " Error: ", err)
+			errs = append(errs, file)
+			continue
+		}
+		if err := libraryService.AddSongToLibrary(ctx, library, song); err != nil {
 			log.Error("Failed to upload file: ", file, " Error: ", err)
 			errs = append(errs, file)
 			continue

@@ -2,4 +2,5 @@
 /tmp
 /*.sqlite
 /api.env
+/api.json
 /bin
