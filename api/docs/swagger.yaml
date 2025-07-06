@@ -92,7 +92,7 @@ definitions:
     type: object
   chords_com_api_internal_entity.ArtistsList:
     properties:
-      artists:
+      entities:
         items:
           $ref: '#/definitions/chords_com_api_internal_entity.ArtistInfo'
         type: array
@@ -230,7 +230,7 @@ definitions:
     type: object
   chords_com_api_internal_entity.SongsList:
     properties:
-      songs:
+      entities:
         items:
           $ref: '#/definitions/chords_com_api_internal_entity.SongInfo'
         type: array

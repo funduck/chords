@@ -592,7 +592,7 @@ const docTemplate = `{
         "chords_com_api_internal_entity.ArtistsList": {
             "type": "object",
             "properties": {
-                "artists": {
+                "entities": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/chords_com_api_internal_entity.ArtistInfo"
@@ -795,7 +795,7 @@ const docTemplate = `{
         "chords_com_api_internal_entity.SongsList": {
             "type": "object",
             "properties": {
-                "songs": {
+                "entities": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/chords_com_api_internal_entity.SongInfo"

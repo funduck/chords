@@ -14,6 +14,6 @@ type ArtistInfo struct {
 }
 
 type ArtistsList struct {
-	Artists []*ArtistInfo `json:"artists"`
+	Artists []*ArtistInfo `json:"entities"`
 	Total   int64         `json:"total"`
 }

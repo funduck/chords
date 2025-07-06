@@ -22,6 +22,6 @@ type SongInfo struct {
 }
 
 type SongsList struct {
-	Songs []*SongInfo `json:"songs"`
+	Songs []*SongInfo `json:"entities"`
 	Total int64       `json:"total"`
 }

@@ -25,6 +25,9 @@
   },
   "prettier.printWidth": 120,
   "prettier.prettierPath": "",
+  "go.testFlags": ["--tags=fts5"],
+  "go.testTimeout": "30s",
+  "go.buildTags": "fts5",
   "sqltools.connections": [
     {
       "previewLimit": 50,
