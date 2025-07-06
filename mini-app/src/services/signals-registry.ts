@@ -1,6 +1,6 @@
 import { signal } from "@telegram-apps/signals";
 
-import { RoomEntity } from "@src/hooks/Api";
+import { ArtistInfoEntity, RoomEntity } from "@src/hooks/Api";
 
 import { SongSettingsDto } from "../features/song/settings";
 
@@ -10,6 +10,8 @@ export class Signals {
 
   static userId = signal<number | null>(null);
   static room = signal<RoomEntity | null>(null);
+  static searchTab = signal<string | null>("song");
+  static artist = signal<ArtistInfoEntity | null>(null);
 
   static applySongSettings = signal<SongSettingsDto | null>(null);
   static publishSongSettings = signal<SongSettingsDto | null>(null);
@@ -18,5 +20,4 @@ export class Signals {
   static publishSongScroll = signal<number | null>(null);
 
   static publishSongId = signal<number | null>(null);
-  static publishArtistId = signal<number | null>(null);
 }

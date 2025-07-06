@@ -6,8 +6,8 @@ function SearchArtistListItem({ entity }: { entity: ArtistInfoEntity }) {
   return (
     <ButtonCell
       onClick={() => {
-        // navigate(RoutesEnum.Song(song.id));
-        Signals.publishArtistId.set(entity.id!);
+        Signals.artist.set(entity!);
+        Signals.searchTab.set("song");
       }}
     >
       {entity.name}

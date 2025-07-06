@@ -1,22 +1,21 @@
 import { Tabs } from "@mantine/core";
+import { useSignal } from "@telegram-apps/sdk-react";
+
+import { Signals } from "@src/services/signals-registry";
 
 import SearchArtists from "./SearchArtists";
 import SearchSongs from "./SearchSongs";
 
 function Search() {
+  const activeTab = useSignal(Signals.searchTab);
+
   return (
     <>
-      <Tabs defaultValue={"all"}>
+      <Tabs value={activeTab} onChange={(value) => Signals.searchTab.set(value)}>
         <Tabs.List grow justify="center" mb="md">
-          <Tabs.Tab value="all">Everywhere</Tabs.Tab>
-          <Tabs.Tab value="artist">Artists</Tabs.Tab>
           <Tabs.Tab value="song">Songs</Tabs.Tab>
+          <Tabs.Tab value="artist">Artists</Tabs.Tab>
         </Tabs.List>
-
-        <Tabs.Panel value="all">
-          TODO
-          {/* <SearchEverywhere /> */}
-        </Tabs.Panel>
 
         <Tabs.Panel value="artist">
           <SearchArtists />
