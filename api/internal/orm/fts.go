@@ -107,10 +107,10 @@ func initArtistsFTS(db *gorm.DB) error {
 }
 
 // SearchFTS performs full-text search on the specified table
-func SearchFTS(tx *gorm.DB, table string, query string) *gorm.DB {
+// Returns query template that returns target table ids
+func SearchFTS(table string) string {
 	ftsTable := fmt.Sprintf("%s_fts", table)
-	return tx.Joins(fmt.Sprintf("JOIN %s ON %s.rowid = %s.id", ftsTable, ftsTable, table)).
-		Where(fmt.Sprintf("%s MATCH ?", ftsTable), query)
+	return fmt.Sprintf("%s.id IN (SELECT %s.rowid FROM %s WHERE %s MATCH ?)", table, ftsTable, ftsTable, ftsTable)
 }
 
 // RebuildFTS rebuilds the FTS index for a specific table

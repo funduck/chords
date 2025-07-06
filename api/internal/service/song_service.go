@@ -89,7 +89,7 @@ func (s *SongService) SearchSongs(ctx context.Context, req *dto.SearchSongReques
 	}
 
 	if req.Query != "" {
-		q = orm.SearchFTS(q, "songs", req.Query)
+		q = q.Where(orm.SearchFTS("songs"), req.Query)
 	}
 
 	// Count total number of matching songs

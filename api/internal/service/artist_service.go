@@ -94,7 +94,7 @@ func (s *ArtistService) SearchArtists(ctx context.Context, req *dto.SearchArtist
 	q := tx.Model(&entity.Artist{})
 
 	if req.Query != "" {
-		q = orm.SearchFTS(q, "artists", req.Query)
+		q = q.Where("("+orm.SearchFTS("artists")+"OR name_normalized LIKE ?)", req.Query, "%"+s.normalizeName(req.Query)+"%")
 	}
 
 	// Count total number of matching artists
