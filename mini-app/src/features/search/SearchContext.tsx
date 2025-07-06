@@ -1,5 +1,6 @@
 import { ReactNode, createContext, useContext, useState } from "react";
 
+import { SearchPageSize } from "@src/config";
 import { ArtistInfoEntity, SongInfoEntity } from "@src/hooks/Api";
 
 interface SearchState<T> {
@@ -8,8 +9,11 @@ interface SearchState<T> {
   entities: T[] | null;
   cursorAfter?: string | undefined; // For pagination, if needed
   cursorBefore?: string | undefined; // For pagination, if needed
-  totalPages: number;
-  hasSearched: boolean;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+  total?: number; // Total count for display purposes
+  searching?: boolean; // Indicates if a search is in progress
+  loadingMore?: boolean; // Indicates if more results are being loaded
 }
 
 interface SearchContextType<T> {
@@ -23,17 +27,17 @@ const SearchArtistsContext = createContext<SearchContextType<ArtistInfoEntity> |
 
 const initialStateSongs: SearchState<SongInfoEntity> = {
   query: "",
-  pageSize: 10,
+  pageSize: SearchPageSize,
   entities: null,
-  totalPages: 0,
-  hasSearched: false,
+  hasNextPage: false,
+  hasPreviousPage: false,
 };
 const initialStateArtists: SearchState<ArtistInfoEntity> = {
   query: "",
-  pageSize: 10,
+  pageSize: SearchPageSize,
   entities: null,
-  totalPages: 0,
-  hasSearched: false,
+  hasNextPage: false,
+  hasPreviousPage: false,
 };
 
 export function SearchProvider({ children }: { children: ReactNode }) {

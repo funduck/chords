@@ -96,16 +96,6 @@ func (s *ArtistService) SearchArtists(ctx context.Context, req *dto.SearchArtist
 	if req.Query != "" {
 		q = orm.SearchFTS(q, "artists", req.Query)
 	}
-	if req.CursorAfter != "" {
-		// Use cursor for pagination
-		normalizedCursor := s.normalizeName(req.CursorAfter)
-		q = q.Where("name_normalized > ?", normalizedCursor)
-	}
-	if req.CursorBefore != "" {
-		// Use cursor for pagination
-		normalizedCursor := s.normalizeName(req.CursorBefore)
-		q = q.Where("name_normalized < ?", normalizedCursor)
-	}
 
 	// Count total number of matching artists
 	var total int64
@@ -117,8 +107,20 @@ func (s *ArtistService) SearchArtists(ctx context.Context, req *dto.SearchArtist
 	}
 
 	artistsList := []*entity.ArtistInfo{}
-	var artists []*entity.Artist
 	if req.ReturnRows {
+		var artists []*entity.Artist
+
+		if req.CursorAfter != "" {
+			// Use cursor for pagination
+			normalizedCursor := s.normalizeName(req.CursorAfter)
+			q = q.Where("name_normalized > ?", normalizedCursor)
+		}
+		if req.CursorBefore != "" {
+			// Use cursor for pagination
+			normalizedCursor := s.normalizeName(req.CursorBefore)
+			q = q.Where("name_normalized < ?", normalizedCursor)
+		}
+
 		// Find artists with pagination
 		err := q.
 			Order("artists.name_normalized ASC").

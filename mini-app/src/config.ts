@@ -6,3 +6,4 @@ export const ApiWsUrl = `ws${SSLSuffix}://${ApiUri}`;
 export const AutoScrollSpeed = parseInt(import.meta.env.VITE_AUTO_SCROLL_SPEED || "50", 10);
 export const AutoScrollInterval = parseInt(import.meta.env.VITE_AUTO_SCROLL_INTERVAL || "2000", 10);
 export const AutoScrollEnabled = import.meta.env.VITE_AUTO_SCROLL_ENABLED == "true";
+export const SearchPageSize = parseInt(import.meta.env.VITE_SEARCH_PAGE_SIZE || "30", 10);

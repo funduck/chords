@@ -8,6 +8,7 @@ import {
   ChordsComApiInternalEntityArtistInfo,
   ChordsComApiInternalEntityRoom,
   ChordsComApiInternalEntitySong,
+  ChordsComApiInternalEntitySongInfo,
   Configuration,
   RoomsApi,
   SongsApi,
@@ -22,7 +23,7 @@ export const SongsApiContext = createContext<SongsApi | null>(null);
 
 export type RoomEntity = ChordsComApiInternalEntityRoom;
 export type SongEntity = ChordsComApiInternalEntitySong;
-export type SongInfoEntity = ChordsComApiInternalEntitySong;
+export type SongInfoEntity = ChordsComApiInternalEntitySongInfo;
 export type ArtistInfoEntity = ChordsComApiInternalEntityArtistInfo;
 
 export function ApiProvider({ children }: { children: ReactNode }) {

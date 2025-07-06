@@ -91,12 +91,6 @@ func (s *SongService) SearchSongs(ctx context.Context, req *dto.SearchSongReques
 	if req.Query != "" {
 		q = orm.SearchFTS(q, "songs", req.Query)
 	}
-	if req.CursorAfter != "" {
-		q = q.Where("songs.title > ?", req.CursorAfter)
-	}
-	if req.CursorBefore != "" {
-		q = q.Where("songs.title < ?", req.CursorBefore)
-	}
 
 	// Count total number of matching songs
 	var total int64
@@ -108,8 +102,16 @@ func (s *SongService) SearchSongs(ctx context.Context, req *dto.SearchSongReques
 	}
 
 	songsList := []*entity.SongInfo{}
-	var songs []*entity.Song
 	if req.ReturnRows {
+		var songs []*entity.Song
+
+		if req.CursorAfter != "" {
+			q = q.Where("songs.title > ?", req.CursorAfter)
+		}
+		if req.CursorBefore != "" {
+			q = q.Where("songs.title < ?", req.CursorBefore)
+		}
+
 		// Find songs with pagination
 		err := q.
 			Order("songs.title ASC").
