@@ -1,5 +1,7 @@
 import { Tabs } from "@mantine/core";
 import { useSignal } from "@telegram-apps/sdk-react";
+import { useEffect } from "react";
+import { useParams } from "react-router";
 
 import { Signals } from "@src/services/signals-registry";
 
@@ -7,7 +9,15 @@ import SearchArtists from "./SearchArtists";
 import SearchSongs from "./SearchSongs";
 
 function Search() {
+  let { artistId } = useParams();
+
   const activeTab = useSignal(Signals.searchTab);
+
+  useEffect(() => {
+    if (artistId) {
+      Signals.searchTab.set("song");
+    }
+  }, [artistId]);
 
   return (
     <>

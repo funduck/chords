@@ -15,7 +15,12 @@ import Song from "./features/song/Song";
 import { useHeader } from "./hooks/Header";
 
 class RoutesEnum {
-  static Search = "/";
+  static Search = function ({ artistId }: { artistId?: number }): string {
+    if (artistId == null) {
+      return "/search";
+    }
+    return "/search/artist/" + artistId;
+  };
   static Room = "/room";
   static Song = function (songId?: number): string {
     if (songId == null) {
@@ -70,7 +75,7 @@ function Router() {
       Icon: () => (
         <Image style={{ background: "white", borderRadius: "50%" }} src="/src/assets/search.svg" alt="Search Icon" />
       ),
-      link: RoutesEnum.Search,
+      link: RoutesEnum.Search({}),
     },
     {
       id: "room",
@@ -151,6 +156,8 @@ function Router() {
       <AppShell.Main id="appshellmain" style={{ display: "flex", flex: 1, flexDirection: "column" }}>
         <Routes>
           <Route index element={<Search />} />
+          <Route path="search" element={<Search />} />
+          <Route path="search/artist/:artistId" element={<Search />} />
           <Route path="room" element={<Room />} />
           <Route path="song" element={<Song />} />
           <Route path="song/:songId" element={<Song />} />

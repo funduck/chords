@@ -1,4 +1,4 @@
-import { Button } from "@mantine/core";
+import { Button, CloseButton } from "@mantine/core";
 import { useSignal } from "@telegram-apps/sdk-react";
 import { useContext } from "react";
 
@@ -24,7 +24,8 @@ function SearchSongs() {
             Signals.artist.set(null);
           }}
         >
-          Cancel search in: {artist.name}
+          {artist.name}
+          <CloseButton></CloseButton>
         </Button>
       )}
 
