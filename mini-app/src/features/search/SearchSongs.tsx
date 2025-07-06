@@ -3,6 +3,7 @@ import { useSignal } from "@telegram-apps/sdk-react";
 import { useContext } from "react";
 
 import { SongsApiContext } from "@src/hooks/Api";
+import { useScrollPosition } from "@src/hooks/useScrollPosition";
 import { Signals } from "@src/services/signals-registry";
 
 import { useSearchSongsContext } from "./SearchContext";
@@ -11,8 +12,10 @@ import SearchSongListItem from "./SearchSongListItem";
 
 function SearchSongs() {
   const songsApi = useContext(SongsApiContext);
-
   const artist = useSignal(Signals.artist);
+
+  // Initialize scroll position management
+  useScrollPosition();
 
   return (
     <>

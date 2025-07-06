@@ -1,18 +1,18 @@
-import { CopyButton, Fieldset, Flex, TextInput } from "@mantine/core";
+import { Button, CopyButton, Fieldset, Flex, Stack, Text, TextInput } from "@mantine/core";
 import { useSignal } from "@telegram-apps/sdk-react";
 import { useContext, useState } from "react";
 
 import { RoomServiceContext } from "@src/hooks/RoomService";
+import { useScrollPosition } from "@src/hooks/useScrollPosition";
 import { Signals } from "@src/services/signals-registry";
-
-import Button from "@components/Button";
-import Stack from "@components/Stack";
-import Text from "@components/Text";
 
 function Room() {
   const room = useSignal(Signals.room);
   const [roomCode, setRoomCode] = useState<string | null>(null);
   const roomService = useContext(RoomServiceContext);
+
+  // Initialize scroll position management
+  useScrollPosition();
 
   if (!roomService) {
     return (
@@ -27,7 +27,7 @@ function Room() {
       <>
         <Stack>
           <Fieldset legend="Create Room">
-            <Button stretched={true} onClick={() => roomService.createRoom()}>
+            <Button fullWidth onClick={() => roomService.createRoom()}>
               Create
             </Button>
           </Fieldset>

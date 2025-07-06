@@ -3,6 +3,7 @@ import { useSignal } from "@telegram-apps/sdk-react";
 import { useEffect } from "react";
 import { useParams } from "react-router";
 
+import { useScrollPosition } from "@src/hooks/useScrollPosition";
 import { Signals } from "@src/services/signals-registry";
 
 import SearchArtists from "./SearchArtists";
@@ -12,6 +13,9 @@ function Search() {
   let { artistId } = useParams();
 
   const activeTab = useSignal(Signals.searchTab);
+
+  // Initialize scroll position management
+  useScrollPosition();
 
   useEffect(() => {
     if (artistId) {

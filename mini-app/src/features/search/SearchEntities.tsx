@@ -1,4 +1,5 @@
 import { Button, Flex, Space, Text } from "@mantine/core";
+import { useScrollIntoView } from "@mantine/hooks";
 import { ReactNode, useContext, useEffect, useRef } from "react";
 
 import QueryInput from "@components/QueryInput";
@@ -46,7 +47,7 @@ interface PaginationProps {
   searchState: any;
   searching: boolean;
   onLoadMore?: () => void;
-  searchMoreButtonRef?: React.RefObject<HTMLButtonElement>;
+  searchMoreButtonRef?: React.RefObject<HTMLButtonElement | null>;
   entityName: string;
 }
 
@@ -67,7 +68,11 @@ function SearchEntities<T extends { id?: number; cursor?: string }, SP extends S
   renderPagination,
   renderResults,
 }: SearchEntitiesProps<T, SP>) {
-  const searchMoreButtonRef = useRef<HTMLButtonElement>(null);
+  const { scrollIntoView: scrollMoreButtonIntoView, targetRef: searchMoreButtonRef } =
+    useScrollIntoView<HTMLButtonElement>({
+      offset: 60,
+    });
+
   const api = useContext(apiContext);
   const { searchState, updateSearchState } = useSearchContext();
 
@@ -140,9 +145,7 @@ function SearchEntities<T extends { id?: number; cursor?: string }, SP extends S
             loadingMore: false,
           });
 
-          if (searchMoreButtonRef.current) {
-            searchMoreButtonRef.current.scrollIntoView({ behavior: "smooth" });
-          }
+          scrollMoreButtonIntoView();
         })
         .catch(console.error)
         .finally(() => {
@@ -211,7 +214,7 @@ function SearchEntities<T extends { id?: number; cursor?: string }, SP extends S
               {searchState.total && searchState.hasNextPage && (
                 <Button
                   w="100%"
-                  ref={searchMoreButtonRef}
+                  ref={searchMoreButtonRef as React.RefObject<HTMLButtonElement>}
                   onClick={handleLoadMore}
                   variant="outline"
                   mt="md"

@@ -4,6 +4,7 @@ import { useContext, useEffect, useRef, useState } from "react";
 import { useParams } from "react-router";
 
 import { SongEntity, SongsApiContext } from "@src/hooks/Api";
+import { useScrollPosition } from "@src/hooks/useScrollPosition";
 import { Signals } from "@src/services/signals-registry";
 import { EstimateFontSize } from "@src/utils/font";
 
@@ -15,6 +16,9 @@ import SongSettings from "./SongSettings";
 
 function Song() {
   const room = useSignal(Signals.room);
+
+  // Initialize scroll position management
+  useScrollPosition();
 
   // GET SONG
   let { songId } = useParams();
