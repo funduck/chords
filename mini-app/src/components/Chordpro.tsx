@@ -3,6 +3,7 @@ import * as Parser from "chordproject-parser";
 import { ChordProParser, HtmlTableFormatter } from "chordsheetjs";
 import { useEffect, useRef, useState } from "react";
 
+import { useScrollPosition } from "@src/hooks/useScrollPosition";
 import { EstimateFontSize } from "@src/utils/font";
 
 function Chordpro({ sheet }: { sheet: string }) {

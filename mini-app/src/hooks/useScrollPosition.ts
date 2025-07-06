@@ -13,7 +13,7 @@ interface ScrollPositionStorage {
 /**
  * Custom hook to save and restore scroll positions for different pages
  */
-export function useScrollPosition() {
+export function useScrollPosition(ref?: React.RefObject<HTMLDivElement>) {
   const location = useLocation();
   const scrollPositionRef = useRef<ScrollPosition>({ x: 0, y: 0 });
 
@@ -22,6 +22,7 @@ export function useScrollPosition() {
       const storage: ScrollPositionStorage = JSON.parse(localStorage.getItem("scroll-positions") || "{}");
       storage[pathname] = position;
       localStorage.setItem("scroll-positions", JSON.stringify(storage));
+      console.debug("Saved scroll position for", pathname, position);
     } catch (error) {
       console.error("Failed to save scroll position:", error);
     }
@@ -40,22 +41,36 @@ export function useScrollPosition() {
   const restoreScrollPosition = (pathname: string) => {
     const savedPosition = getScrollPosition(pathname);
     if (savedPosition) {
+      console.debug("Restoring scroll position for", pathname, savedPosition);
       // Use setTimeout to ensure DOM is fully rendered
       setTimeout(() => {
-        window.scrollTo({
-          left: savedPosition.x,
-          top: savedPosition.y,
-          behavior: "instant",
-        });
+        if (ref?.current) {
+          ref.current.scrollTo({
+            left: savedPosition.x,
+            top: savedPosition.y,
+            behavior: "instant",
+          });
+        } else {
+          window.scrollTo({
+            left: savedPosition.x,
+            top: savedPosition.y,
+            behavior: "instant",
+          });
+        }
       }, 50);
     }
   };
 
   const saveCurrentScrollPosition = () => {
-    const currentPosition = {
-      x: window.scrollX,
-      y: window.scrollY,
-    };
+    const currentPosition = ref?.current
+      ? {
+          x: ref.current.scrollLeft,
+          y: ref.current.scrollTop,
+        }
+      : {
+          x: window.scrollX,
+          y: window.scrollY,
+        };
     scrollPositionRef.current = currentPosition;
     saveScrollPosition(location.pathname, currentPosition);
   };
@@ -68,10 +83,15 @@ export function useScrollPosition() {
 
     // Save scroll position periodically while scrolling
     const handleScroll = () => {
-      const currentPosition = {
-        x: window.scrollX,
-        y: window.scrollY,
-      };
+      const currentPosition = ref?.current
+        ? {
+            x: ref.current.scrollLeft,
+            y: ref.current.scrollTop,
+          }
+        : {
+            x: window.scrollX,
+            y: window.scrollY,
+          };
       scrollPositionRef.current = currentPosition;
 
       // Debounce the save operation
@@ -81,20 +101,22 @@ export function useScrollPosition() {
       }, 100);
     };
 
+    const scrollElement = ref?.current || window;
+
     window.addEventListener("beforeunload", handleBeforeUnload);
-    window.addEventListener("scroll", handleScroll);
+    scrollElement.addEventListener("scroll", handleScroll);
 
     return () => {
       window.removeEventListener("beforeunload", handleBeforeUnload);
-      window.removeEventListener("scroll", handleScroll);
+      scrollElement.removeEventListener("scroll", handleScroll);
       clearTimeout(window.scrollSaveTimeout);
     };
-  }, [location.pathname]);
+  }, [location.pathname, ref]);
 
   // Restore scroll position when entering a page
   useEffect(() => {
     restoreScrollPosition(location.pathname);
-  }, [location.pathname]);
+  }, [location.pathname, ref]);
 
   return {
     saveScrollPosition: saveCurrentScrollPosition,

@@ -1,6 +1,7 @@
 import { Anchor, AppShell, Burger, Button, Group, Menu, em } from "@mantine/core";
 import { useDisclosure, useMediaQuery } from "@mantine/hooks";
 import { IconSettings, IconSettingsFilled } from "@tabler/icons-react";
+import { useSignal } from "@telegram-apps/sdk-react";
 import { useEffect } from "react";
 import { Route, Routes, useNavigate } from "react-router";
 
@@ -13,6 +14,7 @@ import Room from "./features/room/Room";
 import Search from "./features/search/Search";
 import Song from "./features/song/Song";
 import { useHeader } from "./hooks/Header";
+import { Signals } from "./services/signals-registry";
 
 class RoutesEnum {
   static Search = function ({ artistId }: { artistId?: number }): string {
@@ -68,6 +70,8 @@ function Router() {
 
   const navigate = useNavigate();
 
+  const songId = useSignal(Signals.publishSongId);
+
   const tabs = [
     {
       id: "search",
@@ -89,7 +93,7 @@ function Router() {
       id: "song",
       text: "Song",
       Icon: () => <Image style={{ borderRadius: "50%" }} src="/src/assets/song.jpg" alt="Song Icon" />,
-      link: RoutesEnum.Song(),
+      link: RoutesEnum.Song(songId || undefined),
     },
   ];
 

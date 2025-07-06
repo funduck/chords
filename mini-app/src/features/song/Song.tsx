@@ -1,8 +1,9 @@
 import { Box, Divider, ScrollArea, Space } from "@mantine/core";
 import { useSignal } from "@telegram-apps/sdk-react";
 import { useContext, useEffect, useRef, useState } from "react";
-import { useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 
+import { RoutesEnum } from "@src/Router";
 import { SongEntity, SongsApiContext } from "@src/hooks/Api";
 import { useScrollPosition } from "@src/hooks/useScrollPosition";
 import { Signals } from "@src/services/signals-registry";
@@ -17,28 +18,32 @@ import SongSettings from "./SongSettings";
 function Song() {
   const room = useSignal(Signals.room);
 
-  // Initialize scroll position management
-  useScrollPosition();
-
   // GET SONG
   let { songId } = useParams();
 
-  // Store songId in localStorage so app remembers it across sessions
-  if (!songId) {
-    songId = localStorage.getItem("songId") ?? "";
-    if (songId) {
-      console.log("Using songId from localStorage:", songId);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Store songId in localStorage so app remembers it across sessions
+    if (!songId) {
+      songId = localStorage.getItem("songId") ?? "";
+      if (songId) {
+        console.log("Using songId from localStorage:", songId);
+        navigate(RoutesEnum.Song(parseInt(songId!, 10)));
+        return;
+      }
     } else {
-      return <Text>No song selected. Please select a song from the list or set a default song in settings.</Text>;
+      localStorage.setItem("songId", songId);
     }
-  } else {
-    localStorage.setItem("songId", songId);
-  }
+  }, [songId]);
 
   const songViewportRef = useRef<HTMLDivElement>(null);
   const [song, setSong] = useState<SongEntity | null>(null);
   const applySongSettings = useSignal(Signals.applySongSettings);
   const applySongScroll = useSignal(Signals.applySongScroll);
+
+  // Initialize scroll position management
+  const { saveScrollPosition } = useScrollPosition(songViewportRef);
 
   // This flag prevents emitting scroll events we are applying scroll events from room
   const emitScrollEvent = useRef(true);
@@ -114,6 +119,8 @@ function Song() {
   ]);
   // Emitting scroll events
   function onScrollPositionChange() {
+    saveScrollPosition();
+
     if (!room) {
       return;
     }
@@ -137,7 +144,7 @@ function Song() {
     emittingScrollTimeout.current = setTimeout(() => {
       Signals.publishSongScroll.set(scrollPercent);
       console.debug("Scroll event emitted:", scrollPercent);
-    }, 10);
+    }, 50);
   }
   // Applying scroll events
   useEffect(() => {
@@ -171,6 +178,10 @@ function Song() {
 
   if (!song) {
     return <div>Loading...</div>;
+  }
+
+  if (!songId) {
+    return <Text>No song selected. Please select a song from the list or set a default song in settings.</Text>;
   }
 
   return (
