@@ -1,41 +1,16 @@
-# Server
+# Chords
+This is my pet project that should replace Ultimate Guitar app, AmDm.ru and similar sites with songs and chords.
 
-Server api and telegram mini app template
+## Motivation
+* I wanted to start a pet project I really care about
+* I dont like how Ultimate Guitar app works, it is slow, has ads, and limits me to only a subset of songs
+* AmDm.ru has flooded itself with ads and is not usable anymore
 
-## Installation
+Obviously, there are more apps and websites, and my list of references will grow, this is just a starting point.
 
-Prepare configs, by default it should work for local development
-
-```
-cp .env.example .env
-cp api/api.env.example api/api.env
-cp mini-app/.env.example mini-app/.env
-```
-
-### Deploy
-
-Build and run services
-
-```
-docker compose up --build
-```
-
-### Setup TWA
-
-Set `<domain>` as URL for TWA in telegram bot  
-And telegram wants https
-
-## Local development
-Run services in development mode
-
-```
-caddy-dev
-mini-app-dev
-api-dev
-```
-
-## Openapi
-
-`GET /api/swagger/index.html`
-
-MiniApp has codegen built on this spec
+## Core features
+* Search for songs by title or artist or lyrics - and here is the kicker number one - full text search by lyrics
+* View songs with chords and lyrics
+* Autoscroll with adjustable speed
+* Chord diagrams
+* Room - join room when you are playing together and your screen will autoscroll to the same position, one can manage scrolling while others are playing
