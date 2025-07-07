@@ -1,18 +1,24 @@
 import { Button, CopyButton, Fieldset, Flex, Stack, Text, TextInput } from "@mantine/core";
 import { useSignal } from "@telegram-apps/sdk-react";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 
+import { useHeader } from "@src/hooks/Header";
 import { RoomServiceContext } from "@src/hooks/RoomService";
 import { useScrollPosition } from "@src/hooks/useScrollPosition";
 import { Signals } from "@src/services/signals-registry";
 
 function Room() {
+  // Initialize scroll position management
+  useScrollPosition();
+
+  const { setCenterContent } = useHeader();
+  useEffect(() => {
+    setCenterContent(<Text>Room</Text>);
+  }, []);
+
   const room = useSignal(Signals.room);
   const [roomCode, setRoomCode] = useState<string | null>(null);
   const roomService = useContext(RoomServiceContext);
-
-  // Initialize scroll position management
-  useScrollPosition();
 
   if (!roomService) {
     return (

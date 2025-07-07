@@ -64,6 +64,11 @@ definitions:
         type: array
       updated_at:
         type: string
+    required:
+    - created_at
+    - id
+    - name
+    - updated_at
     type: object
   chords_com_api_internal_entity.ArtistInfo:
     properties:
@@ -89,6 +94,11 @@ definitions:
         type: array
       updated_at:
         type: string
+    required:
+    - created_at
+    - id
+    - name
+    - updated_at
     type: object
   chords_com_api_internal_entity.ArtistsList:
     properties:
@@ -125,6 +135,10 @@ definitions:
         $ref: '#/definitions/chords_com_api_internal_entity.LibraryType'
       updated_at:
         type: string
+    required:
+    - created_at
+    - id
+    - updated_at
     type: object
   chords_com_api_internal_entity.LibraryType:
     enum:
@@ -160,6 +174,10 @@ definitions:
         items:
           $ref: '#/definitions/chords_com_api_internal_entity.User'
         type: array
+    required:
+    - created_at
+    - id
+    - updated_at
     type: object
   chords_com_api_internal_entity.SheetFormat:
     enum:
@@ -195,6 +213,13 @@ definitions:
         type: string
       updated_at:
         type: string
+    required:
+    - created_at
+    - format
+    - id
+    - sheet
+    - title
+    - updated_at
     type: object
   chords_com_api_internal_entity.SongInfo:
     properties:
@@ -227,6 +252,13 @@ definitions:
         type: string
       updated_at:
         type: string
+    required:
+    - created_at
+    - format
+    - id
+    - sheet
+    - title
+    - updated_at
     type: object
   chords_com_api_internal_entity.SongsList:
     properties:
@@ -270,6 +302,10 @@ definitions:
         type: array
       updated_at:
         type: string
+    required:
+    - created_at
+    - id
+    - updated_at
     type: object
   chords_com_api_internal_event_bus.Event:
     properties:
@@ -304,6 +340,28 @@ info:
   title: Chords API
   version: "1.0"
 paths:
+  /api/artists/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve an artist by its ID
+      operationId: getArtistByID
+      parameters:
+      - description: Artist ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/chords_com_api_internal_entity.Artist'
+      summary: Get artist by ID
+      tags:
+      - Artists
   /api/artists/search:
     post:
       consumes:

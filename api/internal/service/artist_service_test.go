@@ -175,6 +175,44 @@ func TestArtistService_FindByName(t *testing.T) {
 	})
 }
 
+func TestArtistService_GetArtistByID(t *testing.T) {
+	db := initForTest()
+	service := NewArtistService()
+	ctx := orm.SetDB(context.Background(), db)
+
+	// Create test artist
+	created, err := service.CreateIfNotExists(ctx, "Test Artist")
+	if err != nil {
+		t.Fatalf("Failed to create test artist: %v", err)
+	}
+
+	t.Run("Get existing artist by ID", func(t *testing.T) {
+		found, err := service.GetArtistByID(ctx, created.ID)
+		if err != nil {
+			t.Fatalf("Expected no error, got %v", err)
+		}
+
+		if found == nil {
+			t.Fatal("Expected to find artist, got nil")
+		}
+
+		if found.ID != created.ID {
+			t.Errorf("Expected ID %d, got %d", created.ID, found.ID)
+		}
+
+		if found.Name != created.Name {
+			t.Errorf("Expected name %q, got %q", created.Name, found.Name)
+		}
+	})
+
+	t.Run("Return error for non-existent artist", func(t *testing.T) {
+		_, err := service.GetArtistByID(ctx, 999) // Non-existent ID
+		if err == nil {
+			t.Error("Expected error for non-existent artist, got nil")
+		}
+	})
+}
+
 func TestArtistService_SearchArtists(t *testing.T) {
 	db := initForTest()
 	service := NewArtistService()

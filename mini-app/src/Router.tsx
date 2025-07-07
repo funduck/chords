@@ -5,11 +5,11 @@ import { useSignal } from "@telegram-apps/sdk-react";
 import { useEffect } from "react";
 import { Route, Routes, useNavigate } from "react-router";
 
-import Image from "@components/Image";
 import Stack from "@components/Stack";
 
 import ThemeSwitch from "./components/ThemeSwitch";
 import Title from "./components/Title";
+import Artist from "./features/artist/Artist";
 import Room from "./features/room/Room";
 import Search from "./features/search/Search";
 import Song from "./features/song/Song";
@@ -17,11 +17,17 @@ import { useHeader } from "./hooks/Header";
 import { Signals } from "./services/signals-registry";
 
 class RoutesEnum {
-  static Search = function ({ artistId }: { artistId?: number }): string {
-    if (artistId == null) {
+  static Search = function (tab?: string): string {
+    if (tab == null) {
       return "/search";
     }
-    return "/search/artist/" + artistId;
+    return "/search/" + tab;
+  };
+  static Artist = function (artistId?: number): string {
+    if (artistId == null) {
+      return "/artist";
+    }
+    return "/artist/" + artistId;
   };
   static Room = "/room";
   static Song = function (songId?: number): string {
@@ -70,29 +76,29 @@ function Router() {
 
   const navigate = useNavigate();
 
+  const searchTab = useSignal(Signals.searchTab);
   const songId = useSignal(Signals.publishSongId);
+  const artist = useSignal(Signals.artist);
 
   const tabs = [
     {
       id: "search",
       text: "Search",
-      Icon: () => (
-        <Image style={{ background: "white", borderRadius: "50%" }} src="/src/assets/search.svg" alt="Search Icon" />
-      ),
-      link: RoutesEnum.Search({}),
+      link: RoutesEnum.Search(searchTab || undefined),
+    },
+    {
+      id: "artist",
+      text: "Artist",
+      link: RoutesEnum.Artist(artist?.id),
     },
     {
       id: "room",
       text: "Room",
-      Icon: () => (
-        <Image style={{ background: "white", borderRadius: "20%" }} src="/src/assets/room.png" alt="Room Icon" />
-      ),
       link: RoutesEnum.Room,
     },
     {
       id: "song",
       text: "Song",
-      Icon: () => <Image style={{ borderRadius: "50%" }} src="/src/assets/song.jpg" alt="Song Icon" />,
       link: RoutesEnum.Song(songId || undefined),
     },
   ];
@@ -161,8 +167,10 @@ function Router() {
         <Routes>
           <Route index element={<Search />} />
           <Route path="search" element={<Search />} />
-          <Route path="search/artist/:artistId" element={<Search />} />
+          <Route path="search/:searchTab" element={<Search />} />
           <Route path="room" element={<Room />} />
+          <Route path="artist" element={<Artist />} />
+          <Route path="artist/:artistId" element={<Artist />} />
           <Route path="song" element={<Song />} />
           <Route path="song/:songId" element={<Song />} />
         </Routes>

@@ -37,3 +37,29 @@ func (a *App) SearchArtists(w http.ResponseWriter, r *http.Request) {
 
 	a.respondJSON(w, http.StatusOK, res)
 }
+
+// GetArtistByID godoc
+//
+//	@ID				getArtistByID
+//	@Summary		Get artist by ID
+//	@Description	Retrieve an artist by its ID
+//	@Tags			Artists
+//	@Accept			json
+//	@Produce		json
+//	@Param			id	path		int	true	"Artist ID"
+//	@Success		200	{object}	entity.Artist
+//	@Router			/api/artists/{id} [get]
+func (a *App) GetArtistByID(w http.ResponseWriter, r *http.Request) {
+	artistID, err := parseURLParamUint(w, r, "id")
+	if err != nil {
+		return
+	}
+
+	artist, err := a.artistService.GetArtistByID(r.Context(), artistID)
+	if err != nil {
+		a.respondError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	a.respondJSON(w, http.StatusOK, artist)
+}

@@ -11,7 +11,7 @@ function SearchArtistListItem({ entity }: { entity: ArtistInfoEntity }) {
     <ButtonCell
       onClick={() => {
         Signals.artist.set(entity!);
-        navigate(RoutesEnum.Search({ artistId: entity.id }));
+        navigate(RoutesEnum.Artist(entity.id));
       }}
     >
       {entity.name}

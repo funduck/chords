@@ -18,8 +18,8 @@ import SongSettings from "./SongSettings";
 function Song() {
   const room = useSignal(Signals.room);
 
-  // GET SONG
-  let { songId } = useParams();
+  let { songId } = useParams<{ songId: string }>();
+  const songsApi = useContext(SongsApiContext);
 
   const navigate = useNavigate();
 
@@ -50,8 +50,6 @@ function Song() {
 
   // This is used to debounce the scroll events when user scrolls manually
   const emittingScrollTimeout = useRef(null as ReturnType<typeof setTimeout> | null);
-
-  const songsApi = useContext(SongsApiContext);
 
   useEffect(() => {
     console.debug("Song component mounted, fetching song with ID:", songId);

@@ -2,7 +2,7 @@ package entity
 
 type Artist struct {
 	BaseEntity
-	Name           string  `gorm:"not null" json:"name"`
+	Name           string  `gorm:"not null" json:"name" validate:"required"`
 	NameNormalized string  `gorm:"not null;index" json:"-"`
 	Songs          []*Song `gorm:"many2many:song_artists;" json:"songs,omitempty"`
 	Compositions   []*Song `gorm:"many2many:song_composers;" json:"compositions,omitempty"`

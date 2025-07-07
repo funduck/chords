@@ -10,7 +10,7 @@ export class Signals {
 
   static userId = signal<number | null>(null);
   static room = signal<RoomEntity | null>(null);
-  static searchTab = signal<string | null>("song");
+  static searchTab = signal<string | null>(null);
   static artist = signal<ArtistInfoEntity | null>(null);
 
   static applySongSettings = signal<SongSettingsDto | null>(null);

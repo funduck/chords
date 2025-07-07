@@ -11,9 +11,9 @@ type DeletedAt struct {
 }
 
 type BaseEntity struct {
-	ID        uint      `gorm:"primarykey" json:"id"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	ID        uint      `gorm:"primarykey" json:"id" validate:"required"`
+	CreatedAt time.Time `json:"created_at" validate:"required"`
+	UpdatedAt time.Time `json:"updated_at" validate:"required"`
 	DeletedAt DeletedAt `gorm:"index" json:"deleted_at,omitempty" swaggertype:"string" example:"2025-06-18T15:04:05Z"`
 }
 

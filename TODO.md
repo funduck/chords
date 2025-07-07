@@ -1,8 +1,5 @@
-save scroll position on pages
 
 artist page
-
-search by artist add like %%
 
 history of songs
 

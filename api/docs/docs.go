@@ -62,6 +62,39 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/artists/{id}": {
+            "get": {
+                "description": "Retrieve an artist by its ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Artists"
+                ],
+                "summary": "Get artist by ID",
+                "operationId": "getArtistByID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Artist ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/chords_com_api_internal_entity.Artist"
+                        }
+                    }
+                }
+            }
+        },
         "/api/auth/anonymous": {
             "post": {
                 "description": "Create an anonymous access token",
@@ -521,6 +554,12 @@ const docTemplate = `{
         },
         "chords_com_api_internal_entity.Artist": {
             "type": "object",
+            "required": [
+                "created_at",
+                "id",
+                "name",
+                "updated_at"
+            ],
             "properties": {
                 "compositions": {
                     "type": "array",
@@ -554,6 +593,12 @@ const docTemplate = `{
         },
         "chords_com_api_internal_entity.ArtistInfo": {
             "type": "object",
+            "required": [
+                "created_at",
+                "id",
+                "name",
+                "updated_at"
+            ],
             "properties": {
                 "compositions": {
                     "type": "array",
@@ -613,6 +658,11 @@ const docTemplate = `{
         },
         "chords_com_api_internal_entity.Library": {
             "type": "object",
+            "required": [
+                "created_at",
+                "id",
+                "updated_at"
+            ],
             "properties": {
                 "created_at": {
                     "type": "string"
@@ -664,6 +714,11 @@ const docTemplate = `{
         },
         "chords_com_api_internal_entity.Room": {
             "type": "object",
+            "required": [
+                "created_at",
+                "id",
+                "updated_at"
+            ],
             "properties": {
                 "code": {
                     "type": "string"
@@ -704,6 +759,14 @@ const docTemplate = `{
         },
         "chords_com_api_internal_entity.Song": {
             "type": "object",
+            "required": [
+                "created_at",
+                "format",
+                "id",
+                "sheet",
+                "title",
+                "updated_at"
+            ],
             "properties": {
                 "artists": {
                     "type": "array",
@@ -747,6 +810,14 @@ const docTemplate = `{
         },
         "chords_com_api_internal_entity.SongInfo": {
             "type": "object",
+            "required": [
+                "created_at",
+                "format",
+                "id",
+                "sheet",
+                "title",
+                "updated_at"
+            ],
             "properties": {
                 "artists": {
                     "type": "array",
@@ -814,6 +885,11 @@ const docTemplate = `{
         },
         "chords_com_api_internal_entity.User": {
             "type": "object",
+            "required": [
+                "created_at",
+                "id",
+                "updated_at"
+            ],
             "properties": {
                 "created_at": {
                     "type": "string"

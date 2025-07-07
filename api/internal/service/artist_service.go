@@ -56,23 +56,35 @@ func (s *ArtistService) FindByName(ctx context.Context, name string) (*entity.Ar
 	return &artist, nil
 }
 
+// GetArtistByID retrieves an artist by its ID
+func (s *ArtistService) GetArtistByID(ctx context.Context, id uint) (*entity.Artist, error) {
+	db := orm.GetDB(ctx)
+	var artist entity.Artist
+	err := db.Model(&entity.Artist{}).First(&artist, id).Error
+
+	return &artist, err
+}
+
 // CreateIfNotExists creates an artist if it doesn't already exist based on name comparison
 func (s *ArtistService) CreateIfNotExists(ctx context.Context, name string) (*entity.Artist, error) {
-	// First check if artist already exists
-	existing, err := s.FindByName(ctx, name)
-	if err != nil {
-		return nil, err
-	}
+	// First check if artist already exists by normalized name
+	normalized := s.normalizeName(name)
+	db := orm.GetDB(ctx)
 
-	if existing != nil {
-		return existing, nil
+	var existing entity.Artist
+	err := db.Where("name_normalized = ?", normalized).First(&existing).Error
+	if err == nil {
+		// Artist with same normalized name already exists, return it
+		return &existing, nil
+	}
+	if !orm.IsRecordNotFoundError(err) {
+		return nil, err // Some other error occurred
 	}
 
 	// Create new artist
-	db := orm.GetDB(ctx)
 	artist := &entity.Artist{
 		Name:           name,
-		NameNormalized: s.normalizeName(name),
+		NameNormalized: normalized,
 	}
 
 	err = db.Create(artist).Error
