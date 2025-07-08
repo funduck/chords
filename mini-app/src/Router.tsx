@@ -58,12 +58,14 @@ function SettingsMenu() {
       <Menu.Dropdown>
         {/* Here we inject custom menu items */}
         {settingsContent.map((item, index) => (
-          <Menu.Item key={index}>{item}</Menu.Item>
+          <Menu.Item component="div" key={index}>
+            {item}
+          </Menu.Item>
         ))}
 
+        {settingsContent.length > 0 && <Menu.Divider />}
         {/* Theme switch is always in menu */}
-        <Menu.Divider />
-        <Menu.Item>
+        <Menu.Item component="div">
           <ThemeSwitch />
         </Menu.Item>
       </Menu.Dropdown>
@@ -147,15 +149,17 @@ function Router() {
       <AppShell.Navbar p="lg">
         <Stack gap="lg">
           {tabs.map(({ id, link, text }) => (
-            <Button variant="subtle" justify="start">
-              <Anchor
-                key={id}
-                id={id}
-                onClick={() => {
-                  isMobile && toggleNavbar();
-                  navigate(link);
-                }}
-              >
+            <Button
+              variant="subtle"
+              justify="start"
+              key={id}
+              id={id}
+              onClick={() => {
+                isMobile && toggleNavbar();
+                navigate(link);
+              }}
+            >
+              <Anchor>
                 <Title>{text}</Title>
               </Anchor>
             </Button>

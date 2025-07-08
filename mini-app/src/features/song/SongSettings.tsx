@@ -86,7 +86,6 @@ function SongSettings() {
   const settings = useSignal(Signals.applySongSettings);
 
   useEffect(() => {
-    console.debug("SongSettings mounted");
     if (!settings) {
       SettingsService.load(SongSettingsDto)
         .then((loadedSettings) => {

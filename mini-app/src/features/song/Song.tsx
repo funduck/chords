@@ -54,8 +54,8 @@ function Song() {
   const showRawSong = useSignal(Signals.showRawSong);
 
   useEffect(() => {
-    console.debug("Song component mounted, fetching song with ID:", songId);
     if (songId && songsApi) {
+      console.debug("Fetching song with ID:", songId);
       songsApi
         .getSongByID({ id: parseInt(songId, 10) })
         .then(setSong)

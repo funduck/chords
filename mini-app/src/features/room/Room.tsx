@@ -2,6 +2,7 @@ import { Button, CopyButton, Fieldset, Flex, Space, Stack, Text, TextInput } fro
 import { useSignal } from "@telegram-apps/sdk-react";
 import { useContext, useEffect, useState } from "react";
 
+import { Config } from "@src/config";
 import { useHeader } from "@src/hooks/Header";
 import { RoomServiceContext } from "@src/hooks/RoomService";
 import { useScrollPosition } from "@src/hooks/useScrollPosition";
@@ -33,7 +34,7 @@ function Room() {
       <>
         <Stack>
           <Fieldset legend="Create Room">
-            <Button fullWidth onClick={() => roomService.createRoom()}>
+            <Button variant="outline" fullWidth onClick={() => roomService.createRoom()}>
               Create
             </Button>
           </Fieldset>
@@ -43,9 +44,17 @@ function Room() {
               <TextInput
                 name="roomCode"
                 onChange={(event) => setRoomCode(event.target.value)}
-                error={(roomCode?.length || 0) != 6 ? `Need ${6 - (roomCode?.length || 0)} more characters` : undefined}
+                error={
+                  roomCode?.length && roomCode.length != 6
+                    ? `Need ${6 - (roomCode?.length || 0)} more characters`
+                    : undefined
+                }
               />
-              <Button onClick={() => roomService.joinRoom(roomCode!)} disabled={(roomCode?.length || 0) != 6}>
+              <Button
+                variant="outline"
+                onClick={() => roomService.joinRoom(roomCode!)}
+                disabled={(roomCode?.length || 0) != 6}
+              >
                 Join
               </Button>
             </Flex>
@@ -60,15 +69,19 @@ function Room() {
       <Stack>
         <CopyButton value={room?.code ?? ""}>
           {({ copied, copy }) => (
-            <Button disabled={room?.code == null} onClick={copy}>
+            <Button variant="outline" disabled={room?.code == null} onClick={copy}>
               {copied ? "Copied code" : `Copy code "${room?.code}"`}
             </Button>
           )}
         </CopyButton>
-        <Button onClick={() => roomService.leaveRoom(room)}>Leave Room</Button>
+        <Button variant="outline" onClick={() => roomService.leaveRoom(room)}>
+          Leave Room
+        </Button>
       </Stack>
       <Space h="md" />
-      {room.users && <Text>Users: {room.users?.map((u) => u.id).join(", ")}</Text>}
+      {Config.IsDev && room.id && <Text>Room ID: {room.id}</Text>}
+      {Config.IsDev && room.users && <Text>Users: {room.users?.map((u) => u.id).join(", ")}</Text>}
+      {Config.IsDev && room.state && <Text>State: {JSON.stringify(room.state)}</Text>}
     </>
   );
 }

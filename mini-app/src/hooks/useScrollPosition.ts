@@ -22,7 +22,7 @@ export function useScrollPosition(ref?: React.RefObject<HTMLDivElement>) {
       const storage: ScrollPositionStorage = JSON.parse(localStorage.getItem("scroll-positions") || "{}");
       storage[pathname] = position;
       localStorage.setItem("scroll-positions", JSON.stringify(storage));
-      console.debug("Saved scroll position for", pathname, position);
+      // console.debug("Saved scroll position for", pathname, position);
     } catch (error) {
       console.error("Failed to save scroll position:", error);
     }
@@ -41,7 +41,7 @@ export function useScrollPosition(ref?: React.RefObject<HTMLDivElement>) {
   const restoreScrollPosition = (pathname: string) => {
     const savedPosition = getScrollPosition(pathname);
     if (savedPosition) {
-      console.debug("Restoring scroll position for", pathname, savedPosition);
+      // console.debug("Restoring scroll position for", pathname, savedPosition);
       // Use setTimeout to ensure DOM is fully rendered
       setTimeout(() => {
         if (ref?.current) {

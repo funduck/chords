@@ -16,7 +16,7 @@ export function estimateFontSize({ parent, className }: { parent?: HTMLElement; 
   const height = el.offsetHeight;
   parent.removeChild(el);
 
-  console.debug("Estimated font size:", { width, height });
+  // console.debug("Estimated font size:", { width, height });
 
   return { width, height };
 }
