@@ -7,7 +7,7 @@ import { RoutesEnum } from "@src/Router";
 import { SongEntity, SongsApiContext } from "@src/hooks/Api";
 import { useScrollPosition } from "@src/hooks/useScrollPosition";
 import { Signals } from "@src/services/signals-registry";
-import { EstimateFontSize } from "@src/utils/font";
+import { estimateFontSize } from "@src/utils/font";
 
 import Chordpro from "@components/Chordpro";
 import Stack from "@components/Stack";
@@ -71,7 +71,7 @@ function Song() {
       applySongSettings?.auto_scroll_speed
     ) {
       // Get font size in pixels
-      const { height } = EstimateFontSize({});
+      const { height } = estimateFontSize({});
 
       const scrollInterval = applySongSettings.auto_scroll_interval;
       let scrollSpeed = Math.max(1, applySongSettings.auto_scroll_speed); // 1-100

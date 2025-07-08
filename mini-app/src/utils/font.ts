@@ -1,4 +1,4 @@
-export function EstimateFontSize({ parent, className }: { parent?: HTMLElement; className?: string }): {
+export function estimateFontSize({ parent, className }: { parent?: HTMLElement; className?: string }): {
   width: number;
   height: number;
 } {

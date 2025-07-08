@@ -3,8 +3,7 @@ import * as Parser from "chordproject-parser";
 import { ChordProParser, HtmlTableFormatter } from "chordsheetjs";
 import { useEffect, useRef, useState } from "react";
 
-import { useScrollPosition } from "@src/hooks/useScrollPosition";
-import { EstimateFontSize } from "@src/utils/font";
+import { estimateFontSize } from "@src/utils/font";
 
 function Chordpro({ sheet }: { sheet: string }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -28,7 +27,7 @@ function Chordpro({ sheet }: { sheet: string }) {
       return;
     }
     try {
-      const font = EstimateFontSize({ parent: ref.current, className: "lyrics" }); // Estimate font size for lyrics
+      const font = estimateFontSize({ parent: ref.current, className: "lyrics" }); // Estimate font size for lyrics
 
       // We track screen changes via "width" but we need to use ref.current.offsetWidth to get the actual width of the container
       const maxLineLength = Math.floor((ref.current.offsetWidth || width) / font.width);
