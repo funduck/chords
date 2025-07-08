@@ -12,6 +12,7 @@ export class Signals {
   static room = signal<RoomEntity | null>(null);
   static searchTab = signal<string | null>(null);
   static artist = signal<ArtistInfoEntity | null>(null);
+  static showRawSong = signal<boolean>(false);
 
   static applySongSettings = signal<SongSettingsDto | null>(null);
   static publishSongSettings = signal<SongSettingsDto | null>(null);

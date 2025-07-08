@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { estimateFontSize } from "@src/utils/font";
 
-function Chordpro({ sheet }: { sheet: string }) {
+function Chordpro({ sheet, raw }: { sheet: string; raw?: boolean }) {
   const ref = useRef<HTMLDivElement>(null);
   const [errText, setErrText] = useState("");
   const [width, setWidth] = useState(window.innerWidth);
@@ -27,6 +27,11 @@ function Chordpro({ sheet }: { sheet: string }) {
       return;
     }
     try {
+      if (raw) {
+        ref.current.innerHTML = `<pre>${sheet}</pre>`;
+        return; // If raw is true, we just display the raw sheet
+      }
+
       const font = estimateFontSize({ parent: ref.current, className: "lyrics" }); // Estimate font size for lyrics
 
       // We track screen changes via "width" but we need to use ref.current.offsetWidth to get the actual width of the container
@@ -66,7 +71,7 @@ function Chordpro({ sheet }: { sheet: string }) {
       console.error("Error parsing song", e);
       setErrText(String(e));
     }
-  }, [ref, sheet, width]);
+  }, [ref, sheet, width, raw]);
 
   if (errText) {
     return <Box>Error parsing song: {errText}</Box>;

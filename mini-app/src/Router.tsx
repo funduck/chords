@@ -44,7 +44,7 @@ function SettingsMenu() {
   const { settingsContent } = useHeader();
   const [opened, { toggle }] = useDisclosure();
   return (
-    <Menu shadow="md" width={200} withArrow onChange={toggle} closeOnItemClick={false}>
+    <Menu shadow="md" withArrow onChange={toggle} closeOnItemClick={false}>
       <Menu.Target>
         <Button variant="subtle">
           {opened ? (

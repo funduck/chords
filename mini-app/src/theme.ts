@@ -15,5 +15,11 @@ export const theme = createTheme({
       light: "dark",
       dark: "",
     }),
+
+    chorus: virtualColor({
+      name: "chorus",
+      light: "dark",
+      dark: "gray",
+    }),
   },
 });

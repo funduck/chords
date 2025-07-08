@@ -1,4 +1,4 @@
-import { Box, Divider, ScrollArea, Space } from "@mantine/core";
+import { Box, Divider, ScrollArea, Space, Textarea } from "@mantine/core";
 import { useSignal } from "@telegram-apps/sdk-react";
 import { useContext, useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router";
@@ -50,6 +50,8 @@ function Song() {
 
   // This is used to debounce the scroll events when user scrolls manually
   const emittingScrollTimeout = useRef(null as ReturnType<typeof setTimeout> | null);
+
+  const showRawSong = useSignal(Signals.showRawSong);
 
   useEffect(() => {
     console.debug("Song component mounted, fetching song with ID:", songId);
@@ -204,7 +206,7 @@ function Song() {
           </Box> */}
 
             <Box>
-              <Chordpro sheet={song.sheet!} />
+              <Chordpro sheet={song.sheet!} raw={showRawSong} />
             </Box>
             <Box>
               <Divider />

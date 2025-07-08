@@ -3,6 +3,7 @@ import { IconPlayerPlayFilled, IconPlayerStop } from "@tabler/icons-react";
 import { useSignal } from "@telegram-apps/sdk-react";
 import { useEffect } from "react";
 
+import Switch from "@src/components/Switch";
 import { AutoScrollEnabled, AutoScrollInterval, AutoScrollSpeed } from "@src/config";
 import { useHeader } from "@src/hooks/Header";
 import { SettingsService } from "@src/services/settings.service";
@@ -67,6 +68,20 @@ function AutoScrollSettings() {
   );
 }
 
+function SongDisplaySettings() {
+  const showRawSong = useSignal(Signals.showRawSong);
+
+  return (
+    <Switch
+      label="Show raw song"
+      checked={showRawSong}
+      onChange={(e) => {
+        Signals.showRawSong.set(e);
+      }}
+    />
+  );
+}
+
 function SongSettings() {
   const settings = useSignal(Signals.applySongSettings);
 
@@ -98,7 +113,7 @@ function SongSettings() {
   // Set header content when component mounts
   useEffect(() => {
     setCenterContent(<ShortcutSettings />);
-    setSettingsContent([<AutoScrollSettings />]);
+    setSettingsContent([<AutoScrollSettings />, <SongDisplaySettings />]);
 
     // Clean up when component unmounts
     return () => {

@@ -49,3 +49,9 @@
         font-weight: 600;
     }
 }
+
+.chordpro .chorus {
+    /* margin-left: 1em; */
+    padding-left: 3em;
+    border-left: 0.5em inset var(--mantine-color-chorus-1);
+}
