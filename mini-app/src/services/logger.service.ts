@@ -1,4 +1,4 @@
-import { ApiHttpUrl } from "@src/config";
+import { Config } from "@src/config";
 
 const sessionId = crypto.randomUUID().substring(0, 8); // Generate a short session ID
 
@@ -10,7 +10,7 @@ function sendLogToServer(level: string, ...args: any[]) {
     message: args.map((arg) => (typeof arg === "object" ? JSON.stringify(arg) : arg)).join(" "),
   });
 
-  fetch(ApiHttpUrl + "/log", {
+  fetch(Config.ApiHttpUrl + "/log", {
     method: "POST",
     headers: {
       "Content-Type": "text/plain",

@@ -1,7 +1,7 @@
 import { useSignal } from "@telegram-apps/sdk-react";
 import { ReactNode, createContext, useEffect, useState } from "react";
 
-import { ApiHttpUrl } from "@src/config";
+import { Config } from "@src/config";
 import {
   ArtistsApi,
   AuthApi,
@@ -36,7 +36,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     console.log("Connecting to public API...");
     const conf = new Configuration({
-      basePath: ApiHttpUrl,
+      basePath: Config.ApiHttpUrl,
       middleware: [
         {
           post: async (context) => {
@@ -73,7 +73,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
 
     console.log("Connecting to private API...");
     const conf = new Configuration({
-      basePath: ApiHttpUrl,
+      basePath: Config.ApiHttpUrl,
       headers: {
         authorization: `Bearer ${accessToken}`,
       },

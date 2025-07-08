@@ -4,7 +4,7 @@ import { useSignal } from "@telegram-apps/sdk-react";
 import { useEffect } from "react";
 
 import Switch from "@src/components/Switch";
-import { AutoScrollEnabled, AutoScrollInterval, AutoScrollSpeed } from "@src/config";
+import { Config } from "@src/config";
 import { useHeader } from "@src/hooks/Header";
 import { SettingsService } from "@src/services/settings.service";
 import { Signals } from "@src/services/signals-registry";
@@ -61,7 +61,7 @@ function AutoScrollSettings() {
       disabled={!settings}
       onChange={(e) => {
         const speed = e;
-        setAutoScrollSpeed(speed, AutoScrollInterval);
+        setAutoScrollSpeed(speed, Config.AutoScrollInterval);
       }}
       value={settings?.auto_scroll_speed ?? 0}
     />
@@ -96,9 +96,9 @@ function SongSettings() {
           } else {
             console.log("Song settings created");
             const newSettings = new SongSettingsDto();
-            newSettings.auto_scroll_speed = AutoScrollSpeed;
-            newSettings.auto_scroll_interval = AutoScrollInterval;
-            newSettings.auto_scroll = AutoScrollEnabled;
+            newSettings.auto_scroll_speed = Config.AutoScrollSpeed;
+            newSettings.auto_scroll_interval = Config.AutoScrollInterval;
+            newSettings.auto_scroll = Config.AutoScrollEnabled;
 
             Signals.applySongSettings.set(newSettings);
             SettingsService.save(newSettings).catch(console.error);

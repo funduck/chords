@@ -1,6 +1,6 @@
 import { ReactNode, createContext, useContext, useState } from "react";
 
-import { SearchPageSize } from "@src/config";
+import { Config } from "@src/config";
 import { ArtistInfoEntity, SongInfoEntity } from "@src/hooks/Api";
 
 interface SearchState<T> {
@@ -27,14 +27,14 @@ const SearchArtistsContext = createContext<SearchContextType<ArtistInfoEntity> |
 
 const initialStateSongs: SearchState<SongInfoEntity> = {
   query: "",
-  pageSize: SearchPageSize,
+  pageSize: Config.SearchPageSize,
   entities: null,
   hasNextPage: false,
   hasPreviousPage: false,
 };
 const initialStateArtists: SearchState<ArtistInfoEntity> = {
   query: "",
-  pageSize: SearchPageSize,
+  pageSize: Config.SearchPageSize,
   entities: null,
   hasNextPage: false,
   hasPreviousPage: false,

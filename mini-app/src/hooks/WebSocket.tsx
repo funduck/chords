@@ -1,7 +1,7 @@
 import { useSignal } from "@telegram-apps/sdk-react";
 import { ReactNode, createContext, useEffect, useState } from "react";
 
-import { ApiWsUrl } from "@src/config";
+import { Config } from "@src/config";
 import { Signals } from "@src/services/signals-registry";
 
 export const WebSocketContext = createContext<WebSocket | null>(null);
@@ -18,7 +18,7 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
     console.log("Connecting to WS...");
 
     // Pass the token as a query parameter for authentication
-    const url = new URL(`${ApiWsUrl}/api/ws?state=${accessToken}`);
+    const url = new URL(`${Config.ApiWsUrl}/api/ws?state=${accessToken}`);
     const ws = new WebSocket(url.toString());
 
     ws.onopen = () => {

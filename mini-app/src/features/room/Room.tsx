@@ -1,4 +1,4 @@
-import { Button, CopyButton, Fieldset, Flex, Stack, Text, TextInput } from "@mantine/core";
+import { Button, CopyButton, Fieldset, Flex, Space, Stack, Text, TextInput } from "@mantine/core";
 import { useSignal } from "@telegram-apps/sdk-react";
 import { useContext, useEffect, useState } from "react";
 
@@ -67,6 +67,8 @@ function Room() {
         </CopyButton>
         <Button onClick={() => roomService.leaveRoom(room)}>Leave Room</Button>
       </Stack>
+      <Space h="md" />
+      {room.users && <Text>Users: {room.users?.map((u) => u.id).join(", ")}</Text>}
     </>
   );
 }

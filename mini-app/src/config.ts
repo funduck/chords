@@ -1,9 +1,23 @@
-export const IsDev = import.meta.env.VITE_DEV == "true";
-export const ApiUri = import.meta.env.VITE_API_URI;
-export const SSLSuffix = import.meta.env.VITE_API_SSL == "true" ? "s" : "";
-export const ApiHttpUrl = `http${SSLSuffix}://${ApiUri}`;
-export const ApiWsUrl = `ws${SSLSuffix}://${ApiUri}`;
-export const AutoScrollSpeed = parseInt(import.meta.env.VITE_AUTO_SCROLL_SPEED || "50", 10);
-export const AutoScrollInterval = parseInt(import.meta.env.VITE_AUTO_SCROLL_INTERVAL || "2000", 10);
-export const AutoScrollEnabled = import.meta.env.VITE_AUTO_SCROLL_ENABLED == "true";
-export const SearchPageSize = parseInt(import.meta.env.VITE_SEARCH_PAGE_SIZE || "30", 10);
+const IsDev = import.meta.env.VITE_DEV == "true";
+const ApiUri = import.meta.env.VITE_API_URI;
+const SSLSuffix = import.meta.env.VITE_API_SSL == "true" ? "s" : "";
+const ApiHttpUrl = `http${SSLSuffix}://${ApiUri}`;
+const ApiWsUrl = `ws${SSLSuffix}://${ApiUri}`;
+const AutoScrollSpeed = parseInt(import.meta.env.VITE_AUTO_SCROLL_SPEED || "50", 10);
+const AutoScrollInterval = parseInt(import.meta.env.VITE_AUTO_SCROLL_INTERVAL || "2000", 10);
+const AutoScrollEnabled = import.meta.env.VITE_AUTO_SCROLL_ENABLED == "true";
+const SearchPageSize = parseInt(import.meta.env.VITE_SEARCH_PAGE_SIZE || "30", 10);
+const StrictMode = import.meta.env.VITE_STRICT_MODE == "true";
+
+export const Config = {
+  IsDev,
+  ApiUri,
+  SSLSuffix,
+  ApiHttpUrl,
+  ApiWsUrl,
+  AutoScrollSpeed,
+  AutoScrollInterval,
+  AutoScrollEnabled,
+  SearchPageSize,
+  StrictMode,
+};

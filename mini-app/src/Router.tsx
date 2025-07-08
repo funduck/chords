@@ -1,4 +1,4 @@
-import { Anchor, AppShell, Burger, Button, Group, Menu, em } from "@mantine/core";
+import { Anchor, AppShell, Burger, Button, Group, Menu, Space, Text, em } from "@mantine/core";
 import { useDisclosure, useMediaQuery } from "@mantine/hooks";
 import { IconSettings, IconSettingsFilled } from "@tabler/icons-react";
 import { useSignal } from "@telegram-apps/sdk-react";
@@ -117,6 +117,8 @@ function Router() {
     }
   }, [isMobile]);
 
+  const userId = useSignal(Signals.userId);
+
   return (
     <AppShell
       header={{ height: 60 }}
@@ -159,6 +161,10 @@ function Router() {
             </Button>
           ))}
         </Stack>
+        <Space h="md" />
+        <Text c="dimmed" size="xs">
+          {userId}
+        </Text>
       </AppShell.Navbar>
 
       {/* <AppShell.Aside>Aside</AppShell.Aside> */}
