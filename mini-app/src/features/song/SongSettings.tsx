@@ -55,18 +55,16 @@ function AutoScrollSettings() {
   }
 
   return (
-    <Box m={"xs"}>
-      <Slider
-        label="Auto scroll speed"
-        min={1}
-        disabled={!settings}
-        onChange={(e) => {
-          const speed = e;
-          setAutoScrollSpeed(speed, Config.AutoScrollInterval);
-        }}
-        value={settings?.auto_scroll_speed ?? 0}
-      />
-    </Box>
+    <Slider
+      label="Auto scroll speed"
+      min={1}
+      disabled={!settings}
+      onChange={(e) => {
+        const speed = e;
+        setAutoScrollSpeed(speed, Config.AutoScrollInterval);
+      }}
+      value={settings?.auto_scroll_speed ?? 0}
+    />
   );
 }
 
@@ -74,15 +72,13 @@ function SongDisplaySettings() {
   const showRawSong = useSignal(Signals.showRawSong);
 
   return (
-    <Box m={"xs"}>
-      <Switch
-        label="Show raw song"
-        checked={showRawSong}
-        onChange={(e) => {
-          Signals.showRawSong.set(e);
-        }}
-      />
-    </Box>
+    <Switch
+      label="Show raw song"
+      checked={showRawSong}
+      onChange={(e) => {
+        Signals.showRawSong.set(e);
+      }}
+    />
   );
 }
 

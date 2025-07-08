@@ -9,7 +9,7 @@ type SwitchProps = {
 
 function Switch({ label, disabled, checked, onChange }: SwitchProps) {
   return (
-    <Box>
+    <Box m={"sm"}>
       {/* {label && <Text>{label}</Text>} */}
       <MantineSwitch
         label={label}

@@ -16,6 +16,7 @@ function Slider({ disabled, label, min = 0, onChange, value }: SliderProps) {
       {label && <Text>{label}</Text>}
       <MantineSlider
         size="md"
+        m={"xs"}
         disabled={disabled}
         min={min}
         value={value || min} // Ensure value is controlled and defaults to 0
