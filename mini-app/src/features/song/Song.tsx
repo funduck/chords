@@ -52,6 +52,7 @@ function Song() {
   const emittingScrollTimeout = useRef(null as ReturnType<typeof setTimeout> | null);
 
   const showRawSong = useSignal(Signals.showRawSong);
+  const transposeSong = useSignal(Signals.transposeSong);
 
   useEffect(() => {
     if (songId && songsApi) {
@@ -206,7 +207,7 @@ function Song() {
           </Box> */}
 
             <Box>
-              <Chordpro sheet={song.sheet!} raw={showRawSong} />
+              <Chordpro sheet={song.sheet!} raw={showRawSong} transpose={transposeSong} />
             </Box>
             <Box>
               <Divider />

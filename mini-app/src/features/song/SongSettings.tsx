@@ -1,5 +1,5 @@
-import { Button } from "@mantine/core";
-import { IconPlayerPlayFilled, IconPlayerStop } from "@tabler/icons-react";
+import { Box, Button, Flex, Text } from "@mantine/core";
+import { IconMinus, IconPlayerPlayFilled, IconPlayerStop, IconPlus } from "@tabler/icons-react";
 import { useSignal } from "@telegram-apps/sdk-react";
 import { useEffect } from "react";
 
@@ -55,16 +55,18 @@ function AutoScrollSettings() {
   }
 
   return (
-    <Slider
-      label="Auto scroll speed"
-      min={1}
-      disabled={!settings}
-      onChange={(e) => {
-        const speed = e;
-        setAutoScrollSpeed(speed, Config.AutoScrollInterval);
-      }}
-      value={settings?.auto_scroll_speed ?? 0}
-    />
+    <Box m={"xs"}>
+      <Slider
+        label="Auto scroll speed"
+        min={1}
+        disabled={!settings}
+        onChange={(e) => {
+          const speed = e;
+          setAutoScrollSpeed(speed, Config.AutoScrollInterval);
+        }}
+        value={settings?.auto_scroll_speed ?? 0}
+      />
+    </Box>
   );
 }
 
@@ -72,13 +74,34 @@ function SongDisplaySettings() {
   const showRawSong = useSignal(Signals.showRawSong);
 
   return (
-    <Switch
-      label="Show raw song"
-      checked={showRawSong}
-      onChange={(e) => {
-        Signals.showRawSong.set(e);
-      }}
-    />
+    <Box m={"xs"}>
+      <Switch
+        label="Show raw song"
+        checked={showRawSong}
+        onChange={(e) => {
+          Signals.showRawSong.set(e);
+        }}
+      />
+    </Box>
+  );
+}
+
+function SongKeySettings() {
+  const transposeSong = useSignal(Signals.transposeSong);
+
+  return (
+    <Flex direction="row" m={"xs"} ta={"center"} align="center">
+      <Text>Transpose</Text>
+      <Button variant="subtle" onClick={() => Signals.transposeSong.set(transposeSong - 1)}>
+        <IconMinus />
+      </Button>
+      <Text>
+        <b>{transposeSong}</b>
+      </Text>
+      <Button variant="subtle" onClick={() => Signals.transposeSong.set(transposeSong + 1)}>
+        <IconPlus />
+      </Button>
+    </Flex>
   );
 }
 
@@ -112,7 +135,7 @@ function SongSettings() {
   // Set header content when component mounts
   useEffect(() => {
     setCenterContent(<ShortcutSettings />);
-    setSettingsContent([<AutoScrollSettings />, <SongDisplaySettings />]);
+    setSettingsContent([<AutoScrollSettings />, <SongDisplaySettings />, <SongKeySettings />]);
 
     // Clean up when component unmounts
     return () => {

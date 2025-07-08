@@ -1,11 +1,11 @@
 import { Box } from "@mantine/core";
 import * as Parser from "chordproject-parser";
-import { ChordProParser, HtmlTableFormatter } from "chordsheetjs";
+import { Chord, ChordProParser, HtmlTableFormatter, Key } from "chordsheetjs";
 import { useEffect, useRef, useState } from "react";
 
 import { estimateFontSize } from "@src/utils/font";
 
-function Chordpro({ sheet, raw }: { sheet: string; raw?: boolean }) {
+function Chordpro({ sheet, raw, transpose }: { sheet: string; raw?: boolean; transpose?: number }) {
   const ref = useRef<HTMLDivElement>(null);
   const [errText, setErrText] = useState("");
   const [width, setWidth] = useState(window.innerWidth);
@@ -63,7 +63,22 @@ function Chordpro({ sheet, raw }: { sheet: string; raw?: boolean }) {
         }
       }
       const fixedSheet = fixedSheetLines.join("\n");
-      const song1 = parser1.parse(fixedSheet);
+      let song1 = parser1.parse(fixedSheet);
+      if (transpose != null && transpose != 0) {
+        console.debug("Transposing song by", transpose, "semitones");
+        let key = song1.key;
+        if (!key) {
+          key =
+            song1
+              .getChords()
+              .map((c) => Chord.parseOrFail(c).root?.note)
+              .find(Boolean) || "C"; // Default to C if no chords found
+          song1 = song1.setKey(key);
+          console.debug("No key found, using key:", key);
+        }
+        const newKey = song1.requireCurrentKey().transpose(transpose);
+        song1 = song1.changeKey(newKey);
+      }
       const html = formater1.format(song1);
       ref.current.innerHTML = html;
       setErrText(""); // Clear any previous error
@@ -71,7 +86,7 @@ function Chordpro({ sheet, raw }: { sheet: string; raw?: boolean }) {
       console.error("Error parsing song", e);
       setErrText(String(e));
     }
-  }, [ref, sheet, width, raw]);
+  }, [ref, sheet, width, raw, transpose]);
 
   if (errText) {
     return <Box>Error parsing song: {errText}</Box>;

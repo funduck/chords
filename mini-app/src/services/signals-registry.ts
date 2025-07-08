@@ -13,6 +13,7 @@ export class Signals {
   static searchTab = signal<string | null>(null);
   static artist = signal<ArtistInfoEntity | null>(null);
   static showRawSong = signal<boolean>(false);
+  static transposeSong = signal<number>(0);
 
   static applySongSettings = signal<SongSettingsDto | null>(null);
   static publishSongSettings = signal<SongSettingsDto | null>(null);
