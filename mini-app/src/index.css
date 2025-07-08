@@ -8,7 +8,8 @@
 }
 
 .chordpro {
-    font-family: "Roboto Mono", "Courier New", monospace;
+    font-family: monospace;
+    /* font-family: "Roboto Mono", "Courier New", monospace; */
 }
 
 .chordpro .title {
@@ -45,7 +46,7 @@
         font-weight: 700;
     }
     .chordpro .lyrics {
-        font-size: 1em;
+        font-size: 1.1em;
         font-weight: 600;
     }
 }
