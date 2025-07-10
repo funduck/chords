@@ -3,12 +3,11 @@ import { useDisclosure, useMediaQuery } from "@mantine/hooks";
 import { IconSettings, IconSettingsFilled } from "@tabler/icons-react";
 import { useSignal } from "@telegram-apps/sdk-react";
 import { useEffect } from "react";
-import { Route, Routes, useNavigate } from "react-router";
+import { Route, Routes, useLocation, useNavigate } from "react-router";
 
 import Stack from "@components/Stack";
 
 import ThemeSwitch from "./components/ThemeSwitch";
-import Title from "./components/Title";
 import Artist from "./features/artist/Artist";
 import Room from "./features/room/Room";
 import Search from "./features/search/Search";
@@ -73,6 +72,7 @@ function Router() {
   const { centerContent } = useHeader();
 
   const navigate = useNavigate();
+  const location = useLocation();
 
   const song = useSignal(Signals.song);
   const artist = useSignal(Signals.artist);
@@ -111,6 +111,12 @@ function Router() {
     },
     { group: "my", tabs: [] },
   ];
+
+  // Function to check if a tab is active
+  const isTabActive = (link: string) => {
+    const currentPath = location.pathname;
+    return currentPath === link || (link.endsWith("/") && currentPath.startsWith(link));
+  };
 
   // On mobile we close the navbar when navigating
   // On desktop we open the navbar by default
@@ -174,7 +180,9 @@ function Router() {
                       }}
                     >
                       <Anchor>
-                        <Title>{text}</Title>
+                        <Text size="xl" fw={isTabActive(link) ? 600 : 500}>
+                          {text}
+                        </Text>
                       </Anchor>
                     </Button>
                   ))}
