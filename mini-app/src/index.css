@@ -56,3 +56,8 @@
     padding-left: 3em;
     border-left: 0.5em inset var(--mantine-color-chorus-1);
 }
+
+.chordpro .chord:hover {
+    cursor: pointer;
+    text-decoration: underline;
+}

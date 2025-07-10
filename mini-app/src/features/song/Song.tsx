@@ -4,6 +4,7 @@ import { useContext, useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 
 import { RoutesEnum } from "@src/Router";
+import ChordDisplayManager from "@src/components/ChordDisplayManager";
 import { SongEntity, SongsApiContext } from "@src/hooks/Api";
 import { useScrollPosition } from "@src/hooks/useScrollPosition";
 import { Signals } from "@src/services/signals-registry";
@@ -187,6 +188,7 @@ function Song() {
 
   return (
     <>
+      <ChordDisplayManager />
       <SongSettings />
       <Box id="songbox" style={{ display: "flex", flex: 1, flexDirection: "column", height: "100%" }}>
         <ScrollArea

@@ -33,13 +33,13 @@ function Room() {
     return (
       <>
         <Stack>
-          <Fieldset legend="Create Room">
+          <Fieldset legend="Create Room" style={{ borderColor: "rgba(0,0,0,0)" }}>
             <Button variant="outline" fullWidth onClick={() => roomService.createRoom()}>
               Create
             </Button>
           </Fieldset>
 
-          <Fieldset legend="Join Room">
+          <Fieldset legend="Join Room" style={{ borderColor: "rgba(0,0,0,0)" }}>
             <Flex direction={"row"} gap="md">
               <TextInput
                 name="roomCode"
