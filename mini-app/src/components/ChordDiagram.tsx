@@ -57,7 +57,11 @@ function ChordDiagram({ name }: { name: string }) {
           <Button variant="subtle" c="primary" onClick={posDown}>
             <IconChevronLeft />
           </Button>
-          {position.baseFret && <>{position.baseFret}fr</>}
+          {position.baseFret && (
+            <Text size="xl" c="primary">
+              {position.baseFret}fr
+            </Text>
+          )}
           <Button variant="subtle" c="primary" onClick={posUp}>
             <IconChevronRight />
           </Button>

@@ -83,7 +83,7 @@ function Router() {
       tabs: [
         {
           id: "song",
-          text: "Back to song",
+          text: "Play song",
           link: RoutesEnum.Songs(song?.id),
           hidden: !song,
         },
