@@ -69,32 +69,32 @@ function AutoScrollSettings() {
 }
 
 function SongDisplaySettings() {
-  const showRawSong = useSignal(Signals.showRawSong);
+  const showRawSong = useSignal(Signals.songOptionShowRaw);
 
   return (
     <Switch
       label="Show raw song"
       checked={showRawSong}
       onChange={(e) => {
-        Signals.showRawSong.set(e);
+        Signals.songOptionShowRaw.set(e);
       }}
     />
   );
 }
 
 function SongKeySettings() {
-  const transposeSong = useSignal(Signals.transposeSong);
+  const transposeSong = useSignal(Signals.songOptionTranspose);
 
   return (
     <Flex direction="row" m={"xs"} ta={"center"} align="center">
       <Text>Transpose</Text>
-      <Button variant="subtle" onClick={() => Signals.transposeSong.set(transposeSong - 1)}>
+      <Button variant="subtle" onClick={() => Signals.songOptionTranspose.set(transposeSong - 1)}>
         <IconMinus />
       </Button>
       <Text>
         <b>{transposeSong}</b>
       </Text>
-      <Button variant="subtle" onClick={() => Signals.transposeSong.set(transposeSong + 1)}>
+      <Button variant="subtle" onClick={() => Signals.songOptionTranspose.set(transposeSong + 1)}>
         <IconPlus />
       </Button>
     </Flex>

@@ -30,7 +30,7 @@ function Song() {
       songId = localStorage.getItem("songId") ?? "";
       if (songId) {
         console.log("Using songId from localStorage:", songId);
-        navigate(RoutesEnum.Song(parseInt(songId!, 10)));
+        navigate(RoutesEnum.Songs(parseInt(songId!, 10)));
         return;
       }
     } else {
@@ -39,7 +39,7 @@ function Song() {
   }, [songId]);
 
   const songViewportRef = useRef<HTMLDivElement>(null);
-  const [song, setSong] = useState<SongEntity | null>(null);
+  const song = useSignal(Signals.song);
   const applySongSettings = useSignal(Signals.applySongSettings);
   const applySongScroll = useSignal(Signals.applySongScroll);
 
@@ -52,15 +52,15 @@ function Song() {
   // This is used to debounce the scroll events when user scrolls manually
   const emittingScrollTimeout = useRef(null as ReturnType<typeof setTimeout> | null);
 
-  const showRawSong = useSignal(Signals.showRawSong);
-  const transposeSong = useSignal(Signals.transposeSong);
+  const showRawSong = useSignal(Signals.songOptionShowRaw);
+  const transposeSong = useSignal(Signals.songOptionTranspose);
 
   useEffect(() => {
     if (songId && songsApi) {
       console.debug("Fetching song with ID:", songId);
       songsApi
         .getSongByID({ id: parseInt(songId, 10) })
-        .then(setSong)
+        .then((s) => Signals.song.set(s))
         .catch(console.error);
     }
   }, [songsApi, songId]);

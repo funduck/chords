@@ -32,7 +32,7 @@ class RoomService {
     }
     if (state.song_id) {
       console.log("Navigating to song:", state.song_id);
-      this.navigate(RoutesEnum.Song(state.song_id));
+      this.navigate(RoutesEnum.Songs(state.song_id));
     }
   }
 

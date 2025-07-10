@@ -17,24 +17,18 @@ import { useHeader } from "./hooks/Header";
 import { Signals } from "./services/signals-registry";
 
 class RoutesEnum {
-  static Search = function (tab?: string): string {
-    if (tab == null) {
-      return "/search";
-    }
-    return "/search/" + tab;
-  };
-  static Artist = function (artistId?: number): string {
-    if (artistId == null) {
-      return "/artist";
-    }
-    return "/artist/" + artistId;
-  };
   static Room = "/room";
-  static Song = function (songId?: number): string {
-    if (songId == null) {
-      return "/song";
+  static Artists = function (artistId?: number): string {
+    if (artistId == null) {
+      return "/artists";
     }
-    return "/song/" + songId;
+    return "/artists/" + artistId;
+  };
+  static Songs = function (songId?: number): string {
+    if (songId == null) {
+      return "/songs";
+    }
+    return "/songs/" + songId;
   };
 }
 
@@ -80,31 +74,42 @@ function Router() {
 
   const navigate = useNavigate();
 
-  const searchTab = useSignal(Signals.searchTab);
-  const songId = useSignal(Signals.publishSongId);
+  const song = useSignal(Signals.song);
   const artist = useSignal(Signals.artist);
 
   const tabs = [
     {
-      id: "search",
-      text: "Search",
-      link: RoutesEnum.Search(searchTab || undefined),
+      group: "Current",
+      tabs: [
+        {
+          id: "song",
+          text: "Back to song",
+          link: RoutesEnum.Songs(song?.id),
+          hidden: !song,
+        },
+        {
+          id: "room",
+          text: "Room",
+          link: RoutesEnum.Room,
+        },
+      ],
     },
     {
-      id: "artist",
-      text: "Artist",
-      link: RoutesEnum.Artist(artist?.id),
+      group: "Search",
+      tabs: [
+        {
+          id: "songs",
+          text: "Songs",
+          link: RoutesEnum.Songs(),
+        },
+        {
+          id: "artists",
+          text: "Artists",
+          link: RoutesEnum.Artists(artist?.id),
+        },
+      ],
     },
-    {
-      id: "room",
-      text: "Room",
-      link: RoutesEnum.Room,
-    },
-    {
-      id: "song",
-      text: "Song",
-      link: RoutesEnum.Song(songId || undefined),
-    },
+    { group: "my", tabs: [] },
   ];
 
   // On mobile we close the navbar when navigating
@@ -150,22 +155,31 @@ function Router() {
 
       <AppShell.Navbar p="lg">
         <Stack gap="lg">
-          {tabs.map(({ id, link, text }) => (
-            <Button
-              variant="subtle"
-              justify="start"
-              key={id}
-              id={id}
-              onClick={() => {
-                isMobile && toggleNavbar();
-                navigate(link);
-              }}
-            >
-              <Anchor>
-                <Title>{text}</Title>
-              </Anchor>
-            </Button>
-          ))}
+          {tabs
+            .filter((g) => g.tabs.length)
+            .map((group) => (
+              <>
+                <Text>{group.group}</Text>
+                {group.tabs
+                  .filter((t) => !t.hidden)
+                  .map(({ id, link, text }) => (
+                    <Button
+                      variant="subtle"
+                      justify="start"
+                      key={id}
+                      id={id}
+                      onClick={() => {
+                        isMobile && toggleNavbar();
+                        navigate(link);
+                      }}
+                    >
+                      <Anchor>
+                        <Title>{text}</Title>
+                      </Anchor>
+                    </Button>
+                  ))}
+              </>
+            ))}
         </Stack>
         <Space h="md" />
         <Text c="dimmed" size="xs">
@@ -178,13 +192,11 @@ function Router() {
       <AppShell.Main id="appshellmain" style={{ display: "flex", flex: 1, flexDirection: "column" }}>
         <Routes>
           <Route index element={<Search />} />
-          <Route path="search" element={<Search />} />
-          <Route path="search/:searchTab" element={<Search />} />
+          <Route path="songs" element={<Search />} />
           <Route path="room" element={<Room />} />
-          <Route path="artist" element={<Artist />} />
-          <Route path="artist/:artistId" element={<Artist />} />
-          <Route path="song" element={<Song />} />
-          <Route path="song/:songId" element={<Song />} />
+          <Route path="songs/:songId" element={<Song />} />
+          <Route path="artists" element={<Artist />} />
+          <Route path="artists/:artistId" element={<Artist />} />
         </Routes>
       </AppShell.Main>
 

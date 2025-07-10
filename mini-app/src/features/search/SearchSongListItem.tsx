@@ -19,7 +19,7 @@ function SearchSongListItem({ song }: { song: SongInfoEntity }) {
     <Anchor
       c="primary"
       onClick={() => {
-        navigate(RoutesEnum.Song(song.id));
+        navigate(RoutesEnum.Songs(song.id));
         Signals.publishSongId.set(song.id!);
       }}
     >

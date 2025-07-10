@@ -201,7 +201,7 @@ export function EventsConsumer() {
           break;
         }
         case "song_id": {
-          navigate(RoutesEnum.Song(dto.data.songId));
+          navigate(RoutesEnum.Songs(dto.data.songId));
           break;
         }
         default:

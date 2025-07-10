@@ -12,7 +12,7 @@ function SearchArtistListItem({ entity }: { entity: ArtistInfoEntity }) {
       c="primary"
       onClick={() => {
         Signals.artist.set(entity!);
-        navigate(RoutesEnum.Artist(entity.id));
+        navigate(RoutesEnum.Artists(entity.id));
       }}
     >
       <Text size="lg">{entity.name}</Text>
