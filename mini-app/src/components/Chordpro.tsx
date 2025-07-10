@@ -1,14 +1,17 @@
-import { Box } from "@mantine/core";
+import { Box, Stack } from "@mantine/core";
 import * as Parser from "chordproject-parser";
-import { Chord, ChordProParser, HtmlTableFormatter, Key } from "chordsheetjs";
-import { useEffect, useRef, useState } from "react";
+import { Chord, ChordProParser, HtmlTableFormatter } from "chordsheetjs";
+import { ReactNode, useEffect, useRef, useState } from "react";
 
 import { estimateFontSize } from "@src/utils/font";
+
+import ChordDiagramm from "./ChordDiagram";
 
 function Chordpro({ sheet, raw, transpose }: { sheet: string; raw?: boolean; transpose?: number }) {
   const ref = useRef<HTMLDivElement>(null);
   const [errText, setErrText] = useState("");
   const [width, setWidth] = useState(window.innerWidth);
+  const [chords, setChords] = useState<ReactNode[]>([]);
 
   useEffect(() => {
     const handleWidthChange = () => {
@@ -82,6 +85,10 @@ function Chordpro({ sheet, raw, transpose }: { sheet: string; raw?: boolean; tra
       const html = formater1.format(song1);
       ref.current.innerHTML = html;
       setErrText(""); // Clear any previous error
+
+      const chords = song1.getChords();
+      console.log("Chords found:", chords);
+      setChords(chords.map((c) => <ChordDiagramm name={c} />));
     } catch (e) {
       console.error("Error parsing song", e);
       setErrText(String(e));
@@ -92,7 +99,12 @@ function Chordpro({ sheet, raw, transpose }: { sheet: string; raw?: boolean; tra
     return <Box>Error parsing song: {errText}</Box>;
   }
 
-  return <Box className="chordpro" ref={ref} />;
+  return (
+    <>
+      <Box className="chordpro" ref={ref} />
+      {chords.length > 0 && <Stack id="chord-diagrams">{chords}</Stack>}
+    </>
+  );
 }
 
 export default Chordpro;

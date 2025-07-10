@@ -1,11 +1,10 @@
+import { Anchor, Text } from "@mantine/core";
 import { useNavigate } from "react-router";
 
 import { RoutesEnum } from "@src/Router";
 import { SongInfoEntity } from "@src/hooks/Api";
 import { Signals } from "@src/services/signals-registry";
 import { stringToTitleCase } from "@src/utils/string";
-
-import ButtonCell from "@components/ButtonCell";
 
 function SearchSongListItem({ song }: { song: SongInfoEntity }) {
   const navigate = useNavigate();
@@ -17,14 +16,17 @@ function SearchSongListItem({ song }: { song: SongInfoEntity }) {
   }
 
   return (
-    <ButtonCell
+    <Anchor
+      c="primary"
       onClick={() => {
         navigate(RoutesEnum.Song(song.id));
         Signals.publishSongId.set(song.id!);
       }}
     >
-      {title} {artistOrComposer ? ` - ${artistOrComposer}` : ""}
-    </ButtonCell>
+      <Text size="lg">
+        {title} {artistOrComposer ? ` - ${artistOrComposer}` : ""}
+      </Text>
+    </Anchor>
   );
 }
 

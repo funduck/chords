@@ -4,6 +4,12 @@ export const theme = createTheme({
   /** Put your mantine theme override here */
 
   colors: {
+    primary: virtualColor({
+      name: "primary",
+      light: "dark",
+      dark: "gray",
+    }),
+
     chord: virtualColor({
       name: "chord",
       light: "blue",

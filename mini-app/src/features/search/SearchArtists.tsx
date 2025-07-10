@@ -20,7 +20,7 @@ function SearchArtists() {
       searchMethod={(params) => artistsApi!.searchArtists(params)}
       ListItemComponent={SearchArtistListItem}
       listItemProps={(entity) => ({ entity })}
-      placeholder="Search by Name"
+      placeholder="Search Artist by Name"
       entityName="artists"
     />
   );

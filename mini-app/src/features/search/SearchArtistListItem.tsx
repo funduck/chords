@@ -1,21 +1,22 @@
+import { Anchor, Text } from "@mantine/core";
 import { useNavigate } from "react-router";
 
 import { RoutesEnum } from "@src/Router";
-import ButtonCell from "@src/components/ButtonCell";
 import { ArtistInfoEntity } from "@src/hooks/Api";
 import { Signals } from "@src/services/signals-registry";
 
 function SearchArtistListItem({ entity }: { entity: ArtistInfoEntity }) {
   const navigate = useNavigate();
   return (
-    <ButtonCell
+    <Anchor
+      c="primary"
       onClick={() => {
         Signals.artist.set(entity!);
         navigate(RoutesEnum.Artist(entity.id));
       }}
     >
-      {entity.name}
-    </ButtonCell>
+      <Text size="lg">{entity.name}</Text>
+    </Anchor>
   );
 }
 

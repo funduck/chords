@@ -11,6 +11,7 @@ import { Signals } from "@src/services/signals-registry";
 import SearchArtists from "../search/SearchArtists";
 import { useSearchSongsContext } from "../search/SearchContext";
 import SearchEntities from "../search/SearchEntities";
+import SearchResetArtist from "../search/SearchResetArtist";
 import SearchSongListItem from "../search/SearchSongListItem";
 
 function Artist() {
@@ -29,8 +30,8 @@ function Artist() {
   const { updateSearchState } = useSearchSongsContext();
 
   useEffect(() => {
-    if (artistId && artist && artistsApi) {
-      if (artist.id !== parseInt(artistId)) {
+    if (artistId && artistsApi) {
+      if (artist?.id != parseInt(artistId)) {
         // Fetch artist info if not already loaded
         artistsApi
           .getArtistByID({ id: parseInt(artistId) })
@@ -39,6 +40,7 @@ function Artist() {
           })
           .catch(console.error);
       } else {
+        // Reset search state if artistId matches the current artist
         updateSearchState({
           cursorAfter: undefined,
           cursorBefore: undefined,
@@ -48,19 +50,31 @@ function Artist() {
         });
       }
     }
+    if (!artistId && artist) {
+      // Reset artist if artistId is not provided
+      Signals.artist.set(null);
+      // Reset search state
+      updateSearchState({
+        cursorAfter: undefined,
+        cursorBefore: undefined,
+        loadingMore: false,
+        searching: true,
+        query: "",
+      });
+    }
   }, [artistId, artist, artistsApi]);
 
   if (!songsApi || !artistsApi) {
     return <Text>Waititng for api...</Text>;
   }
 
-  if (!artistId) {
+  if (!artistId || !artist) {
     return <SearchArtists />;
   }
 
   return (
     <>
-      <Text>Songs by: {artist?.name}</Text>
+      <SearchResetArtist />
       <Space h="md" />
       <SearchEntities
         apiContext={SongsApiContext}
@@ -75,7 +89,7 @@ function Artist() {
         }
         ListItemComponent={SearchSongListItem}
         listItemProps={(entity) => ({ song: entity })}
-        placeholder="Search by Title or Lyrics"
+        placeholder="Search Song by Title or Lyrics"
         entityName="songs"
       />
     </>

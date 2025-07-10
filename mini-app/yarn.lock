@@ -626,6 +626,11 @@
   resolved "https://registry.yarnpkg.com/@tabler/icons/-/icons-3.34.0.tgz#b11734dc76686abe969b68c2f33e565b116b70fb"
   integrity sha512-jtVqv0JC1WU2TTEBN32D9+R6mc1iEBuPwLnBsWaR02SIEciu9aq5806AWkCHuObhQ4ERhhXErLEK7Fs+tEZxiA==
 
+"@techies23/react-chords@^1.0.7":
+  version "1.0.7"
+  resolved "https://registry.yarnpkg.com/@techies23/react-chords/-/react-chords-1.0.7.tgz#af13c5d5e5aa86c46fc78bd14db4bb5133de16c7"
+  integrity sha512-7Sy9J7CafTQ4BGV69gCldkjO0xNGeZhfbOZiSskDWO2W/ujSU+X/2qu2MUDuCT0/o6iIBgydhAo3sb2YkfPb5Q==
+
 "@telegram-apps/bridge@^2.9.0":
   version "2.9.0"
   resolved "https://registry.yarnpkg.com/@telegram-apps/bridge/-/bridge-2.9.0.tgz#5793b45db6615a85db140c5c27d1d7c37b78760c"

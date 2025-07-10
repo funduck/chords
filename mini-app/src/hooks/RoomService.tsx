@@ -26,13 +26,13 @@ class RoomService {
       console.error("Invalid room state:", state);
       return;
     }
-    if (state.song_id) {
-      console.log("Navigating to song:", state.song_id);
-      this.navigate(RoutesEnum.Song(state.song_id));
-    }
     if (state.song_settings) {
       console.log("Applying room state:", state);
       Signals.applySongSettings.set(new SongSettingsDto().fromJson(state.song_settings));
+    }
+    if (state.song_id) {
+      console.log("Navigating to song:", state.song_id);
+      this.navigate(RoutesEnum.Song(state.song_id));
     }
   }
 

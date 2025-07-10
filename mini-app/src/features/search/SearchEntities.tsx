@@ -1,4 +1,4 @@
-import { Button, Flex, Space, Text } from "@mantine/core";
+import { Button, Divider, Flex, Space, Text } from "@mantine/core";
 import { useScrollIntoView } from "@mantine/hooks";
 import { ReactNode, useContext, useEffect, useRef } from "react";
 
@@ -195,7 +195,10 @@ function SearchEntities<T extends { id?: number; cursor?: string }, SP extends S
           ) : (
             <Stack>
               {searchState.entities.map((entity: T) => (
-                <ListItemComponent key={entity.id} {...listItemProps(entity)} />
+                <>
+                  <ListItemComponent key={entity.id} {...listItemProps(entity)} />
+                  <Divider />
+                </>
               ))}
             </Stack>
           )}

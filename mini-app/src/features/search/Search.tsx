@@ -33,6 +33,8 @@ function Search() {
 
   return (
     <>
+      <SearchSongs />
+      {/*
       <Tabs
         value={activeTab || "song"}
         defaultValue={"song"}
@@ -53,7 +55,7 @@ function Search() {
         <Tabs.Panel value="song">
           <SearchSongs />
         </Tabs.Panel>
-      </Tabs>
+      </Tabs> */}
     </>
   );
 }
