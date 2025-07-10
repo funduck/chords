@@ -1,4 +1,4 @@
-import { Button, Card, Flex, Text } from "@mantine/core";
+import { Button, Card, Flex, Text, useMantineColorScheme } from "@mantine/core";
 import { IconChevronLeft, IconChevronRight } from "@tabler/icons-react";
 import Chord from "@techies23/react-chords";
 import { useState } from "react";
@@ -6,6 +6,8 @@ import { useState } from "react";
 import { ChordsService } from "@src/services/chords/chords.service";
 
 function ChordDiagram({ name }: { name: string }) {
+  const { colorScheme } = useMantineColorScheme();
+
   const { chord, comment } = ChordsService.getChord(name);
 
   if (!chord) {
@@ -44,19 +46,22 @@ function ChordDiagram({ name }: { name: string }) {
   const svg = <Chord key={name} chord={position} instrument={instrument} lite={lite} />;
 
   return (
-    <Card w={"250px"}>
+    <Card w={"250px"} style={{ backgroundColor: colorScheme == "dark" ? "gray" : "" }}>
       <Card.Section ml={"0px"}>{svg}</Card.Section>
-      <Flex direction={"row"} justify={"space-between"} align={"center"}>
-        <Button variant="subtle" c="primary" onClick={posDown}>
-          <IconChevronLeft />
-        </Button>
-        <Text size="1.5em" fw={500}>
+      <Flex direction={"column"} ta={"center"}>
+        <Text size="1.4em" c="primary" fw={500}>
           {chord.key}
           {chord.suffix}
         </Text>
-        <Button variant="subtle" c="primary" onClick={posUp}>
-          <IconChevronRight />
-        </Button>
+        <Flex direction={"row"} justify={"space-between"} align={"center"} ta="center">
+          <Button variant="subtle" c="primary" onClick={posDown}>
+            <IconChevronLeft />
+          </Button>
+          {position.baseFret && <>{position.baseFret}fr</>}
+          <Button variant="subtle" c="primary" onClick={posUp}>
+            <IconChevronRight />
+          </Button>
+        </Flex>
       </Flex>
       {comment && (
         <Text size="sm" c="dimmed" mt="xs">
