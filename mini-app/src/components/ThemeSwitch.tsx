@@ -21,7 +21,7 @@ function ThemeSwitch() {
   };
 
   return (
-    <Box ta="center" variant="subtle" w={"100%"} onClick={toggleTheme} m={"xs"}>
+    <Box ta="center" variant="subtle" w={"100%"} onClick={toggleTheme} mt="4px">
       {theme === "light" ? (
         <IconMoon color="var(--mantine-color-text)" />
       ) : (
