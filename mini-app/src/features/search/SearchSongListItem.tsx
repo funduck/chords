@@ -1,4 +1,4 @@
-import { Anchor, Text } from "@mantine/core";
+import { Anchor, Flex, Text } from "@mantine/core";
 import { useNavigate } from "react-router";
 
 import { RoutesEnum } from "@src/Router";
@@ -11,9 +11,9 @@ function SearchSongListItem({ song }: { song: SongInfoEntity }) {
 
   let title = stringToTitleCase(song.title);
   const artistOrComposer = (song.artists || song.composers || []).map((a) => a.name).join(", ");
-  if (artistOrComposer && song.title?.includes(artistOrComposer)) {
-    title = song.title.replace(artistOrComposer, "").trim();
-  }
+  // if (artistOrComposer && song.title?.includes(artistOrComposer)) {
+  //   title = song.title.replace(artistOrComposer, "").trim();
+  // }
 
   return (
     <Anchor
@@ -23,9 +23,13 @@ function SearchSongListItem({ song }: { song: SongInfoEntity }) {
         Signals.publishSongId.set(song.id!);
       }}
     >
-      <Text size="lg">
-        {title} {artistOrComposer ? ` - ${artistOrComposer}` : ""}
-      </Text>
+      <Flex direction={"row"} align={"center"} gap={"sm"}>
+        <Text size="lg">{title}</Text>
+        {artistOrComposer && <Text c="dimmed">{artistOrComposer}</Text>}
+        <Text c="dimmed" size="xs">
+          #{song.id}
+        </Text>
+      </Flex>
     </Anchor>
   );
 }

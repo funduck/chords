@@ -3,4 +3,5 @@
 /*.sqlite
 /api.env
 /api.json
+/api.yaml
 /bin

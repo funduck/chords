@@ -15,7 +15,7 @@ func Init() {
 	}
 	runtime_viper = viper.New()
 	runtime_viper.SetConfigName("api")  // name of config file (without extension)
-	runtime_viper.SetConfigType("json") // or "json", "toml", etc.
+	runtime_viper.SetConfigType("yaml") // or "json", "toml", etc.
 	runtime_viper.AddConfigPath(".")    // path to look for the config file in
 
 	// Enable automatic key mapping
@@ -27,7 +27,7 @@ func Init() {
 	}
 
 	// Debug: Print all keys that Viper found
-	fmt.Printf("All Viper keys: %v\n", runtime_viper.AllKeys())
+	fmt.Printf("Config loaded keys: %v\n", runtime_viper.AllKeys())
 }
 
 func Unmarshal(config interface{}) error {

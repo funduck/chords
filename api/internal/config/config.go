@@ -1,7 +1,5 @@
 package config
 
-import "fmt"
-
 type Config struct {
 	Port                        string            `mapstructure:"port"`
 	SQLiteFile                  string            `mapstructure:"sqlite_file"`
@@ -24,7 +22,7 @@ func New() *Config {
 		panic(err)
 	}
 
-	fmt.Printf("Loaded config: %+v\n", config)
+	// fmt.Printf("Loaded config: %+v\n", config)
 	return config
 }
 
@@ -34,7 +32,7 @@ func InitForTest() *Config {
 	}
 	config = &Config{
 		Port:                        "8080",
-		SQLiteFile:                  ":memory:",
+		SQLiteFile:                  "file::memory:",
 		Secret:                      "test_secret",
 		AccessTokenExpiresInSeconds: 3600,
 		LoggerEnv:                   "test",

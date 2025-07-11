@@ -1,0 +1,13 @@
+port: 9001
+sqlite_file: dev.sqlite
+secret: topsecret
+access_token_expires_in_seconds: 86400
+
+# dev | prod
+logger_env: dev
+
+# debug | info | warn | error
+logger_level: info
+logger_levels:
+  db: info
+  client: debug

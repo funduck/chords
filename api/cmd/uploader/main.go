@@ -56,6 +56,15 @@ func main() {
 		})
 	}
 
+	// Filter out files that do not have .pro extension
+	tmp := make([]string, 0, len(fileList))
+	for _, file := range fileList {
+		if strings.HasSuffix(strings.ToLower(file), ".pro") {
+			tmp = append(tmp, file)
+		}
+	}
+	fileList = tmp
+
 	log.Info("Library name: ", *lib)
 	log.Info("Dry run mode: ", *dryRun)
 	log.Info("Files to upload: ", fileList)

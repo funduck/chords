@@ -114,6 +114,8 @@ func (s *SongService) SearchSongs(ctx context.Context, req *dto.SearchSongReques
 
 		// Find songs with pagination
 		err := q.
+			Preload("Artists").
+			Preload("Composers").
 			Order("songs.title ASC").
 			Limit(req.Limit).
 			Find(&songs).Error
@@ -128,7 +130,6 @@ func (s *SongService) SearchSongs(ctx context.Context, req *dto.SearchSongReques
 			}
 			songsList = append(songsList, listItem)
 		}
-		// TODO preload other fields if needed
 	}
 
 	return &entity.SongsList{Songs: songsList, Total: total}, nil

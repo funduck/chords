@@ -1,0 +1,21 @@
+{
+  "name": "tools",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc",
+    "dev": "ts-node src/index.ts",
+    "start": "node dist/index.js",
+    "clean": "rm -rf dist",
+    "parse-md": "ts-node src/parse-md.ts"
+  },
+  "dependencies": {
+    "chordsheetjs": "^12.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.12",
+    "typescript": "^5.0.0",
+    "ts-node": "^10.9.0"
+  }
+}

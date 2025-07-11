@@ -23,7 +23,7 @@ func (s *ArtistService) normalizeName(name string) string {
 	normalized := strings.ToLower(name)
 
 	// Remove special characters and spaces, keep only alphanumeric
-	reg := regexp.MustCompile(`[^a-z0-9]`)
+	reg := regexp.MustCompile(`[^a-z0-9а-я]`)
 	normalized = reg.ReplaceAllString(normalized, "")
 
 	// Remove repeated letters
@@ -106,7 +106,12 @@ func (s *ArtistService) SearchArtists(ctx context.Context, req *dto.SearchArtist
 	q := tx.Model(&entity.Artist{})
 
 	if req.Query != "" {
-		q = q.Where("("+orm.SearchFTS("artists")+"OR name_normalized LIKE ?)", req.Query, "%"+s.normalizeName(req.Query)+"%")
+		normalizedName := s.normalizeName(req.Query)
+		if len(normalizedName) > 3 {
+			q = q.Where("("+orm.SearchFTS("artists")+"OR name_normalized LIKE ?)", req.Query, "%"+normalizedName+"%")
+		} else {
+			q = q.Where(orm.SearchFTS("artists"), req.Query)
+		}
 	}
 
 	// Count total number of matching artists

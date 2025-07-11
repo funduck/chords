@@ -15,7 +15,7 @@ func InitForTest() (*gorm.DB, *sql.DB) {
 	// 	}
 	// }
 
-	file := "file::memory:?cache=shared"
+	file := "file::memory:"
 
 	log := NewGormLogger()
 
