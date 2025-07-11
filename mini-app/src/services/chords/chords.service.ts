@@ -19,13 +19,19 @@ const ChordsDB: {
   tunings: RawChordsDB.tunings,
   keys: RawChordsDB.keys,
   suffixes: RawChordsDB.suffixes,
-  chords: new Map(
-    Object.entries(RawChordsDB.chords).map(([key, value]) => [
-      key,
-      new Map(value.map((chord) => [chord.suffix, chord])),
-    ]),
-  ),
+  chords: new Map(),
 };
+
+// Populate the chords map from the raw chords database
+// Map will be mush faster for lookups
+for (const [_, chords] of Object.entries(RawChordsDB.chords)) {
+  for (const chord of chords) {
+    if (!ChordsDB.chords.has(chord.key)) {
+      ChordsDB.chords.set(chord.key, new Map());
+    }
+    ChordsDB.chords.get(chord.key)!.set(chord.suffix, chord);
+  }
+}
 
 export class ChordsService {
   static getChord(name: string): {
@@ -42,6 +48,28 @@ export class ChordsService {
     if (suffix.startsWith("b") || suffix.startsWith("#")) {
       note += suffix.slice(0, 1);
       suffix = suffix.slice(1);
+    }
+
+    // Normalize note names
+    switch (note) {
+      case "D#":
+        note = "Eb";
+        break;
+      case "G#":
+        note = "Ab";
+        break;
+      case "A#":
+        note = "Bb";
+        break;
+      case "H":
+        note = "B";
+        break;
+      case "B#":
+        note = "C";
+        break;
+      case "Cb":
+        note = "B";
+        break;
     }
 
     // Handle cases like "Cma7" -> "Cmaj7"
