@@ -19,6 +19,13 @@ api-dev:
 api-test:
 	cd api && make test
 
+build-tools:
+	cd tools && yarn run build
+	cd api && make build-uploader
+
+overwrite-database:
+	./overwrite-database.sh
+
 dev:
 	concurrently \
 		"make caddy-dev" \

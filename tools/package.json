@@ -7,8 +7,7 @@
     "build": "tsc",
     "dev": "ts-node src/index.ts",
     "start": "node dist/index.js",
-    "clean": "rm -rf dist",
-    "parse-md": "ts-node src/parse-md.ts"
+    "clean": "rm -rf dist"
   },
   "dependencies": {
     "chordsheetjs": "^12.3.0"

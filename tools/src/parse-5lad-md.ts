@@ -35,7 +35,12 @@ function extractSheetFromMarkdown(content: string): string {
     lines.pop();
   }
 
-  return lines.join("\n").trim();
+  // replace Hm with Bm
+  for (let i = 0; i < lines.length; i++) {
+    lines[i] = lines[i].replace(/\bH(m?)\b/g, "B$1");
+  }
+
+  return lines.join("\n");
 }
 
 function extractTitleAndArtistFromMarkdown(content: string): {
@@ -62,11 +67,13 @@ async function main() {
 
     const parser = new ChordsOverWordsParser();
     const sheet = extractSheetFromMarkdown(content);
+    // console.log(`Extracted sheet:\n${sheet}`);
     const song = parser.parse(sheet);
     const formater = new ChordProFormatter();
     let chordpro = formater.format(song);
 
     const { title, artist } = extractTitleAndArtistFromMarkdown(content);
+    // console.log(`Extracted title: ${title}, artist: ${artist}`);
     if (title) {
       chordpro = `{title: ${title}}\n${chordpro}`;
     }

@@ -15,7 +15,7 @@ function parse_md() {
     local file="$1"
     local out="${file%.md}.pro"
     # go run ../../api/cmd/md2chordpro/main.go "$file" "$out"
-    node ../../tools/dist/parse-md.js "$file" "$out"
+    node ../../tools/dist/parse-5lad-md.js "$file" "$out"
 }
 
 mkdir -p data/5lad
