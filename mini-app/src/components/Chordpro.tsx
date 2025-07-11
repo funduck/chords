@@ -11,6 +11,7 @@ function Chordpro({ sheet, raw, transpose }: { sheet: string; raw?: boolean; tra
   const [width, setWidth] = useState(window.innerWidth);
   const [title, setTitle] = useState("");
   const [artist, setArtist] = useState("");
+  const [composer, setComposer] = useState("");
 
   useEffect(() => {
     const handleWidthChange = () => {
@@ -47,7 +48,8 @@ function Chordpro({ sheet, raw, transpose }: { sheet: string; raw?: boolean; tra
 
       const song0 = parser0.parse(sheet);
       setTitle(song0.title || "");
-      setArtist([...song0.artists, ...song0.composers].join(", ") || "");
+      setArtist([...song0.artists].join(", ") || "");
+      setComposer([...song0.composers].join(", ") || "");
 
       const sheetLines = formater0.format(song0);
       const fixedSheetLines: string[] = [];
@@ -100,7 +102,8 @@ function Chordpro({ sheet, raw, transpose }: { sheet: string; raw?: boolean; tra
   return (
     <>
       <Title>{title}</Title>
-      <Text size="xl">{artist}</Text>
+      <Text size="xl">Artist: {artist}</Text>
+      <Text size="xl">Composer: {composer}</Text>
       <Divider my="md" />
       <Box className="chordpro" ref={ref} />
       <Divider my="md" />
