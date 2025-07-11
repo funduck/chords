@@ -101,7 +101,10 @@ func main() {
 			continue
 		}
 		if songInfo.Title == "" || (songInfo.Artist == "" && songInfo.Composer == "") {
-			head := strings.Split(fileContent, "\n")[:10]
+			head := strings.Split(fileContent, "\n")
+			if len(head) > 10 {
+				head = head[:10]
+			}
 			log.Error("Invalid chordpro file: ", file, " - missing title or artist and composer")
 			log.Error("File content head: ", strings.Join(head, "\n"))
 			continue
