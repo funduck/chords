@@ -40,6 +40,23 @@ function extractSheetFromMarkdown(content: string): string {
     lines[i] = lines[i].replace(/\bH(m?)\b/g, "B$1");
   }
 
+  // Parse chorus lines
+  let chorus = false;
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    if (!chorus && line.trim().match(/припев:?/i)) {
+      chorus = true;
+      lines[i] = "{start_of_chorus}";
+    } else if (chorus && !line.startsWith(" ") && line.length > 1) {
+      chorus = false;
+      lines[i] = "{end_of_chorus}\n" + line;
+    }
+  }
+
+  if (chorus) {
+    lines.push("{end_of_chorus}");
+  }
+
   return lines.join("\n");
 }
 
