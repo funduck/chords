@@ -7,9 +7,10 @@ interface QueryInputProps {
   onQueryChange: (query: string) => void;
   onSubmit: () => void;
   placeholder?: string;
+  enableHistory?: boolean;
 }
 
-function QueryInput({ name, query, onQueryChange, onSubmit, placeholder }: QueryInputProps) {
+function QueryInput({ name, query, onQueryChange, onSubmit, placeholder, enableHistory }: QueryInputProps) {
   const storageKey = `${name}-history`;
 
   const [searchHistory, setSearchHistory] = useState<string[]>([]);
@@ -95,7 +96,7 @@ function QueryInput({ name, query, onQueryChange, onSubmit, placeholder }: Query
         />
       </Combobox.Target>
 
-      {searchHistoryOptions.length > 0 && (
+      {enableHistory && searchHistoryOptions.length > 0 && (
         <Combobox.Dropdown>
           <Combobox.Options>{searchHistoryOptions}</Combobox.Options>
         </Combobox.Dropdown>

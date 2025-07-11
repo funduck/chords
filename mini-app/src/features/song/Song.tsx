@@ -211,11 +211,6 @@ function Song() {
             <Box>
               <Chordpro sheet={song.sheet!} raw={showRawSong} transpose={transposeSong} />
             </Box>
-            <Box>
-              <Divider />
-              <Space h="md" />
-              <Text style={{ fontStyle: "italic" }}>End</Text>
-            </Box>
           </Stack>
         </ScrollArea>
       </Box>

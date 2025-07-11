@@ -1,4 +1,4 @@
-import { Box } from "@mantine/core";
+import { Box, Divider, Space, Text, Title } from "@mantine/core";
 import * as Parser from "chordproject-parser";
 import { Chord, ChordProParser, HtmlTableFormatter } from "chordsheetjs";
 import { useEffect, useRef, useState } from "react";
@@ -9,6 +9,8 @@ function Chordpro({ sheet, raw, transpose }: { sheet: string; raw?: boolean; tra
   const ref = useRef<HTMLDivElement>(null);
   const [errText, setErrText] = useState("");
   const [width, setWidth] = useState(window.innerWidth);
+  const [title, setTitle] = useState("");
+  const [artist, setArtist] = useState("");
 
   useEffect(() => {
     const handleWidthChange = () => {
@@ -44,6 +46,9 @@ function Chordpro({ sheet, raw, transpose }: { sheet: string; raw?: boolean; tra
       // chordproject-parser does better parsing while chordsheetjs does better formatting
 
       const song0 = parser0.parse(sheet);
+      setTitle(song0.title || "");
+      setArtist([...song0.artists, ...song0.composers].join(", ") || "");
+
       const sheetLines = formater0.format(song0);
       const fixedSheetLines: string[] = [];
       for (const line of sheetLines) {
@@ -94,7 +99,12 @@ function Chordpro({ sheet, raw, transpose }: { sheet: string; raw?: boolean; tra
 
   return (
     <>
+      <Title>{title}</Title>
+      <Text size="xl">{artist}</Text>
+      <Divider my="md" />
       <Box className="chordpro" ref={ref} />
+      <Divider my="md" />
+      <Text style={{ fontStyle: "italic" }}>End</Text>
     </>
   );
 }

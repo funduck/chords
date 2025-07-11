@@ -35,8 +35,14 @@ export class ChordsService {
     let chordName = name;
     let comment = "";
 
-    const note = name.slice(0, 1);
+    let note = name.slice(0, 1);
     let suffix = name.slice(1) || "";
+
+    // Handle cases like "Bb" or "C#"
+    if (suffix.startsWith("b") || suffix.startsWith("#")) {
+      note += suffix.slice(0, 1);
+      suffix = suffix.slice(1);
+    }
 
     // Handle cases like "Cma7" -> "Cmaj7"
     if (suffix.match(/^ma[0-9]/)) {
