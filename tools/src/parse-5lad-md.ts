@@ -61,32 +61,32 @@ function extractTitleAndArtistFromMarkdown(content: string): {
   throw new Error("Title and artist not found in the markdown content");
 }
 
-function markChoruses(sheet: string): string {
-  let chorus = false;
-  const lines = sheet.split("\n");
-  let res: string[] = [];
+// function markChoruses(sheet: string): string {
+//   let chorus = false;
+//   const lines = sheet.split("\n");
+//   let res: string[] = [];
 
-  for (const line of lines) {
-    if (!chorus && line.trim().match(/^(припев|chorus)/i)) {
-      chorus = true;
-      res.push("{start_of_chorus}");
-      res.push(line);
-      continue;
-    }
-    if (chorus && line.trim().length > 1 && !line.startsWith(" ")) {
-      chorus = false;
-      res.push("{end_of_chorus}");
-      res.push(line);
-      continue;
-    }
-    res.push(line);
-  }
-  if (chorus) {
-    res.push("{end_of_chorus}");
-  }
+//   for (const line of lines) {
+//     if (!chorus && line.trim().match(/^(припев|chorus)/i)) {
+//       chorus = true;
+//       res.push("{start_of_chorus}");
+//       res.push(line);
+//       continue;
+//     }
+//     if (chorus && line.trim().length > 1 && !line.startsWith(" ")) {
+//       chorus = false;
+//       res.push("{end_of_chorus}");
+//       res.push(line);
+//       continue;
+//     }
+//     res.push(line);
+//   }
+//   if (chorus) {
+//     res.push("{end_of_chorus}");
+//   }
 
-  return res.join("\n");
-}
+//   return res.join("\n");
+// }
 
 async function main() {
   try {
@@ -98,7 +98,7 @@ async function main() {
     const song = parser.parse(sheet);
     const formater = new ChordProFormatter();
     let chordpro = formater.format(song);
-    chordpro = markChoruses(chordpro);
+    // chordpro = markChoruses(chordpro);
 
     const { title, artist } = extractTitleAndArtistFromMarkdown(content);
     // console.log(`Extracted title: ${title}, artist: ${artist}`);
