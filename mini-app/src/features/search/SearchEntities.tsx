@@ -200,39 +200,40 @@ function SearchEntities<T extends { id?: number; cursor?: string }, SP extends S
                   <Divider />
                 </>
               ))}
-            </Stack>
-          )}
 
-          {renderPagination ? (
-            renderPagination({
-              searchState,
-              searching: false,
-              onLoadMore: handleLoadMore,
-              searchMoreButtonRef,
-              entityName,
-            })
-          ) : (
-            // Default infinite scroll pagination
-            <>
-              {searchState.total && searchState.hasNextPage && (
-                <Button
-                  w="100%"
-                  ref={searchMoreButtonRef as React.RefObject<HTMLButtonElement>}
-                  onClick={handleLoadMore}
-                  variant="outline"
-                  mt="md"
-                  ta={"center"}
-                  c="dimmed"
-                >
-                  Showing {searchState.entities.length} of {searchState.total} {entityName}
-                </Button>
+              {renderPagination ? (
+                renderPagination({
+                  searchState,
+                  searching: false,
+                  onLoadMore: handleLoadMore,
+                  searchMoreButtonRef,
+                  entityName,
+                })
+              ) : (
+                // Default infinite scroll pagination
+                <>
+                  {searchState.total && searchState.hasNextPage && (
+                    <Button
+                      w="100%"
+                      ref={searchMoreButtonRef as React.RefObject<HTMLButtonElement>}
+                      onClick={handleLoadMore}
+                      variant="outline"
+                      mt="md"
+                      ta={"center"}
+                      c="dimmed"
+                    >
+                      Showing {searchState.entities.length} of {searchState.total} {entityName}
+                    </Button>
+                  )}
+                  {searchState.total && !searchState.hasNextPage && (
+                    <Text size="sm" c="dimmed" ta="center" mt="md">
+                      All {searchState.total} {entityName} loaded
+                    </Text>
+                  )}
+                  <Space h="xl" />
+                </>
               )}
-              {searchState.total && !searchState.hasNextPage && (
-                <Text size="sm" c="dimmed" ta="center" mt="md">
-                  All {searchState.total} {entityName} loaded
-                </Text>
-              )}
-            </>
+            </Stack>
           )}
         </>
       )}
