@@ -5,6 +5,7 @@ import { BrowserRouter } from "react-router";
 import Router from "./Router";
 import AnonymousLogin from "./features/auth/AnonymousLogin";
 import { SearchProvider } from "./features/search/SearchContext";
+import { SongContextProvider } from "./features/song/SongContext";
 import { ApiProvider } from "./hooks/Api";
 import { EventsConsumer, EventsPublisher } from "./hooks/Events";
 import { HeaderProvider } from "./hooks/Header";
@@ -20,14 +21,16 @@ function App() {
         <ApiProvider>
           <WebSocketProvider>
             <RoomServiceProvider>
-              <HeaderProvider>
-                <SearchProvider>
-                  <EventsPublisher />
-                  <EventsConsumer />
-                  <AnonymousLogin />
-                  <Router />
-                </SearchProvider>
-              </HeaderProvider>
+              <SongContextProvider>
+                <HeaderProvider>
+                  <SearchProvider>
+                    <EventsPublisher />
+                    <EventsConsumer />
+                    <AnonymousLogin />
+                    <Router />
+                  </SearchProvider>
+                </HeaderProvider>
+              </SongContextProvider>
             </RoomServiceProvider>
           </WebSocketProvider>
         </ApiProvider>

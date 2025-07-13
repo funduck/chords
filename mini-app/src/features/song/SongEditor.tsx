@@ -1,17 +1,26 @@
 import { Textarea } from "@mantine/core";
-import { useSignal } from "@telegram-apps/sdk-react";
 import { useEffect, useRef } from "react";
 
-import { Signals } from "@src/services/signals-registry";
+import { useSongContext } from "./SongContext";
 
-function SongEditor() {
-  const sheet = useSignal(Signals.sheet);
+function SongEditor({ currentSong }: { currentSong?: boolean }) {
+  const { songState, updateSongState } = useSongContext();
+
+  const sheet = currentSong ? songState.sheet : songState.newSheet;
 
   const ref = useRef<HTMLTextAreaElement>(null);
 
   function storeSheetValue(value: string) {
     if (value && value.length) {
-      Signals.sheet.set(value);
+      if (currentSong) {
+        updateSongState({
+          sheet: value,
+        });
+      } else {
+        updateSongState({
+          newSheet: value,
+        });
+      }
       localStorage.setItem("editor-sheet", value);
       console.debug("Stored sheet in localStorage", value.length);
     }
@@ -37,7 +46,7 @@ function SongEditor() {
         ref.current!.value = savedSheet;
       }
     }
-  }, []);
+  }, [sheet]);
 
   return (
     <>

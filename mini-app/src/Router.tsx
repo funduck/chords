@@ -11,7 +11,9 @@ import ThemeSwitch from "./components/ThemeSwitch";
 import Artist from "./features/artist/Artist";
 import Room from "./features/room/Room";
 import Search from "./features/search/Search";
+import NewSong from "./features/song/NewSong";
 import Song from "./features/song/Song";
+import { useSongContext } from "./features/song/SongContext";
 import { useHeader } from "./hooks/Header";
 import { Signals } from "./services/signals-registry";
 
@@ -75,7 +77,9 @@ function Router() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const song = useSignal(Signals.song);
+  const { songState } = useSongContext();
+  const { songId } = songState;
+
   const artist = useSignal(Signals.artist);
 
   const tabs = [
@@ -85,15 +89,15 @@ function Router() {
         {
           id: "song",
           text: "Play song",
-          link: song ? RoutesEnum.Songs(song?.id) : RoutesEnum.Editor,
+          link: songId ? RoutesEnum.Songs(songId) : RoutesEnum.Editor,
           // hidden: !song,
           hidden: false,
         },
-        // {
-        //   id: "editor",
-        //   text: "Editor",
-        //   link: RoutesEnum.Editor,
-        // },
+        {
+          id: "editor",
+          text: "Editor",
+          link: RoutesEnum.Editor,
+        },
         {
           id: "room",
           text: "Room",
@@ -208,9 +212,9 @@ function Router() {
         <Routes>
           <Route index element={<Search />} />
           <Route path="search/songs" element={<Search />} />
-          <Route path="editor" element={<Song />} />
-          <Route path="room" element={<Room />} />
           <Route path="songs/:songId" element={<Song />} />
+          <Route path="editor" element={<NewSong />} />
+          <Route path="room" element={<Room />} />
           <Route path="search/artists" element={<Artist />} />
           <Route path="artists/:artistId" element={<Artist />} />
         </Routes>

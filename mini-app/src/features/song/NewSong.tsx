@@ -1,6 +1,5 @@
 import { Box, ScrollArea } from "@mantine/core";
 import { useEffect, useRef } from "react";
-import { useParams } from "react-router";
 
 import ChordDisplayManager from "@src/components/ChordDisplayManager";
 import ChordProViewer from "@src/components/ChordproViewer";
@@ -10,20 +9,11 @@ import { useSongContext } from "./SongContext";
 import SongEditor from "./SongEditor";
 import SongSettings from "./SongSettings";
 
-function Song() {
-  const { songState, loadSong } = useSongContext();
-  const song = songState.loadedSong;
-  const sheet = songState.sheet || song?.sheet || "";
+function NewSong() {
+  const { songState, updateDisplayOptions } = useSongContext();
+  const sheet = songState.newSheet || "";
   const displayMode = songState.displayOptions?.mode || "render";
   const transposeSong = songState.displayOptions?.transpose || 0;
-
-  // Handle routing
-  const { songId } = useParams<{ songId: string }>();
-  useEffect(() => {
-    if (songId && songId !== songState.loadedSong?.id?.toString()) {
-      loadSong(parseInt(songId, 10));
-    }
-  }, [songId, songState, loadSong]);
 
   const songViewportRef = useRef<HTMLDivElement>(null);
 
@@ -34,6 +24,12 @@ function Song() {
       onScrollPositionChangeInit={(fn) => (onScrollPositionChange = fn)}
     />
   );
+
+  useEffect(() => {
+    if (!sheet || sheet.length === 0) {
+      updateDisplayOptions({ mode: "editor" });
+    }
+  }, [sheet]);
 
   return (
     <>
@@ -52,11 +48,11 @@ function Song() {
           }}
         >
           {displayMode == "render" && <ChordProViewer sheet={sheet} transpose={transposeSong} />}
-          {displayMode == "editor" && <SongEditor currentSong={true} />}
+          {displayMode == "editor" && <SongEditor currentSong={false} />}
         </ScrollArea>
       </Box>
     </>
   );
 }
 
-export default Song;
+export default NewSong;

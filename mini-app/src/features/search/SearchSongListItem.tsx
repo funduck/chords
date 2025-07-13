@@ -1,26 +1,23 @@
 import { Anchor, Flex, Text } from "@mantine/core";
-import { useNavigate } from "react-router";
 
-import { RoutesEnum } from "@src/Router";
 import { SongInfoEntity } from "@src/hooks/Api";
-import { Signals } from "@src/services/signals-registry";
 import { stringToTitleCase } from "@src/utils/string";
 
+import { useSongContext } from "../song/SongContext";
+
 function SearchSongListItem({ song }: { song: SongInfoEntity }) {
-  const navigate = useNavigate();
+  const { loadSong } = useSongContext();
 
   let title = stringToTitleCase(song.title);
   const artistOrComposer = (song.artists || song.composers || []).map((a) => a.name).join(", ");
-  // if (artistOrComposer && song.title?.includes(artistOrComposer)) {
-  //   title = song.title.replace(artistOrComposer, "").trim();
-  // }
 
   return (
     <Anchor
       c="primary"
       onClick={() => {
-        navigate(RoutesEnum.Songs(song.id));
-        Signals.publishSongId.set(song.id!);
+        loadSong(song.id!);
+        // navigate(RoutesEnum.Songs(song.id));
+        // Signals.publishSongId.set(song.id!);
       }}
     >
       <Flex direction={"row"} align={"center"} gap={"sm"}>

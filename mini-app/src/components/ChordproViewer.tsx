@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { estimateFontSize } from "@src/utils/font";
 
-function Chordpro({ sheet, raw, transpose }: { sheet: string; raw?: boolean; transpose?: number }) {
+function ChordProViewer({ sheet, raw, transpose }: { sheet: string; raw?: boolean; transpose?: number }) {
   const ref = useRef<HTMLDivElement>(null);
   const [errText, setErrText] = useState("");
   const [width, setWidth] = useState(window.innerWidth);
@@ -112,4 +112,4 @@ function Chordpro({ sheet, raw, transpose }: { sheet: string; raw?: boolean; tra
   );
 }
 
-export default Chordpro;
+export default ChordProViewer;
