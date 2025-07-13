@@ -17,18 +17,19 @@ import { Signals } from "./services/signals-registry";
 
 class RoutesEnum {
   static Room = "/room";
-  static Artists = function (artistId?: number): string {
+  static SearchArtists = function (artistId?: number): string {
     if (artistId == null) {
-      return "/artists";
+      return "/search/artists";
     }
     return "/artists/" + artistId;
   };
   static Songs = function (songId?: number): string {
     if (songId == null) {
-      return "/songs";
+      return "/search/songs";
     }
     return "/songs/" + songId;
   };
+  static Editor = "/editor";
 }
 
 export { RoutesEnum };
@@ -84,9 +85,15 @@ function Router() {
         {
           id: "song",
           text: "Play song",
-          link: RoutesEnum.Songs(song?.id),
-          hidden: !song,
+          link: song ? RoutesEnum.Songs(song?.id) : RoutesEnum.Editor,
+          // hidden: !song,
+          hidden: false,
         },
+        // {
+        //   id: "editor",
+        //   text: "Editor",
+        //   link: RoutesEnum.Editor,
+        // },
         {
           id: "room",
           text: "Room",
@@ -105,7 +112,7 @@ function Router() {
         {
           id: "artists",
           text: "Artists",
-          link: RoutesEnum.Artists(artist?.id),
+          link: RoutesEnum.SearchArtists(artist?.id),
         },
       ],
     },
@@ -143,10 +150,10 @@ function Router() {
       style={{ display: "flex", flexDirection: "column", height: "100vh" }}
     >
       <AppShell.Header>
-        <Group justify="space-between" m="sm">
+        <Group justify="space-between" ta={"center"} align="center" style={{ height: "100%" }}>
           {/* Burger on the left */}
           <Group gap="sm">
-            <Burger opened={navbarOpened} onClick={toggleNavbar} />
+            <Burger opened={navbarOpened} onClick={toggleNavbar} ml="xs" />
           </Group>
 
           {/* Center content is optional */}
@@ -200,10 +207,11 @@ function Router() {
       <AppShell.Main id="appshellmain" style={{ display: "flex", flex: 1, flexDirection: "column" }}>
         <Routes>
           <Route index element={<Search />} />
-          <Route path="songs" element={<Search />} />
+          <Route path="search/songs" element={<Search />} />
+          <Route path="editor" element={<Song />} />
           <Route path="room" element={<Room />} />
           <Route path="songs/:songId" element={<Song />} />
-          <Route path="artists" element={<Artist />} />
+          <Route path="search/artists" element={<Artist />} />
           <Route path="artists/:artistId" element={<Artist />} />
         </Routes>
       </AppShell.Main>

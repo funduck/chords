@@ -1,11 +1,11 @@
-import { Box, Divider, ScrollArea, Space, Textarea } from "@mantine/core";
+import { Box, ScrollArea } from "@mantine/core";
 import { useSignal } from "@telegram-apps/sdk-react";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router";
 
 import { RoutesEnum } from "@src/Router";
 import ChordDisplayManager from "@src/components/ChordDisplayManager";
-import { SongEntity, SongsApiContext } from "@src/hooks/Api";
+import { SongsApiContext } from "@src/hooks/Api";
 import { useScrollPosition } from "@src/hooks/useScrollPosition";
 import { Signals } from "@src/services/signals-registry";
 import { estimateFontSize } from "@src/utils/font";
@@ -14,34 +14,41 @@ import Chordpro from "@components/Chordpro";
 import Stack from "@components/Stack";
 import Text from "@components/Text";
 
+import SongEditor from "./SongEditor";
 import SongSettings from "./SongSettings";
 
 function Song() {
+  // const navigate = useNavigate();
+
   const room = useSignal(Signals.room);
 
   let { songId } = useParams<{ songId: string }>();
+  const song = useSignal(Signals.song);
+  const sheet = useSignal(Signals.sheet);
   const songsApi = useContext(SongsApiContext);
 
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    // Store songId in localStorage so app remembers it across sessions
-    if (!songId) {
-      songId = localStorage.getItem("songId") ?? "";
-      if (songId) {
-        console.log("Using songId from localStorage:", songId);
-        navigate(RoutesEnum.Songs(parseInt(songId!, 10)));
-        return;
-      }
-    } else {
-      localStorage.setItem("songId", songId);
-    }
-  }, [songId]);
+  // // Store songId in localStorage so app remembers it across sessions
+  // useEffect(() => {
+  //   if (!songId) {
+  //     songId = localStorage.getItem("songId") ?? "";
+  //     if (songId) {
+  //       console.log("Using songId from localStorage:", songId);
+  //       navigate(RoutesEnum.Songs(parseInt(songId!, 10)));
+  //       return;
+  //     }
+  //   } else {
+  //     localStorage.setItem("songId", songId);
+  //   }
+  // }, [songId]);
 
   const songViewportRef = useRef<HTMLDivElement>(null);
-  const song = useSignal(Signals.song);
   const applySongSettings = useSignal(Signals.applySongSettings);
   const applySongScroll = useSignal(Signals.applySongScroll);
+
+  const displayMode = useSignal(Signals.songOptionDisplayMode);
+  const transposeSong = useSignal(Signals.songOptionTranspose);
+
+  console.debug("Display mode:", displayMode);
 
   // Initialize scroll position management
   const { saveScrollPosition } = useScrollPosition(songViewportRef);
@@ -52,16 +59,20 @@ function Song() {
   // This is used to debounce the scroll events when user scrolls manually
   const emittingScrollTimeout = useRef(null as ReturnType<typeof setTimeout> | null);
 
-  const showRawSong = useSignal(Signals.songOptionShowRaw);
-  const transposeSong = useSignal(Signals.songOptionTranspose);
-
   useEffect(() => {
     if (songId && songsApi) {
       console.debug("Fetching song with ID:", songId);
       songsApi
         .getSongByID({ id: parseInt(songId, 10) })
-        .then((s) => Signals.song.set(s))
+        .then((s) => {
+          Signals.song.set(s);
+          if (s.sheet) {
+            Signals.sheet.set(s.sheet);
+          }
+        })
         .catch(console.error);
+    } else {
+      Signals.songOptionDisplayMode.set("editor");
     }
   }, [songsApi, songId]);
 
@@ -178,14 +189,6 @@ function Song() {
     Signals.applySongScroll.set(null); // Clear the signal after applying
   }, [room, song, songViewportRef.current, applySongScroll, applySongSettings?.auto_scroll]);
 
-  if (!song) {
-    return <div>Loading...</div>;
-  }
-
-  if (!songId) {
-    return <Text>No song selected. Please select a song from the list or set a default song in settings.</Text>;
-  }
-
   return (
     <>
       <ChordDisplayManager />
@@ -209,7 +212,10 @@ function Song() {
           </Box> */}
 
             <Box>
-              <Chordpro sheet={song.sheet!} raw={showRawSong} transpose={transposeSong} />
+              {sheet && (displayMode == "song" || displayMode == "raw") && (
+                <Chordpro sheet={sheet} raw={displayMode == "raw"} transpose={transposeSong} />
+              )}
+              {displayMode == "editor" && <SongEditor />}
             </Box>
           </Stack>
         </ScrollArea>

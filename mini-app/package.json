@@ -9,7 +9,8 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0 && yarn run stylelint",
     "stylelint": "stylelint '**/*.css' --cache",
     "preview": "vite preview --host --port 80",
-    "codegen:openapi": "openapi -i http://api/api/json -o ./src/services/openapi"
+    "codegen:openapi": "openapi -i http://api/api/json -o ./src/services/openapi",
+    "test": "node --test"
   },
   "dependencies": {
     "@mantine/core": "^8.1.1",
@@ -40,6 +41,7 @@
     "@trivago/prettier-plugin-sort-imports": "^4.3.0",
     "@types/chordsheetjs": "^6.2.0",
     "@types/lodash": "^4.17.17",
+    "@types/node": "^24.0.13",
     "@types/react": "^18.2.15",
     "@types/react-dom": "^18.2.7",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
@@ -51,6 +53,8 @@
     "openapi-typescript": "^7.4.1",
     "openapi-typescript-codegen": "^0.29.0",
     "prettier": "^3.3.3",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.20.3",
     "typescript": "^5.0.2",
     "vite": "^4.5.5"
   },

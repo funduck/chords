@@ -34,6 +34,7 @@ for (const [_, chords] of Object.entries(RawChordsDB.chords)) {
 }
 
 export class ChordsService {
+  /** Finds matching Chord in database */
   static getChord(name: string): {
     comment?: string;
     chord: Chord | undefined;

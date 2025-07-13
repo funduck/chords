@@ -3,7 +3,7 @@ import { IconChevronLeft, IconChevronRight } from "@tabler/icons-react";
 import Chord from "@techies23/react-chords";
 import { useState } from "react";
 
-import { ChordsService } from "@src/services/chords/chords.service";
+import { ChordsService } from "@src/services/chords/chords";
 
 function ChordDiagram({ name }: { name: string }) {
   const { colorScheme } = useMantineColorScheme();

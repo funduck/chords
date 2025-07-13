@@ -1,4 +1,4 @@
-import { Box, Divider, Space, Text, Title } from "@mantine/core";
+import { Box, Divider, Text, Title } from "@mantine/core";
 import * as Parser from "chordproject-parser";
 import { Chord, ChordProParser, HtmlTableFormatter } from "chordsheetjs";
 import { useEffect, useRef, useState } from "react";

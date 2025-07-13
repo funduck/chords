@@ -1,4 +1,4 @@
-import { Box, Button, Flex, Text } from "@mantine/core";
+import { Box, Button, Flex, Select, Text } from "@mantine/core";
 import { IconMinus, IconPlayerPlayFilled, IconPlayerStop, IconPlus } from "@tabler/icons-react";
 import { useSignal } from "@telegram-apps/sdk-react";
 import { useEffect } from "react";
@@ -29,13 +29,16 @@ function ShortcutSettings() {
   }
 
   return (
-    <Button variant="subtle" disabled={!settings} onClick={() => setAutoScroll(!settings?.auto_scroll)}>
-      {settings?.auto_scroll ? (
-        <IconPlayerStop color="var(--mantine-color-text)" />
-      ) : (
-        <IconPlayerPlayFilled color="var(--mantine-color-text)" />
-      )}
-    </Button>
+    <Flex direction="row" ta={"center"} align="center">
+      <Button variant="subtle" disabled={!settings} onClick={() => setAutoScroll(!settings?.auto_scroll)}>
+        {settings?.auto_scroll ? (
+          <IconPlayerStop color="var(--mantine-color-text)" />
+        ) : (
+          <IconPlayerPlayFilled color="var(--mantine-color-text)" />
+        )}
+      </Button>
+      <SongDisplaySettings />
+    </Flex>
   );
 }
 
@@ -69,14 +72,14 @@ function AutoScrollSettings() {
 }
 
 function SongDisplaySettings() {
-  const showRawSong = useSignal(Signals.songOptionShowRaw);
+  const displayMode = useSignal(Signals.songOptionDisplayMode);
 
   return (
     <Switch
-      label="Show raw song"
-      checked={showRawSong}
+      label={"Editor mode"}
+      checked={displayMode == "editor"}
       onChange={(e) => {
-        Signals.songOptionShowRaw.set(e);
+        Signals.songOptionDisplayMode.set(e ? "editor" : "song");
       }}
     />
   );
@@ -131,7 +134,7 @@ function SongSettings() {
   // Set header content when component mounts
   useEffect(() => {
     setCenterContent(<ShortcutSettings />);
-    setSettingsContent([<AutoScrollSettings />, <SongDisplaySettings />, <SongKeySettings />]);
+    setSettingsContent([<AutoScrollSettings />, <SongKeySettings />]);
 
     // Clean up when component unmounts
     return () => {
