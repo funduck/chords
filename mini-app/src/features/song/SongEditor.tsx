@@ -43,7 +43,7 @@ function SongEditor({ currentSong }: { currentSong?: boolean }) {
     } else {
       const savedSheet = loadSheetValue();
       if (savedSheet) {
-        ref.current!.value = savedSheet;
+        storeSheetValue(savedSheet);
       }
     }
   }, [sheet]);

@@ -12,11 +12,6 @@ export class Signals {
 
   static room = signal<RoomEntity | null>(null);
   static artist = signal<ArtistInfoEntity | null>(null);
-  static song = signal<SongEntity | null>(null);
-  static sheet = signal<string | null>(null);
-
-  static songOptionDisplayMode = signal<"song" | "raw" | "editor">("song");
-  static songOptionTranspose = signal<number>(0);
 
   static applySongSettings = signal<SongSettingsDto | null>(null);
   static publishSongSettings = signal<SongSettingsDto | null>(null);
