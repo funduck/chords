@@ -4,12 +4,12 @@ import { BrowserRouter } from "react-router";
 
 import Router from "./Router";
 import AnonymousLogin from "./features/auth/AnonymousLogin";
+import { RoomContextProvider } from "./features/room/RoomContext";
+import { RoomEventsConsumer, RoomEventsPublisher } from "./features/room/RoomEvents";
 import { SearchProvider } from "./features/search/SearchContext";
 import { SongContextProvider } from "./features/song/SongContext";
 import { ApiProvider } from "./hooks/Api";
-import { EventsConsumer, EventsPublisher } from "./hooks/Events";
 import { HeaderProvider } from "./hooks/Header";
-import { RoomServiceProvider } from "./hooks/RoomService";
 import { WebSocketProvider } from "./hooks/WebSocket";
 import "./index.css";
 import { theme } from "./theme";
@@ -20,18 +20,18 @@ function App() {
       <BrowserRouter>
         <ApiProvider>
           <WebSocketProvider>
-            <RoomServiceProvider>
-              <SongContextProvider>
+            <SongContextProvider>
+              <RoomContextProvider>
                 <HeaderProvider>
                   <SearchProvider>
-                    <EventsPublisher />
-                    <EventsConsumer />
+                    <RoomEventsPublisher />
+                    <RoomEventsConsumer />
                     <AnonymousLogin />
                     <Router />
                   </SearchProvider>
                 </HeaderProvider>
-              </SongContextProvider>
-            </RoomServiceProvider>
+              </RoomContextProvider>
+            </SongContextProvider>
           </WebSocketProvider>
         </ApiProvider>
       </BrowserRouter>

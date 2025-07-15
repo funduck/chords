@@ -1,40 +1,49 @@
 import { Button, CopyButton, Fieldset, Flex, Space, Stack, Text, TextInput } from "@mantine/core";
-import { useSignal } from "@telegram-apps/sdk-react";
-import { useContext, useEffect, useState } from "react";
+import { IconCopy, IconDoorExit, IconShare, IconShare2, IconShare3 } from "@tabler/icons-react";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router";
 
 import { Config } from "@src/config";
+import { useRoomsApi } from "@src/hooks/Api";
 import { useHeader } from "@src/hooks/Header";
-import { RoomServiceContext } from "@src/hooks/RoomService";
 import { useScrollPosition } from "@src/hooks/useScrollPosition";
-import { Signals } from "@src/services/signals-registry";
+
+import { useRoomContext } from "./RoomContext";
 
 function Room() {
   // Initialize scroll position management
   useScrollPosition();
+
+  const { roomState, createRoom, joinRoom, leaveRoom } = useRoomContext();
+  const room = roomState.room;
+
+  const roomsApi = useRoomsApi();
 
   const { setCenterContent } = useHeader();
   useEffect(() => {
     setCenterContent(<Text>Room</Text>);
   }, []);
 
-  const room = useSignal(Signals.room);
   const [roomCode, setRoomCode] = useState<string | null>(null);
-  const roomService = useContext(RoomServiceContext);
 
-  if (!roomService) {
-    return (
-      <>
-        <Text>Waiting for api...</Text>
-      </>
-    );
-  }
+  const currentURL = window.location.href;
+  const { roomCode: joinRoomCode } = useParams();
+  // TODO fix
+  useEffect(() => {
+    if (!roomsApi) {
+      return;
+    }
+    if (joinRoomCode) {
+      joinRoom(joinRoomCode);
+    }
+  }, [roomsApi]);
 
   if (!room) {
     return (
       <>
         <Stack>
           <Fieldset legend="Create Room" style={{ borderColor: "rgba(0,0,0,0)" }}>
-            <Button variant="outline" fullWidth onClick={() => roomService.createRoom()}>
+            <Button variant="outline" fullWidth onClick={() => createRoom()}>
               Create
             </Button>
           </Fieldset>
@@ -50,11 +59,7 @@ function Room() {
                     : undefined
                 }
               />
-              <Button
-                variant="outline"
-                onClick={() => roomService.joinRoom(roomCode!)}
-                disabled={(roomCode?.length || 0) != 6}
-              >
+              <Button variant="outline" onClick={() => joinRoom(roomCode!)} disabled={(roomCode?.length || 0) != 6}>
                 Join
               </Button>
             </Flex>
@@ -64,17 +69,44 @@ function Room() {
     );
   }
 
+  const joinLink = room.code ? `${currentURL.replace(/\/room.+/, "/room")}/join/${room.code}` : "";
+
   return (
     <>
       <Stack>
-        <CopyButton value={room?.code ?? ""}>
+        <CopyButton value={joinLink}>
           {({ copied, copy }) => (
             <Button variant="outline" disabled={room?.code == null} onClick={copy}>
-              {copied ? "Copied code" : `Copy code "${room?.code}"`}
+              {copied ? (
+                "Copied"
+              ) : (
+                <>
+                  <IconShare3 />
+                  <Space w="xs" />
+                  Copy join link
+                </>
+              )}
             </Button>
           )}
         </CopyButton>
-        <Button variant="outline" onClick={() => roomService.leaveRoom(room)}>
+        <CopyButton value={room?.code ?? ""}>
+          {({ copied, copy }) => (
+            <Button variant="outline" disabled={room?.code == null} onClick={copy}>
+              {copied ? (
+                "Copied"
+              ) : (
+                <>
+                  <IconCopy />
+                  <Space w="xs" />
+                  Copy code {room?.code}
+                </>
+              )}
+            </Button>
+          )}
+        </CopyButton>
+        <Button variant="outline" onClick={() => leaveRoom()}>
+          <IconDoorExit />
+          <Space w="xs" />
           Leave Room
         </Button>
       </Stack>

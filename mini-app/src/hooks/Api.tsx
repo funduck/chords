@@ -1,5 +1,5 @@
 import { useSignal } from "@telegram-apps/sdk-react";
-import { ReactNode, createContext, useEffect, useState } from "react";
+import { ReactNode, createContext, useContext, useEffect, useState } from "react";
 
 import { Config } from "@src/config";
 import {
@@ -122,4 +122,36 @@ export function ApiProvider({ children }: { children: ReactNode }) {
       </RoomsApiContext.Provider>
     </AuthApiContext.Provider>
   );
+}
+
+export function useAuthApi() {
+  const api = useContext(AuthApiContext);
+  if (!api) {
+    throw new Error("Auth API is not available. Make sure to wrap your component with ApiProvider.");
+  }
+  return api;
+}
+
+export function useRoomsApi() {
+  const api = useContext(RoomsApiContext);
+  // if (!api) {
+  //   throw new Error("Rooms API is not available. Make sure to wrap your component with ApiProvider.");
+  // }
+  return api;
+}
+
+export function useArtistsApi() {
+  const api = useContext(ArtistsApiContext);
+  // if (!api) {
+  //   throw new Error("Artists API is not available. Make sure to wrap your component with ApiProvider.");
+  // }
+  return api;
+}
+
+export function useSongsApi() {
+  const api = useContext(SongsApiContext);
+  // if (!api) {
+  //   throw new Error("Songs API is not available. Make sure to wrap your component with ApiProvider.");
+  // }
+  return api;
 }

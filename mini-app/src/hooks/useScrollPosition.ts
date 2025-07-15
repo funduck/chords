@@ -81,6 +81,8 @@ export function useScrollPosition(ref?: React.RefObject<HTMLDivElement>) {
       saveCurrentScrollPosition();
     };
 
+    let timer: any;
+
     // Save scroll position periodically while scrolling
     const handleScroll = () => {
       const currentPosition = ref?.current
@@ -95,8 +97,8 @@ export function useScrollPosition(ref?: React.RefObject<HTMLDivElement>) {
       scrollPositionRef.current = currentPosition;
 
       // Debounce the save operation
-      clearTimeout(window.scrollSaveTimeout);
-      window.scrollSaveTimeout = setTimeout(() => {
+      clearTimeout(timer);
+      timer = setTimeout(() => {
         saveScrollPosition(location.pathname, currentPosition);
       }, 100);
     };
@@ -109,7 +111,7 @@ export function useScrollPosition(ref?: React.RefObject<HTMLDivElement>) {
     return () => {
       window.removeEventListener("beforeunload", handleBeforeUnload);
       scrollElement.removeEventListener("scroll", handleScroll);
-      clearTimeout(window.scrollSaveTimeout);
+      clearTimeout(timer);
     };
   }, [location.pathname, ref]);
 
@@ -123,11 +125,4 @@ export function useScrollPosition(ref?: React.RefObject<HTMLDivElement>) {
     restoreScrollPosition: () => restoreScrollPosition(location.pathname),
     getScrollPosition: () => getScrollPosition(location.pathname),
   };
-}
-
-// Extend Window interface to include our timeout
-declare global {
-  interface Window {
-    scrollSaveTimeout: number;
-  }
 }

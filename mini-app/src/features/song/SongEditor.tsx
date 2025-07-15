@@ -51,6 +51,7 @@ function SongEditor({ currentSong }: { currentSong?: boolean }) {
   return (
     <>
       <Textarea
+        size="lg"
         ref={ref}
         autosize
         placeholder="Paste song lyrics and chords here..."

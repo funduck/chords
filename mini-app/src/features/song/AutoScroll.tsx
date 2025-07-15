@@ -1,43 +1,27 @@
-import { useSignal } from "@telegram-apps/sdk-react";
 import { useEffect, useRef } from "react";
 
 import { Config } from "@src/config";
 import { useScrollPosition } from "@src/hooks/useScrollPosition";
-import { Signals } from "@src/services/signals-registry";
 import { estimateFontSize } from "@src/utils/font";
 
 import { useSongContext } from "./SongContext";
 
-type OnScrollPositionChange = (position: { x: number; y: number }) => void;
-
-function AutoScrollManager({
-  viewportRef,
-  onScrollPositionChangeInit,
-}: {
-  viewportRef: React.RefObject<HTMLDivElement>;
-  onScrollPositionChangeInit: (fn: OnScrollPositionChange) => void;
-}) {
-  const room = useSignal(Signals.room);
-
-  const { songState, applyChanges } = useSongContext();
+function AutoScrollManager({ viewportRef }: { viewportRef: React.RefObject<HTMLDivElement> }) {
+  const { songState, updateSongState } = useSongContext();
 
   const enabled = songState?.autoScrollOptions?.enabled ?? Config.AutoScrollEnabled;
   const speed = songState?.autoScrollOptions?.speed ?? Config.AutoScrollSpeed;
   const interval = songState?.autoScrollOptions?.interval ?? Config.AutoScrollInterval;
 
-  const applySongScroll = applyChanges?.applySongScroll;
-  const applySongSettings = applyChanges?.applySongSettings;
-
   // Initialize scroll position management
-  const { saveScrollPosition } = useScrollPosition(viewportRef);
+  useScrollPosition(viewportRef);
 
   // This flag prevents emitting scroll events we are applying scroll events from room
-  const emitScrollEvent = useRef(true);
+  const allowScrollEvent = useRef(true);
 
   // This is used to debounce the scroll events when user scrolls manually
   const emittingScrollTimeout = useRef(null as ReturnType<typeof setTimeout> | null);
 
-  // HANDLE SYNC SCROLLING IN ROOM
   // Auto scrolling
   useEffect(() => {
     if (viewportRef.current && enabled && interval && speed) {
@@ -56,12 +40,7 @@ function AutoScrollManager({
         }
 
         // Prevent emitting scroll events while auto-scrolling
-        emitScrollEvent.current = false;
-        viewportRef.current.onscrollend = () => {
-          setTimeout(() => {
-            emitScrollEvent.current = true;
-          }, 10);
-        };
+        allowScrollEvent.current = false;
 
         viewportRef.current.scrollBy({
           top: scrollSpeed,
@@ -73,63 +52,78 @@ function AutoScrollManager({
         clearInterval(_interval);
       };
     }
-  }, [room, viewportRef.current, enabled, interval, speed]);
+  }, [viewportRef.current, enabled, interval, speed]);
+
   // Emitting scroll events
   function onScrollPositionChange() {
-    saveScrollPosition();
-
-    if (!room) {
-      return;
-    }
     if (!viewportRef.current) {
       console.error("Song container not found");
       return;
     }
-    if (!emitScrollEvent.current) {
+    if (!allowScrollEvent.current) {
       return;
     }
-    const scrollPercent =
-      (viewportRef.current!.scrollTop / (viewportRef.current!.scrollHeight - viewportRef.current!.clientHeight)) * 100;
 
     // Debounce scroll events to avoid flooding the signal
     if (emittingScrollTimeout.current) {
-      clearTimeout(emittingScrollTimeout.current);
-      emittingScrollTimeout.current = null;
+      return;
     }
+
     emittingScrollTimeout.current = setTimeout(() => {
-      Signals.publishSongScroll.set(scrollPercent);
+      const scrollPercent =
+        (viewportRef.current!.scrollTop / (viewportRef.current!.scrollHeight - viewportRef.current!.clientHeight)) *
+        100;
+      updateSongState({
+        scrollPosition: scrollPercent,
+      });
       console.debug("Scroll event emitted:", scrollPercent);
-    }, 50);
+      emittingScrollTimeout.current = null;
+    }, 50); // Debounce time in milliseconds
   }
-  onScrollPositionChangeInit(onScrollPositionChange);
+
+  // Attach scroll event listener
+  useEffect(() => {
+    if (!viewportRef.current) {
+      console.debug("Song container not found, skipping scroll event listener");
+      return;
+    }
+    let timer: any;
+    viewportRef.current.onscroll = onScrollPositionChange;
+    viewportRef.current.onscrollend = () => {
+      if (timer) {
+        clearTimeout(timer);
+      }
+      timer = setTimeout(() => {
+        allowScrollEvent.current = true;
+      }, 10); // Adding a small delay to allow scroll event to be processed
+    };
+    return () => {
+      if (viewportRef.current) {
+        viewportRef.current.onscroll = null;
+        viewportRef.current.onscrollend = null;
+      }
+    };
+  }, [viewportRef.current]);
+
   // Applying scroll events
   useEffect(() => {
-    if (!room) {
-      return;
-    }
-    if (applySongScroll == null) {
-      return;
-    }
     if (!viewportRef.current) {
       console.debug("Apply scroll: song container not found");
       return;
     }
+    if (songState.applyScrollPosition == null) {
+      return;
+    }
 
-    console.debug("Applying scroll:", applySongScroll);
-
-    // applySongScroll is a percentage (0-100)
-    const scrollTop = (applySongScroll / 100) * (viewportRef.current.scrollHeight - viewportRef.current.clientHeight);
+    // songState.applyScrollPosition is a percentage (0-100)
+    const scrollTop =
+      (songState.applyScrollPosition / 100) * (viewportRef.current.scrollHeight - viewportRef.current.clientHeight);
 
     // Prevent emitting scroll events while applying scroll
-    emitScrollEvent.current = false;
-    viewportRef.current.onscrollend = () => {
-      emitScrollEvent.current = true;
-    };
+    allowScrollEvent.current = false;
 
     viewportRef.current.scrollTo({ top: scrollTop, behavior: "smooth" });
-
-    Signals.applySongScroll.set(null); // Clear the signal after applying
-  }, [room, viewportRef.current, applySongScroll, applySongSettings?.auto_scroll]);
+  }, [viewportRef.current, songState.applyScrollPosition]);
 
   return <></>;
 }

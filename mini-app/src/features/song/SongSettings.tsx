@@ -1,8 +1,7 @@
 import { Button, Flex, Text } from "@mantine/core";
-import { IconMinus, IconPlayerPlayFilled, IconPlayerStop, IconPlus } from "@tabler/icons-react";
+import { IconEdit, IconEye, IconMinus, IconPlayerPlayFilled, IconPlayerStop, IconPlus } from "@tabler/icons-react";
 import { useEffect } from "react";
 
-import Switch from "@src/components/Switch";
 import { Config } from "@src/config";
 import { useHeader } from "@src/hooks/Header";
 
@@ -33,14 +32,13 @@ function AutoScrollPlayStopSettings() {
 
 function AutoScrollSpeedSettings() {
   const { songState, updateAutoScrollOptions } = useSongContext();
-  const enabled = songState.autoScrollOptions?.enabled ?? Config.AutoScrollEnabled;
   const speed = songState.autoScrollOptions?.speed ?? Config.AutoScrollSpeed;
 
   return (
     <Slider
       label="Auto scroll speed"
       min={1}
-      disabled={!enabled}
+      disabled={!songState.autoScrollOptions}
       onChange={(e) => {
         const speed = e;
         updateAutoScrollOptions({
@@ -58,15 +56,21 @@ function SongDisplaySettings() {
   const displayMode = songState.displayOptions?.mode || "render";
 
   return (
-    <Switch
-      label={"Editor mode"}
-      checked={displayMode == "editor"}
-      onChange={(e) => {
+    <Button
+      variant="subtle"
+      disabled={!songState}
+      onClick={() =>
         updateDisplayOptions({
-          mode: e ? "editor" : "render",
-        });
-      }}
-    />
+          mode: displayMode == "render" ? "editor" : "render",
+        })
+      }
+    >
+      {displayMode == "editor" ? (
+        <IconEye color="var(--mantine-color-text)" />
+      ) : (
+        <IconEdit color="var(--mantine-color-text)" />
+      )}
+    </Button>
   );
 }
 

@@ -89,9 +89,8 @@ function Router() {
         {
           id: "song",
           text: "Play song",
-          link: songId ? RoutesEnum.Songs(songId) : RoutesEnum.Editor,
-          // hidden: !song,
-          hidden: false,
+          link: RoutesEnum.Songs(songId),
+          hidden: !songId,
         },
         {
           id: "editor",
@@ -156,15 +155,15 @@ function Router() {
       <AppShell.Header>
         <Group justify="space-between" ta={"center"} align="center" style={{ height: "100%" }}>
           {/* Burger on the left */}
-          <Group gap="sm">
+          <Group>
             <Burger opened={navbarOpened} onClick={toggleNavbar} ml="xs" />
           </Group>
 
           {/* Center content is optional */}
-          {centerContent && <Group gap="sm">{centerContent}</Group>}
+          {centerContent && <Group>{centerContent}</Group>}
 
           {/* Settings menu on the right with also optional content, except theme switch */}
-          <Group gap="sm">
+          <Group>
             <SettingsMenu />
           </Group>
         </Group>
@@ -215,6 +214,7 @@ function Router() {
           <Route path="songs/:songId" element={<Song />} />
           <Route path="editor" element={<NewSong />} />
           <Route path="room" element={<Room />} />
+          <Route path="room/join/:roomCode" element={<Room />} />
           <Route path="search/artists" element={<Artist />} />
           <Route path="artists/:artistId" element={<Artist />} />
         </Routes>

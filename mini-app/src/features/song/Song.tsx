@@ -28,12 +28,7 @@ function Song() {
   const songViewportRef = useRef<HTMLDivElement>(null);
 
   let onScrollPositionChange;
-  const autoScrollManager = (
-    <AutoScrollManager
-      viewportRef={songViewportRef}
-      onScrollPositionChangeInit={(fn) => (onScrollPositionChange = fn)}
-    />
-  );
+  const autoScrollManager = <AutoScrollManager viewportRef={songViewportRef} />;
 
   return (
     <>

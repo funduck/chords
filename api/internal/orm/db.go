@@ -3,6 +3,7 @@ package orm
 import (
 	"context"
 	"database/sql"
+	"errors"
 
 	"chords.com/api/internal/config"
 	"chords.com/api/internal/logger"
@@ -104,7 +105,7 @@ func IsRecordNotFoundError(err error) bool {
 	if err == nil {
 		return false
 	}
-	if err == gorm.ErrRecordNotFound {
+	if errors.Is(err, gorm.ErrRecordNotFound) || err == gorm.ErrRecordNotFound {
 		return true
 	}
 	return false

@@ -2,9 +2,10 @@ import { ReactNode, createContext, useContext, useEffect, useState } from "react
 import { useNavigate } from "react-router";
 
 import { RoutesEnum } from "@src/Router";
+import { Config } from "@src/config";
 import { SongEntity, SongsApiContext } from "@src/hooks/Api";
 
-interface AutoScrollOptions {
+export interface AutoScrollOptions {
   enabled?: boolean;
   speed?: number; // Speed in percents (1-100)
   interval?: number; // Interval in milliseconds
@@ -23,23 +24,13 @@ interface SongState {
   newSheet?: string; // For new song
   displayOptions?: DisplayOptions;
   autoScrollOptions?: AutoScrollOptions;
-}
-
-interface ApplyChanges {
-  applySongScroll?: number; // Scroll position in percents
-  applySongSettings?: {
-    auto_scroll?: boolean;
-    auto_scroll_interval?: number;
-    auto_scroll_speed?: number;
-  };
+  scrollPosition?: number; // Current scroll position in percents
+  applyScrollPosition?: number;
 }
 
 interface SongContextType {
   // STATE
   songState: SongState;
-
-  // APPLY CHANGES
-  applyChanges?: ApplyChanges; // This is used to apply changes from the room
 
   // BASIC UPDATE
   updateSongState(updates: Partial<SongState>): void;
@@ -58,7 +49,17 @@ interface SongContextType {
 const SongContext = createContext<SongContextType | undefined>(undefined);
 
 export function SongContextProvider({ children }: { children: ReactNode }) {
-  const [songState, setSongState] = useState<SongState>({});
+  const [songState, setSongState] = useState<SongState>({
+    autoScrollOptions: {
+      enabled: false,
+      speed: Config.AutoScrollSpeed,
+      interval: Config.AutoScrollInterval,
+    },
+    displayOptions: {
+      mode: "render",
+      transpose: 0,
+    },
+  });
 
   const songsApi = useContext(SongsApiContext);
 

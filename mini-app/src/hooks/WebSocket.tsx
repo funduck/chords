@@ -1,5 +1,5 @@
 import { useSignal } from "@telegram-apps/sdk-react";
-import { ReactNode, createContext, useEffect, useState } from "react";
+import { ReactNode, createContext, useContext, useEffect, useState } from "react";
 
 import { Config } from "@src/config";
 import { Signals } from "@src/services/signals-registry";
@@ -47,4 +47,12 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
   }, [accessToken]);
 
   return <WebSocketContext.Provider value={ws}>{children}</WebSocketContext.Provider>;
+}
+
+export function useWebSocket() {
+  const ws = useContext(WebSocketContext);
+  // if (!ws) {
+  //   throw new Error("WebSocket is not available. Make sure to wrap your component with WebSocketProvider.");
+  // }
+  return ws;
 }
