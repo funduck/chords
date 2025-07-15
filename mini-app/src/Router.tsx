@@ -1,6 +1,12 @@
 import { Anchor, AppShell, Burger, Button, Flex, Group, Menu, Space, Text, em } from "@mantine/core";
 import { useDisclosure, useMediaQuery } from "@mantine/hooks";
-import { IconSettings, IconSettingsFilled } from "@tabler/icons-react";
+import {
+  IconChevronCompactRight,
+  IconChevronRight,
+  IconPoint,
+  IconSettings,
+  IconSettingsFilled,
+} from "@tabler/icons-react";
 import { useSignal } from "@telegram-apps/sdk-react";
 import { useEffect } from "react";
 import { Route, Routes, useLocation, useNavigate } from "react-router";
@@ -149,6 +155,7 @@ function Router() {
       header={{ height: 60 }}
       navbar={{ width: 300, breakpoint: "sm", collapsed: { mobile: !navbarOpened, desktop: !navbarOpened } }}
       transitionDuration={150}
+      transitionTimingFunction="ease-in-out"
       padding="md"
       style={{ display: "flex", flexDirection: "column", height: "100vh" }}
     >
@@ -175,7 +182,7 @@ function Router() {
             .filter((g) => g.tabs.length)
             .map((group) => (
               <>
-                <Text>{group.group}</Text>
+                <Text size="xl">{group.group}</Text>
                 {group.tabs
                   .filter((t) => !t.hidden)
                   .map(({ id, link, text }) => (
@@ -185,14 +192,17 @@ function Router() {
                       key={id}
                       id={id}
                       onClick={() => {
-                        isMobile && toggleNavbar();
                         navigate(link);
+                        setTimeout(() => {
+                          isMobile && toggleNavbar();
+                        }, 150);
                       }}
                     >
                       <Anchor>
-                        <Text size="xl" fw={isTabActive(link) ? 600 : 500}>
-                          {text}
-                        </Text>
+                        <Flex align="center">
+                          {isTabActive(link) && <IconChevronRight />}
+                          <Text size="lg">{text}</Text>
+                        </Flex>
                       </Anchor>
                     </Button>
                   ))}
