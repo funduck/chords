@@ -5,12 +5,13 @@ import { RoutesEnum } from "@src/Router";
 import { RoomEntity, useRoomsApi } from "@src/hooks/Api";
 import { useWebSocket } from "@src/hooks/WebSocket";
 
-import { useSongContext } from "../song/SongContext";
 import { SongSettingsDto } from "../song/settings";
 
 export type RoomStateDto = {
   song_id: number | null;
   song_settings: SongSettingsDto;
+  song_sheet: string | null;
+  new_sheet: string | null;
 };
 
 interface RoomState {
@@ -18,7 +19,7 @@ interface RoomState {
   syncEnabled?: boolean;
 }
 
-type EventNamesEnum = "song_id" | "song_scroll" | "song_settings";
+export type EventNamesEnum = "song_id" | "song_scroll" | "song_settings" | "song_sheet" | "new_sheet";
 
 type PublishState = Partial<Record<EventNamesEnum, { at: number; value: any }>>; // Map of event names to timestamps
 

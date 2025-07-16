@@ -13,7 +13,7 @@ import SongSettings from "./SongSettings";
 function Song() {
   const { songState, loadSong } = useSongContext();
   const song = songState.loadedSong;
-  const sheet = songState.sheet || song?.sheet || "";
+  const sheet = songState.songSheet || song?.sheet || "";
   const displayMode = songState.displayOptions?.mode || "render";
   const transposeSong = songState.displayOptions?.transpose || 0;
 

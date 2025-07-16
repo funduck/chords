@@ -10,8 +10,8 @@ import { Signals } from "@src/services/signals-registry";
 
 import { SongSettingsDto } from "@features/song/settings";
 
-import { AutoScrollOptions, useSongContext } from "../song/SongContext";
-import { RoomStateDto, useRoomContext } from "./RoomContext";
+import { useSongContext } from "../song/SongContext";
+import { EventNamesEnum, RoomStateDto, useRoomContext } from "./RoomContext";
 
 class Event {
   // These fields are accepted by the server
@@ -48,7 +48,7 @@ class Event {
 class RoomEvent {
   private event: Event;
 
-  constructor(obj: Event | { userId: number; roomId: number; type: string; data: any }) {
+  constructor(obj: Event | { userId: number; roomId: number; type: EventNamesEnum; data: any }) {
     if (obj instanceof Event) {
       this.event = obj;
       return;
@@ -81,8 +81,8 @@ class RoomEvent {
     return parseInt(re[1], 10);
   }
 
-  get type(): string {
-    return this.event.type;
+  get type(): EventNamesEnum {
+    return this.event.type as EventNamesEnum;
   }
 
   get data(): any {
@@ -100,12 +100,18 @@ export function RoomEventsPublisher() {
   const { roomState, publishState, applyState, publish } = useRoomContext();
   const room = roomState.room;
 
+  // Instead of useEffect for every field I track changes in "publishState"
   const publishedSongId = publishState["song_id"];
   const publishedScroll = publishState["song_scroll"];
   const publishedSettings = publishState["song_settings"];
+  const publishedSheet = publishState["song_sheet"];
+  const publishedNewSheet = publishState["new_sheet"];
 
+  // "applyState" is used to track the last applied state for each event
   const appliedScroll = applyState["song_scroll"];
   const appliedSettings = applyState["song_settings"];
+  const appliedSheet = applyState["song_sheet"];
+  const appliedNewSheet = applyState["new_sheet"];
 
   const now = +Date.now();
 
@@ -167,6 +173,43 @@ export function RoomEventsPublisher() {
       );
       publish("song_settings", cloneDeep(songState.autoScrollOptions));
     }
+    // For current song editor
+    if (
+      songState.songSheet &&
+      !isEqual(songState.songSheet, publishedSheet?.value) &&
+      (appliedSheet?.at ?? 0) + 1000 < now // Only publish if the last applied sheet was more than 1 second ago
+    ) {
+      events.push(
+        new RoomEvent({
+          userId: userId,
+          roomId: room.id!,
+          type: "song_sheet",
+          data: {
+            songId: songState.songId,
+            songSheet: songState.songSheet,
+          },
+        }),
+      );
+      publish("song_sheet", songState.songSheet);
+    }
+    // For new song editor
+    if (
+      songState.newSheet &&
+      !isEqual(songState.newSheet, publishedNewSheet?.value) &&
+      (appliedNewSheet?.at ?? 0) + 1000 < now // Only publish if the last applied new sheet was more than 1 second ago
+    ) {
+      events.push(
+        new RoomEvent({
+          userId: userId,
+          roomId: room.id!,
+          type: "new_sheet",
+          data: {
+            newSheet: songState.newSheet,
+          },
+        }),
+      );
+      publish("new_sheet", songState.newSheet);
+    }
 
     if (events.length) {
       for (const event of events) {
@@ -182,6 +225,8 @@ export function RoomEventsPublisher() {
 
       // roomState.song_settings = publishSongSettings || roomState.song_settings;
       stateDto.song_id = publishedSongId?.value || stateDto.song_id;
+      stateDto.song_sheet = publishedSheet?.value || stateDto.song_sheet;
+      stateDto.new_sheet = publishedNewSheet?.value || stateDto.new_sheet;
 
       if (!isEqual(stateDto, room.state)) {
         console.debug("Updating room state:", stateDto);
@@ -205,6 +250,8 @@ export function RoomEventsPublisher() {
     songState.scrollPosition,
     songState.songId,
     songState.autoScrollOptions,
+    songState.songSheet,
+    songState.newSheet,
   ]);
 
   return <></>;
@@ -243,6 +290,21 @@ export function RoomEventsConsumer() {
       }
       console.debug("Received event:", dto);
       switch (dto.type) {
+        case "song_sheet": {
+          apply("song_sheet", dto.data.songSheet);
+          updateSongState({
+            songId: dto.data.songId,
+            songSheet: dto.data.songSheet,
+          });
+          break;
+        }
+        case "new_sheet": {
+          apply("new_sheet", dto.data.newSheet);
+          updateSongState({
+            newSheet: dto.data.newSheet,
+          });
+          break;
+        }
         case "song_settings": {
           apply("song_settings", dto.data.songSettings);
           const settingsDto = new SongSettingsDto().fromJson(dto.data.songSettings);
@@ -258,7 +320,7 @@ export function RoomEventsConsumer() {
         case "song_scroll": {
           apply("song_scroll", dto.data.scrollPercent);
           updateSongState({
-            applyScrollPosition: dto.data.scrollPercent,
+            applyScrollPosition: dto.data.scrollPercent, // Had to use separate field to avoid infinite loop
           });
           break;
         }

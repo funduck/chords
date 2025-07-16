@@ -20,7 +20,7 @@ interface DisplayOptions {
 interface SongState {
   songId?: number;
   loadedSong?: SongEntity;
-  sheet?: string; // For current song display and editing
+  songSheet?: string; // For current song display and editing
   newSheet?: string; // For new song
   displayOptions?: DisplayOptions;
   autoScrollOptions?: AutoScrollOptions;
@@ -109,7 +109,7 @@ export function SongContextProvider({ children }: { children: ReactNode }) {
     updateSongState({
       songId: undefined,
       loadedSong: undefined,
-      sheet: undefined,
+      songSheet: undefined,
       displayOptions: {
         mode: "editor",
         transpose: 0,
@@ -136,7 +136,7 @@ export function SongContextProvider({ children }: { children: ReactNode }) {
         updateSongState({
           songId,
           loadedSong: s,
-          sheet: s.sheet,
+          songSheet: s.sheet,
           displayOptions: {
             mode: "render",
             transpose: 0,

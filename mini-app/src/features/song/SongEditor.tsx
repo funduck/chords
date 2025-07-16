@@ -6,24 +6,15 @@ import { useSongContext } from "./SongContext";
 function SongEditor({ currentSong }: { currentSong?: boolean }) {
   const { songState, updateSongState } = useSongContext();
 
-  const sheet = currentSong ? songState.sheet : songState.newSheet;
+  const sheet = currentSong ? songState.songSheet : songState.newSheet;
 
   const ref = useRef<HTMLTextAreaElement>(null);
 
+  const timer = useRef(null as ReturnType<typeof setTimeout> | null);
+
   function storeSheetValue(value: string) {
-    if (value && value.length) {
-      if (currentSong) {
-        updateSongState({
-          sheet: value,
-        });
-      } else {
-        updateSongState({
-          newSheet: value,
-        });
-      }
-      localStorage.setItem("editor-sheet", value);
-      console.debug("Stored sheet in localStorage", value.length);
-    }
+    localStorage.setItem("editor-sheet", value);
+    console.debug("Stored sheet in localStorage", value.length);
   }
 
   function loadSheetValue(): string {
@@ -35,6 +26,27 @@ function SongEditor({ currentSong }: { currentSong?: boolean }) {
     return "";
   }
 
+  function onSheetChanged() {
+    const value = ref.current!.value;
+    if (value && value.length) {
+      if (timer.current) {
+        clearTimeout(timer.current);
+      }
+      timer.current = setTimeout(() => {
+        if (currentSong) {
+          updateSongState({
+            songSheet: value,
+          });
+        } else {
+          updateSongState({
+            newSheet: value,
+          });
+        }
+        timer.current = null;
+      }, 1000); // Debounce changes by 1 second
+    }
+  }
+
   // Load the sheet from localStorage if not provided
   useEffect(() => {
     if (sheet && sheet.length) {
@@ -43,7 +55,7 @@ function SongEditor({ currentSong }: { currentSong?: boolean }) {
     } else {
       const savedSheet = loadSheetValue();
       if (savedSheet) {
-        storeSheetValue(savedSheet);
+        ref.current!.value = savedSheet;
       }
     }
   }, [sheet]);
@@ -55,7 +67,7 @@ function SongEditor({ currentSong }: { currentSong?: boolean }) {
         ref={ref}
         autosize
         placeholder="Paste song lyrics and chords here..."
-        onChange={(e) => storeSheetValue(e.target.value)}
+        onChange={onSheetChanged}
       />
     </>
   );
