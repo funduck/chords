@@ -17,14 +17,6 @@ function NewSong() {
 
   const songViewportRef = useRef<HTMLDivElement>(null);
 
-  let onScrollPositionChange;
-  const autoScrollManager = (
-    <AutoScrollManager
-      viewportRef={songViewportRef}
-      onScrollPositionChangeInit={(fn) => (onScrollPositionChange = fn)}
-    />
-  );
-
   useEffect(() => {
     if (!sheet || sheet.length === 0) {
       updateDisplayOptions({ mode: "editor" });
@@ -33,22 +25,25 @@ function NewSong() {
 
   return (
     <>
-      {autoScrollManager}
+      <AutoScrollManager viewportRef={songViewportRef} />
       <ChordDisplayManager />
       <SongSettings />
       <Box id="songbox" style={{ display: "flex", flex: 1, flexDirection: "column", height: "100%" }}>
         <ScrollArea
           viewportRef={songViewportRef}
           type="always"
-          onScrollPositionChange={onScrollPositionChange}
           style={{
             display: "flex",
             flexGrow: 1,
             paddingTop: "20px",
           }}
         >
-          {displayMode == "render" && <ChordProViewer sheet={sheet} transpose={transposeSong} />}
-          {displayMode == "editor" && <SongEditor currentSong={false} />}
+          <Box hidden={displayMode == "render"}>
+            <SongEditor currentSong={false} />
+          </Box>
+          <Box hidden={displayMode == "editor"}>
+            <ChordProViewer sheet={sheet} transpose={transposeSong} />
+          </Box>
         </ScrollArea>
       </Box>
     </>
