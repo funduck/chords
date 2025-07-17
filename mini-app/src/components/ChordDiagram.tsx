@@ -46,13 +46,25 @@ function ChordDiagram({ name }: { name: string }) {
   const svg = <Chord key={name} chord={position} instrument={instrument} lite={lite} />;
 
   return (
-    <Card w={"250px"} style={{ backgroundColor: colorScheme == "dark" ? "gray" : "" }}>
-      <Card.Section ml={"0px"}>{svg}</Card.Section>
+    <Flex direction={"column"} align={"center"} gap={"md"}>
+      <Text size="1.4em" c="primary" fw={500}>
+        {chord.key}
+        {chord.suffix}
+      </Text>
+      <Card
+        w={"250px"}
+        style={{
+          backgroundColor: colorScheme == "dark" ? "var(--mantine-color-gray-5)" : "var(--mantine-color-gray-1)",
+        }}
+      >
+        <Card.Section ml={"0px"}>{svg}</Card.Section>
+        {comment && (
+          <Text size="sm" c="dimmed" mt="xs">
+            {comment}
+          </Text>
+        )}
+      </Card>
       <Flex direction={"column"} ta={"center"}>
-        <Text size="1.4em" c="primary" fw={500}>
-          {chord.key}
-          {chord.suffix}
-        </Text>
         <Flex direction={"row"} justify={"space-between"} align={"center"} ta="center">
           <Button variant="subtle" c="primary" onClick={posDown}>
             <IconChevronLeft />
@@ -67,12 +79,7 @@ function ChordDiagram({ name }: { name: string }) {
           </Button>
         </Flex>
       </Flex>
-      {comment && (
-        <Text size="sm" c="dimmed" mt="xs">
-          {comment}
-        </Text>
-      )}
-    </Card>
+    </Flex>
   );
 }
 
