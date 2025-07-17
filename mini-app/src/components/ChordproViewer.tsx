@@ -3,15 +3,35 @@ import * as Parser from "chordproject-parser";
 import { Chord, ChordProParser, HtmlTableFormatter } from "chordsheetjs";
 import { useEffect, useRef, useState } from "react";
 
+import { ChordProService } from "@src/services/chordpro/chordpro";
 import { estimateFontSize } from "@src/utils/font";
 
-function ChordProViewer({ sheet, raw, transpose }: { sheet: string; raw?: boolean; transpose?: number }) {
+function ChordProViewer({ sheet, transpose }: { sheet: string; transpose?: number }) {
   const ref = useRef<HTMLDivElement>(null);
   const [errText, setErrText] = useState("");
   const [width, setWidth] = useState(window.innerWidth);
   const [title, setTitle] = useState("");
   const [artist, setArtist] = useState("");
   const [composer, setComposer] = useState("");
+
+  function setArtists(artist: string | string[] | null) {
+    if (Array.isArray(artist)) {
+      setArtist(artist.join(", "));
+    } else if (typeof artist === "string") {
+      setArtist(artist);
+    } else {
+      setArtist("");
+    }
+  }
+  function setComposers(composer: string | string[] | null) {
+    if (Array.isArray(composer)) {
+      setComposer(composer.join(", "));
+    } else if (typeof composer === "string") {
+      setComposer(composer);
+    } else {
+      setComposer("");
+    }
+  }
 
   useEffect(() => {
     const handleWidthChange = () => {
@@ -30,77 +50,36 @@ function ChordProViewer({ sheet, raw, transpose }: { sheet: string; raw?: boolea
       return;
     }
     try {
-      if (raw) {
-        ref.current.innerHTML = `<pre>${sheet}</pre>`;
-        return; // If raw is true, we just display the raw sheet
-      }
-
       const font = estimateFontSize({ parent: ref.current, className: "lyrics" }); // Estimate font size for lyrics
 
       // We track screen changes via "width" but we need to use ref.current.offsetWidth to get the actual width of the container
       const maxLineLength = Math.floor((ref.current.offsetWidth || width) / font.width);
 
-      const parser0 = new Parser.ChordProParser();
-      const formater0 = new Parser.ChordProFormatter();
-      const parser1 = new ChordProParser();
-      const formater1 = new HtmlTableFormatter();
-      // chordproject-parser does better parsing while chordsheetjs does better formatting
-
-      const song0 = parser0.parse(sheet);
-      setTitle(song0.title || "");
-      setArtist([...song0.artists].join(", ") || "");
-      setComposer([...song0.composers].join(", ") || "");
-
-      const sheetLines = formater0.format(song0);
-      const fixedSheetLines: string[] = [];
-      for (const line of sheetLines) {
-        if (!line.startsWith("{") && line.length > maxLineLength) {
-          const rest = line.split(" ").reduce((acc, word) => {
-            if (acc.length + word.length + 1 > maxLineLength) {
-              fixedSheetLines.push(acc);
-              return word; // Start new line with the current word
-            }
-            return acc ? `${acc} ${word}` : word; // Add space if acc is not empty
-          }, "");
-          if (rest) {
-            fixedSheetLines.push(rest); // Add the last part if it exists
-          }
-        } else {
-          fixedSheetLines.push(line);
-        }
+      let song = ChordProService.parseToSong(sheet, {
+        maxLineLength,
+      });
+      if (transpose) {
+        song = ChordProService.transpose(song, transpose);
       }
-      const fixedSheet = fixedSheetLines.join("\n");
-      let song1 = parser1.parse(fixedSheet);
-      if (transpose != null && transpose != 0) {
-        console.debug("Transposing song by", transpose, "semitones");
-        let key = song1.key;
-        if (!key) {
-          key =
-            song1
-              .getChords()
-              .map((c) => Chord.parseOrFail(c).root?.note)
-              .find(Boolean) || "C"; // Default to C if no chords found
-          song1 = song1.setKey(key);
-          console.debug("No key found, using key:", key);
-        }
-        const newKey = song1.requireCurrentKey().transpose(transpose);
-        song1 = song1.changeKey(newKey);
-      }
-      const html = formater1.format(song1);
+
+      setTitle(song.title || "");
+      setArtists(song.artist);
+      setComposers(song.composer);
+
+      const formater = new HtmlTableFormatter();
+      const html = formater.format(song);
+
       ref.current.innerHTML = html;
       setErrText(""); // Clear any previous error
     } catch (e) {
       console.error("Error parsing song", e);
       setErrText(String(e));
     }
-  }, [ref, sheet, width, raw, transpose]);
-
-  if (errText) {
-    return <Box>Error parsing song: {errText}</Box>;
-  }
+  }, [ref, sheet, width, transpose]);
 
   return (
     <>
+      {errText && <Box>Error parsing song: {errText}</Box>}
       <Title>{title}</Title>
       <Text size="xl">Artist: {artist}</Text>
       <Text size="xl">Composer: {composer}</Text>

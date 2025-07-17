@@ -1,4 +1,4 @@
-import { Chord, ChordProParser } from "chordsheetjs";
+import { Chord, ChordProFormatter, ChordProParser, ChordsOverWordsParser, Song } from "chordsheetjs";
 
 export class ChordProService {
   static adjustLineLength(sheet: string, maxLineLength: number): string {
@@ -23,27 +23,50 @@ export class ChordProService {
     return resLines.join("\n");
   }
 
-  static parse(sheet: string, transpose?: number) {
-    const parser = new ChordProParser();
-
-    let song = parser.parse(sheet);
-
-    if (transpose != null && transpose != 0) {
-      let key = song.key;
-      if (!key) {
-        // Transposition requires a key, so we have to pick one
-        key =
-          song
-            .getChords()
-            .map((c) => Chord.parse(c)?.root?.note)
-            .find(Boolean) || "C"; // Default to C if no chords found
-        song = song.setKey(key);
-        console.debug("No key found, using key:", key);
-      }
-      const newKey = song.requireCurrentKey().transpose(transpose);
-      song = song.changeKey(newKey);
+  static parseToChordproSheet(
+    sheet: string,
+    options: { parse?: "chordsoverwords" | "chordpro"; maxLineLength?: number } = {},
+  ): string {
+    if (!sheet || !sheet.trim()) {
+      throw new Error("Empty sheet cannot be parsed");
     }
+    let parser: { parse: (sheet: string) => Song };
+    if (options.parse == "chordpro" || sheet.match(/{(title|artist|composer):/)) {
+      parser = new ChordProParser();
+    } else {
+      parser = new ChordsOverWordsParser();
+    }
+    const song = parser.parse(sheet);
+    const formater = new ChordProFormatter();
+    sheet = formater.format(song);
+    if (options.maxLineLength) {
+      sheet = this.adjustLineLength(sheet, options.maxLineLength);
+    }
+    return sheet;
+  }
 
-    return song;
+  static parseToSong(
+    sheet: string,
+    options: { parse?: "chordsoverwords" | "chordpro"; maxLineLength?: number } = {},
+  ): Song {
+    sheet = this.parseToChordproSheet(sheet, options);
+    const parser = new ChordProParser();
+    return parser.parse(sheet);
+  }
+
+  static transpose(song: Song, transpose: number): Song {
+    let key = song.key;
+    if (!key) {
+      // Transposition requires a key, so we have to pick one
+      key =
+        song
+          .getChords()
+          .map((c) => Chord.parse(c)?.root?.note)
+          .find(Boolean) || "C"; // Default to C if no chords found
+      song = song.setKey(key);
+      console.debug("No key found, using key:", key);
+    }
+    const newKey = song.requireCurrentKey().transpose(transpose);
+    return song.changeKey(newKey);
   }
 }

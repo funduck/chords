@@ -31,6 +31,7 @@
 
 .chordpro .lyrics {
     color: var(--mantine-color-lyrics-9);
+    font-weight: 500;
     font-size: 1em;
 }
 
@@ -42,12 +43,12 @@
 /* Song needs slightly different font size for mobile */
 @media (max-width: 1000px) {
     .chordpro .chord {
-        font-size: 1.1em;
+        font-size: 1.2em;
         font-weight: 700;
     }
     .chordpro .lyrics {
         font-size: 1.1em;
-        font-weight: 600;
+        font-weight: 500;
     }
 }
 

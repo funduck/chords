@@ -1,5 +1,7 @@
-import { Textarea } from "@mantine/core";
+import { Anchor, Space, Text, Textarea } from "@mantine/core";
 import { useEffect, useRef } from "react";
+
+import { ChordProService } from "@src/services/chordpro/chordpro";
 
 import { useSongContext } from "./SongContext";
 
@@ -50,8 +52,9 @@ function SongEditor({ currentSong }: { currentSong?: boolean }) {
   // Load the sheet from localStorage if not provided
   useEffect(() => {
     if (sheet && sheet.length) {
-      storeSheetValue(sheet);
-      ref.current!.value = sheet;
+      const formattedSheet = ChordProService.parseToChordproSheet(sheet, {});
+      storeSheetValue(formattedSheet);
+      ref.current!.value = formattedSheet;
     } else {
       const savedSheet = loadSheetValue();
       if (savedSheet) {
@@ -62,11 +65,16 @@ function SongEditor({ currentSong }: { currentSong?: boolean }) {
 
   return (
     <>
+      <Text>
+        Song is displayed using{" "}
+        <Anchor href="https://www.chordpro.org/chordpro/chordpro-introduction/">chordpro</Anchor> format.
+        <Space h="sm" />
+      </Text>
       <Textarea
         size="lg"
         ref={ref}
         autosize
-        placeholder="Paste song lyrics and chords here..."
+        placeholder="Paste song lyrics and chords here, it will be automatically formatted."
         onChange={onSheetChanged}
       />
     </>
