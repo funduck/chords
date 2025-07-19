@@ -73,7 +73,7 @@ func TestArtistService_normalizeName(t *testing.T) {
 func TestArtistService_CreateIfNotExists(t *testing.T) {
 	db := initForTest()
 	service := NewArtistService()
-	ctx := orm.SetDB(context.Background(), db)
+	ctx := orm.WithDB(context.Background(), db)
 
 	t.Run("Create new artist", func(t *testing.T) {
 		artist, err := service.CreateIfNotExists(ctx, "John Doe")
@@ -140,7 +140,7 @@ func TestArtistService_CreateIfNotExists(t *testing.T) {
 func TestArtistService_FindByName(t *testing.T) {
 	db := initForTest()
 	service := NewArtistService()
-	ctx := orm.SetDB(context.Background(), db)
+	ctx := orm.WithDB(context.Background(), db)
 
 	// Create test artist
 	created, err := service.CreateIfNotExists(ctx, "Test Artist")
@@ -178,7 +178,7 @@ func TestArtistService_FindByName(t *testing.T) {
 func TestArtistService_GetArtistByID(t *testing.T) {
 	db := initForTest()
 	service := NewArtistService()
-	ctx := orm.SetDB(context.Background(), db)
+	ctx := orm.WithDB(context.Background(), db)
 
 	// Create test artist
 	created, err := service.CreateIfNotExists(ctx, "Test Artist")
@@ -216,7 +216,7 @@ func TestArtistService_GetArtistByID(t *testing.T) {
 func TestArtistService_SearchArtists(t *testing.T) {
 	db := initForTest()
 	service := NewArtistService()
-	ctx := orm.SetDB(context.Background(), db)
+	ctx := orm.WithDB(context.Background(), db)
 
 	// Create test artists
 	testArtists := []string{

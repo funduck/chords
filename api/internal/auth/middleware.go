@@ -43,7 +43,7 @@ func Middleware(next http.Handler) http.Handler {
 			return
 		}
 
-		ctx := SetAccessToken(r.Context(), accessToken)
+		ctx := WithAccessToken(r.Context(), accessToken)
 
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})

@@ -43,6 +43,25 @@ func (s *LibraryService) EnsurePublicLibrary(ctx context.Context, name string) (
 	return &library, err
 }
 
+func (s *LibraryService) EnsureUserLibrary(ctx context.Context, userID uint) (*entity.Library, error) {
+	tx := orm.GetDB(ctx)
+	var library entity.Library
+	err := tx.Model(&entity.Library{}).
+		Where("type = ?", entity.LibraryType_Private).
+		Where("owner_id = ?", userID).
+		First(&library).Error
+	if err == nil {
+		return &library, err
+	}
+	if !orm.IsRecordNotFoundError(err) {
+		return nil, err // Some other error occurred
+	}
+	// Library not found, create it
+	library = entity.Library{OwnerID: userID, Type: entity.LibraryType_Private, Name: "My Library"}
+	err = tx.Create(&library).Error
+	return &library, err
+}
+
 func (s *LibraryService) AddSongToLibrary(ctx context.Context, library *entity.Library, song *entity.Song) error {
 	log := logger.GetLogger(ctx)
 	tx := orm.GetDB(ctx)

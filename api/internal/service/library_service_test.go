@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestLibraryService(t *testing.T) {
+func TestLibraryService_Public(t *testing.T) {
 	config.InitForTest()
 	orm.InitForTest()
 
@@ -217,5 +217,213 @@ func TestLibraryService(t *testing.T) {
 		svc2 := NewLibraryService()
 
 		assert.Equal(t, svc1, svc2, "expected NewLibraryService to return the same instance")
+	})
+}
+
+func TestLibraryService_Private(t *testing.T) {
+	config.InitForTest()
+	orm.InitForTest()
+
+	svc := NewLibraryService()
+
+	tx := orm.GetDBInstance()
+	var err error
+
+	// Create test users
+	user1 := entity.User{}
+	err = tx.Create(&user1).Error
+	assert.NoError(t, err, "failed to create test user 1")
+
+	user2 := entity.User{}
+	err = tx.Create(&user2).Error
+	assert.NoError(t, err, "failed to create test user 2")
+
+	// Create test data
+	artist := entity.Artist{
+		Name: "Test Artist",
+	}
+	err = tx.Create(&artist).Error
+	assert.NoError(t, err, "failed to create test artist")
+
+	song := entity.Song{
+		Title:   "Test Private Song",
+		Artists: []*entity.Artist{&artist},
+		Format:  "chordpro",
+		Sheet: `
+        {title: Test Private Song}
+        {artist: Test Artist}
+        Verse 1:
+        [C]This is a [G]private [C]song
+        [Am]With some [F]lyrics`,
+	}
+	err = tx.Create(&song).Error
+	assert.NoError(t, err, "failed to create test song")
+
+	song2 := entity.Song{
+		Title:   "Another Private Song",
+		Artists: []*entity.Artist{&artist},
+		Format:  "chordpro",
+		Sheet: `
+        {title: Another Private Song}
+        {artist: Test Artist}
+        Verse 1:
+        [G]Another [D]private [G]song
+        [Em]With different [C]lyrics`,
+	}
+	err = tx.Create(&song2).Error
+	assert.NoError(t, err, "failed to create second test song")
+
+	t.Run("EnsureUserLibrary creates new private library", func(t *testing.T) {
+		ctx := context.Background()
+
+		library, err := svc.EnsureUserLibrary(ctx, user1.ID)
+		assert.NoError(t, err, "expected no error when creating user library")
+		assert.NotNil(t, library, "expected library to be created")
+		assert.Equal(t, "My Library", library.Name, "expected library name %q, got %q", "My Library", library.Name)
+		assert.Equal(t, entity.LibraryType_Private, library.Type, "expected library type %q, got %q", entity.LibraryType_Private, library.Type)
+		assert.Equal(t, user1.ID, library.OwnerID, "expected library owner ID %d, got %d", user1.ID, library.OwnerID)
+		assert.NotZero(t, library.ID, "expected library ID to be set")
+	})
+
+	t.Run("EnsureUserLibrary returns existing private library", func(t *testing.T) {
+		ctx := context.Background()
+
+		// First call - should return existing library
+		library1, err := svc.EnsureUserLibrary(ctx, user1.ID)
+		assert.NoError(t, err, "expected no error when getting existing user library")
+		assert.NotNil(t, library1, "expected library to be returned")
+
+		// Second call - should return the same library
+		library2, err := svc.EnsureUserLibrary(ctx, user1.ID)
+		assert.NoError(t, err, "expected no error when getting existing user library again")
+		assert.NotNil(t, library2, "expected library to be returned again")
+		assert.Equal(t, library1.ID, library2.ID, "expected same library ID %d, got %d", library1.ID, library2.ID)
+		assert.Equal(t, library1.Name, library2.Name, "expected same library name %q, got %q", library1.Name, library2.Name)
+		assert.Equal(t, library1.Type, library2.Type, "expected same library type %q, got %q", library1.Type, library2.Type)
+		assert.Equal(t, library1.OwnerID, library2.OwnerID, "expected same library owner ID %d, got %d", library1.OwnerID, library2.OwnerID)
+	})
+
+	t.Run("EnsureUserLibrary creates separate libraries for different users", func(t *testing.T) {
+		ctx := context.Background()
+
+		library1, err := svc.EnsureUserLibrary(ctx, user1.ID)
+		assert.NoError(t, err, "expected no error when creating first user library")
+		assert.NotNil(t, library1, "expected first library to be created")
+
+		library2, err := svc.EnsureUserLibrary(ctx, user2.ID)
+		assert.NoError(t, err, "expected no error when creating second user library")
+		assert.NotNil(t, library2, "expected second library to be created")
+
+		assert.NotEqual(t, library1.ID, library2.ID, "expected different library IDs, got same ID %d", library1.ID)
+		assert.Equal(t, user1.ID, library1.OwnerID, "expected first library owner ID %d, got %d", user1.ID, library1.OwnerID)
+		assert.Equal(t, user2.ID, library2.OwnerID, "expected second library owner ID %d, got %d", user2.ID, library2.OwnerID)
+		assert.Equal(t, entity.LibraryType_Private, library1.Type, "expected first library type %q, got %q", entity.LibraryType_Private, library1.Type)
+		assert.Equal(t, entity.LibraryType_Private, library2.Type, "expected second library type %q, got %q", entity.LibraryType_Private, library2.Type)
+	})
+
+	t.Run("AddSongToLibrary adds song to private library", func(t *testing.T) {
+		ctx := context.Background()
+
+		library, err := svc.EnsureUserLibrary(ctx, user1.ID)
+		assert.NoError(t, err, "expected no error when getting user library")
+		assert.NotNil(t, library, "expected library to be created")
+
+		err = svc.AddSongToLibrary(ctx, library, &song)
+		assert.NoError(t, err, "expected no error when adding song to private library")
+
+		// Verify song was added by checking the association
+		var count int64
+		err = tx.Model(&entity.Song{}).
+			Joins("JOIN library_songs ls ON ls.song_id = songs.id").
+			Where("ls.library_id = ?", library.ID).
+			Where("ls.song_id = ?", song.ID).
+			Count(&count).Error
+		assert.NoError(t, err, "expected no error when counting songs in private library")
+		assert.Equal(t, int64(1), count, "expected song count %d, got %d", 1, count)
+	})
+
+	t.Run("AddSongToLibrary handles duplicate songs in private library", func(t *testing.T) {
+		ctx := context.Background()
+
+		library, err := svc.EnsureUserLibrary(ctx, user2.ID)
+		assert.NoError(t, err, "expected no error when getting user library")
+		assert.NotNil(t, library, "expected library to be created")
+
+		// Add song first time
+		err = svc.AddSongToLibrary(ctx, library, &song)
+		assert.NoError(t, err, "expected no error when adding song to private library first time")
+
+		// Add same song second time - should not error
+		err = svc.AddSongToLibrary(ctx, library, &song)
+		assert.NoError(t, err, "expected no error when adding duplicate song to private library")
+
+		// Verify song exists only once
+		var count int64
+		err = tx.Model(&entity.Song{}).
+			Joins("JOIN library_songs ls ON ls.song_id = songs.id").
+			Where("ls.library_id = ?", library.ID).
+			Where("ls.song_id = ?", song.ID).
+			Count(&count).Error
+		assert.NoError(t, err, "expected no error when counting songs in private library")
+		assert.Equal(t, int64(1), count, "expected song count %d, got %d", 1, count)
+	})
+
+	t.Run("AddSongToLibrary adds multiple songs to private library", func(t *testing.T) {
+		ctx := context.Background()
+
+		library, err := svc.EnsureUserLibrary(ctx, user1.ID)
+		assert.NoError(t, err, "expected no error when getting user library")
+		assert.NotNil(t, library, "expected library to be created")
+
+		// Add second song (first song should already be there from previous test)
+		err = svc.AddSongToLibrary(ctx, library, &song2)
+		assert.NoError(t, err, "expected no error when adding second song to private library")
+
+		// Verify both songs are in the library
+		var count int64
+		err = tx.Model(&entity.Song{}).
+			Joins("JOIN library_songs ls ON ls.song_id = songs.id").
+			Where("ls.library_id = ?", library.ID).
+			Count(&count).Error
+		assert.NoError(t, err, "expected no error when counting songs in private library")
+		assert.Equal(t, int64(2), count, "expected song count %d, got %d", 2, count)
+	})
+
+	t.Run("Same song can be in different users' private libraries", func(t *testing.T) {
+		ctx := context.Background()
+
+		library1, err := svc.EnsureUserLibrary(ctx, user1.ID)
+		assert.NoError(t, err, "expected no error when getting first user library")
+		assert.NotNil(t, library1, "expected first library to be created")
+
+		library2, err := svc.EnsureUserLibrary(ctx, user2.ID)
+		assert.NoError(t, err, "expected no error when getting second user library")
+		assert.NotNil(t, library2, "expected second library to be created")
+
+		// Add same song to both users' libraries
+		err = svc.AddSongToLibrary(ctx, library1, &song2)
+		assert.NoError(t, err, "expected no error when adding song to first user library")
+
+		err = svc.AddSongToLibrary(ctx, library2, &song2)
+		assert.NoError(t, err, "expected no error when adding song to second user library")
+
+		// Verify song is in both libraries
+		var count1 int64
+		err = tx.Model(&entity.Song{}).
+			Joins("JOIN library_songs ls ON ls.song_id = songs.id").
+			Where("ls.library_id = ?", library1.ID).
+			Where("ls.song_id = ?", song2.ID).
+			Count(&count1).Error
+		assert.NoError(t, err, "expected no error when counting songs in first user library")
+		assert.Equal(t, int64(1), count1, "expected song count %d in first user library, got %d", 1, count1)
+
+		var count2 int64
+		err = tx.Model(&entity.Song{}).
+			Joins("JOIN library_songs ls ON ls.song_id = songs.id").
+			Where("ls.library_id = ?", library2.ID).
+			Where("ls.song_id = ?", song2.ID).
+			Count(&count2).Error
+		assert.NoError(t, err, "expected no error when counting songs in second user library")
+		assert.Equal(t, int64(1), count2, "expected song count %d in second user library, got %d", 1, count2)
 	})
 }

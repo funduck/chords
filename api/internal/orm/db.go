@@ -38,7 +38,7 @@ func GetDBInstance() *gorm.DB {
 //	func SetSQLDb(ctx context.Context, db *sql.DB) context.Context {
 //		return context.WithValue(ctx, sqldbKey, db)
 //	}
-func SetDB(ctx context.Context, db *gorm.DB) context.Context {
+func WithDB(ctx context.Context, db *gorm.DB) context.Context {
 	return context.WithValue(ctx, gormdbKey, db)
 }
 

@@ -134,3 +134,25 @@ func (s *SongService) SearchSongs(ctx context.Context, req *dto.SearchSongReques
 
 	return &entity.SongsList{Songs: songsList, Total: total}, nil
 }
+
+func (s *SongService) UpdateSong(ctx context.Context, id uint, req *dto.UpdateSongRequest) (*entity.Song, error) {
+	tx := orm.GetDB(ctx)
+
+	// Check if song exists
+	var song entity.Song
+	err := tx.First(&song, id).Error
+	if err != nil {
+		return nil, err // Song not found or other error
+	}
+
+	if req.Sheet != "" {
+		song.Sheet = req.Sheet
+	}
+
+	err = tx.Save(&song).Error
+	if err != nil {
+		return nil, err // Error saving updated song
+	}
+
+	return &song, nil
+}

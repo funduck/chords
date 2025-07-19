@@ -66,7 +66,7 @@ type accessTokenKeyType string
 
 var accessTokenKey accessTokenKeyType = "access_token"
 
-func SetAccessToken(ctx context.Context, at *AccessToken) context.Context {
+func WithAccessToken(ctx context.Context, at *AccessToken) context.Context {
 	if at == nil {
 		return ctx
 	}

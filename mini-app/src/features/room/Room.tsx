@@ -1,5 +1,5 @@
 import { Button, CopyButton, Fieldset, Flex, Space, Stack, Text, TextInput } from "@mantine/core";
-import { IconCopy, IconDoorExit, IconShare, IconShare2, IconShare3 } from "@tabler/icons-react";
+import { IconCopy, IconDoorExit, IconShare3 } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 
@@ -111,9 +111,9 @@ function Room() {
         </Button>
       </Stack>
       <Space h="md" />
-      {Config.IsDev && room.id && <Text>Room ID: {room.id}</Text>}
+      {/* {Config.IsDev && room.id && <Text>Room ID: {room.id}</Text>}
       {Config.IsDev && room.users && <Text>Users: {room.users?.map((u) => u.id).join(", ")}</Text>}
-      {Config.IsDev && room.state && <Text>State: {JSON.stringify(room.state)}</Text>}
+      {Config.IsDev && room.state && <Text>State: {JSON.stringify(room.state)}</Text>} */}
     </>
   );
 }

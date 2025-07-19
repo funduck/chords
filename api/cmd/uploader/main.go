@@ -36,7 +36,7 @@ func main() {
 	chordproParser := chordpro.NewParser()
 
 	ctx := context.Background()
-	ctx = orm.SetDB(ctx, orm.GetDBInstance())
+	ctx = orm.WithDB(ctx, orm.GetDBInstance())
 
 	fileList := strings.Split(*files, ",")
 

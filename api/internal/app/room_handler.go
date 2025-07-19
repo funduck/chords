@@ -28,7 +28,7 @@ func (a *App) CreateRoom(w http.ResponseWriter, r *http.Request) {
 
 	// Start a transaction
 	tx := orm.GetDB(r.Context())
-	orm.SetDB(r.Context(), tx.Begin())
+	orm.WithDB(r.Context(), tx.Begin())
 	defer tx.Rollback()
 
 	room, err := a.roomService.CreateRoom(r.Context(), accessToken)
