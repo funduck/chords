@@ -41,8 +41,8 @@ func (a *App) GetSongByID(w http.ResponseWriter, r *http.Request) {
 //	@Tags			Songs
 //	@Accept			json
 //	@Produce		json
-//	@Param			song	body	dto.CreateSongRequest	true	"Song details"
-//	@Success		201	{object}	entity.Song
+//	@Param			song	body		dto.CreateSongRequest	true	"Song details"
+//	@Success		201		{object}	entity.Song
 //	@Router			/api/songs [put]
 func (a *App) CreateSong(w http.ResponseWriter, r *http.Request) {
 	var req dto.CreateSongRequest
@@ -67,9 +67,9 @@ func (a *App) CreateSong(w http.ResponseWriter, r *http.Request) {
 //	@Tags			Songs
 //	@Accept			json
 //	@Produce		json
-//	@Param			id	path		int	true	"Song ID"
-//	@Param			song	body	dto.UpdateSongRequest	true	"Updated song details"
-//	@Success		200	{object}	entity.Song
+//	@Param			id		path		int						true	"Song ID"
+//	@Param			song	body		dto.UpdateSongRequest	true	"Updated song details"
+//	@Success		200		{object}	entity.Song
 //	@Router			/api/songs/{id} [patch]
 func (a *App) UpdateSong(w http.ResponseWriter, r *http.Request) {
 	songID, err := parseURLParamUint(w, r, "id")

@@ -1,4 +1,25 @@
 definitions:
+  chords_com_api_internal_dto.CreateSongRequest:
+    properties:
+      artists:
+        items:
+          type: string
+        type: array
+      composers:
+        items:
+          type: string
+        type: array
+      format:
+        $ref: '#/definitions/chords_com_api_internal_entity.SheetFormat'
+      sheet:
+        type: string
+      title:
+        type: string
+    required:
+    - format
+    - sheet
+    - title
+    type: object
   chords_com_api_internal_dto.SearchArtistRequest:
     properties:
       cursor_after:
@@ -42,6 +63,13 @@ definitions:
       return_total:
         default: true
         type: boolean
+    type: object
+  chords_com_api_internal_dto.UpdateSongRequest:
+    properties:
+      sheet:
+        type: string
+    required:
+    - sheet
     type: object
   chords_com_api_internal_entity.Artist:
     properties:
@@ -182,9 +210,11 @@ definitions:
   chords_com_api_internal_entity.SheetFormat:
     enum:
     - chordpro
+    - chords_over_words
     type: string
     x-enum-varnames:
     - SheetFormat_Chordpro
+    - SheetFormat_ChordsOverWords
   chords_com_api_internal_entity.Song:
     properties:
       artists:
@@ -569,6 +599,29 @@ paths:
       summary: Join a room
       tags:
       - Rooms
+  /api/songs:
+    put:
+      consumes:
+      - application/json
+      description: Create a new song with the provided details
+      operationId: createSong
+      parameters:
+      - description: Song details
+        in: body
+        name: song
+        required: true
+        schema:
+          $ref: '#/definitions/chords_com_api_internal_dto.CreateSongRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/chords_com_api_internal_entity.Song'
+      summary: Create a new song
+      tags:
+      - Songs
   /api/songs/{id}:
     get:
       consumes:
@@ -589,6 +642,33 @@ paths:
           schema:
             $ref: '#/definitions/chords_com_api_internal_entity.Song'
       summary: Get song by ID
+      tags:
+      - Songs
+    patch:
+      consumes:
+      - application/json
+      description: Update the details of an existing song
+      operationId: updateSong
+      parameters:
+      - description: Song ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Updated song details
+        in: body
+        name: song
+        required: true
+        schema:
+          $ref: '#/definitions/chords_com_api_internal_dto.UpdateSongRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/chords_com_api_internal_entity.Song'
+      summary: Update an existing song
       tags:
       - Songs
   /api/songs/search:

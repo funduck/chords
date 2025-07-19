@@ -368,6 +368,41 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/songs": {
+            "put": {
+                "description": "Create a new song with the provided details",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Songs"
+                ],
+                "summary": "Create a new song",
+                "operationId": "createSong",
+                "parameters": [
+                    {
+                        "description": "Song details",
+                        "name": "song",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/chords_com_api_internal_dto.CreateSongRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/chords_com_api_internal_entity.Song"
+                        }
+                    }
+                }
+            }
+        },
         "/api/songs/search": {
             "post": {
                 "description": "Search for songs using various parameters.",
@@ -446,6 +481,46 @@ const docTemplate = `{
                         }
                     }
                 }
+            },
+            "patch": {
+                "description": "Update the details of an existing song",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Songs"
+                ],
+                "summary": "Update an existing song",
+                "operationId": "updateSong",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Song ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Updated song details",
+                        "name": "song",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/chords_com_api_internal_dto.UpdateSongRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/chords_com_api_internal_entity.Song"
+                        }
+                    }
+                }
             }
         },
         "/ws": {
@@ -489,6 +564,37 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "chords_com_api_internal_dto.CreateSongRequest": {
+            "type": "object",
+            "required": [
+                "format",
+                "sheet",
+                "title"
+            ],
+            "properties": {
+                "artists": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "composers": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "format": {
+                    "$ref": "#/definitions/chords_com_api_internal_entity.SheetFormat"
+                },
+                "sheet": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
         "chords_com_api_internal_dto.SearchArtistRequest": {
             "type": "object",
             "properties": {
@@ -549,6 +655,17 @@ const docTemplate = `{
                 "return_total": {
                     "type": "boolean",
                     "default": true
+                }
+            }
+        },
+        "chords_com_api_internal_dto.UpdateSongRequest": {
+            "type": "object",
+            "required": [
+                "sheet"
+            ],
+            "properties": {
+                "sheet": {
+                    "type": "string"
                 }
             }
         },
@@ -751,10 +868,12 @@ const docTemplate = `{
         "chords_com_api_internal_entity.SheetFormat": {
             "type": "string",
             "enum": [
-                "chordpro"
+                "chordpro",
+                "chords_over_words"
             ],
             "x-enum-varnames": [
-                "SheetFormat_Chordpro"
+                "SheetFormat_Chordpro",
+                "SheetFormat_ChordsOverWords"
             ]
         },
         "chords_com_api_internal_entity.Song": {
