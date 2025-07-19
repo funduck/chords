@@ -604,6 +604,9 @@ const docTemplate = `{
                 "cursor_before": {
                     "type": "string"
                 },
+                "library_type": {
+                    "$ref": "#/definitions/chords_com_api_internal_entity.LibraryType"
+                },
                 "limit": {
                     "type": "integer",
                     "maximum": 100,
@@ -781,6 +784,12 @@ const docTemplate = `{
                 "updated_at"
             ],
             "properties": {
+                "artists": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/chords_com_api_internal_entity.Artist"
+                    }
+                },
                 "created_at": {
                     "type": "string"
                 },

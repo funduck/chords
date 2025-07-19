@@ -5,12 +5,14 @@ import (
 	"regexp"
 	"strings"
 
+	"chords.com/api/internal/auth"
 	"chords.com/api/internal/dto"
 	"chords.com/api/internal/entity"
 	"chords.com/api/internal/orm"
 )
 
-type ArtistService struct{}
+type ArtistService struct {
+}
 
 func NewArtistService() *ArtistService {
 	return &ArtistService{}
@@ -104,6 +106,24 @@ func (s *ArtistService) SearchArtists(ctx context.Context, req *dto.SearchArtist
 	}
 
 	q := tx.Model(&entity.Artist{})
+
+	// Apply library filtering if specified
+	if req.LibraryType == "" {
+		req.LibraryType = entity.LibraryType_Public
+	}
+	if req.LibraryType != entity.LibraryType_Public {
+		q = q.Joins("JOIN library_artists la ON la.artist_id = artists.id").
+			Joins("JOIN libraries l ON l.id = la.library_id").
+			Where("l.type = ?", req.LibraryType)
+
+		if req.LibraryType == entity.LibraryType_Private || req.LibraryType == entity.LibraryType_Favorites {
+			accessToken, err := auth.GetAccessToken(ctx)
+			if err != nil {
+				return nil, err
+			}
+			q = q.Where("l.owner_id = ?", accessToken.UserID)
+		}
+	}
 
 	if req.Query != "" {
 		normalizedName := s.normalizeName(req.Query)

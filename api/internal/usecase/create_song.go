@@ -16,6 +16,7 @@ type ICreateSongArtistService interface {
 
 type ICreateSongLibraryService interface {
 	EnsureUserLibrary(ctx context.Context, userID uint) (*entity.Library, error)
+	AddArtistToLibrary(ctx context.Context, library *entity.Library, artist *entity.Artist) error
 	AddSongToLibrary(ctx context.Context, library *entity.Library, song *entity.Song) error
 }
 
@@ -39,10 +40,19 @@ func (uc *CreateSongUseCase) Execute(ctx context.Context, req *dto.CreateSongReq
 		return nil, err
 	}
 
+	library, err := uc.libraryService.EnsureUserLibrary(ctx, accessToken.UserID)
+	if err != nil {
+		return nil, err
+	}
+
 	var artists []*entity.Artist
 	if len(req.Artists) > 0 {
 		for _, artistName := range req.Artists {
 			artist, err := uc.artistService.CreateIfNotExists(ctx, artistName)
+			if err != nil {
+				return nil, err
+			}
+			err = uc.libraryService.AddArtistToLibrary(ctx, library, artist)
 			if err != nil {
 				return nil, err
 			}
@@ -53,15 +63,18 @@ func (uc *CreateSongUseCase) Execute(ctx context.Context, req *dto.CreateSongReq
 	var composers []*entity.Artist
 	if len(req.Composers) > 0 {
 		for _, composerName := range req.Composers {
-			com, err := uc.artistService.CreateIfNotExists(ctx, composerName)
+			composer, err := uc.artistService.CreateIfNotExists(ctx, composerName)
 			if err != nil {
 				return nil, err
 			}
-			composers = append(composers, com)
+			err = uc.libraryService.AddArtistToLibrary(ctx, library, composer)
+			if err != nil {
+				return nil, err
+			}
+			composers = append(composers, composer)
 		}
 	}
 
-	// Create the song entity
 	song := &entity.Song{
 		Artists:   artists,
 		Composers: composers,
@@ -72,11 +85,6 @@ func (uc *CreateSongUseCase) Execute(ctx context.Context, req *dto.CreateSongReq
 	}
 
 	err = tx.Create(song).Error
-	if err != nil {
-		return nil, err
-	}
-
-	library, err := uc.libraryService.EnsureUserLibrary(ctx, accessToken.UserID)
 	if err != nil {
 		return nil, err
 	}

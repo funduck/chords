@@ -118,8 +118,8 @@ function SongEditor({ currentSong }: { currentSong?: boolean }) {
     <>
       <Box mb="md">
         <Text>
-          Song will be displayed using{" "}
-          <Anchor href="https://www.chordpro.org/chordpro/chordpro-introduction/">chordpro</Anchor> format.
+          For songs we use <Anchor href="https://www.chordpro.org/chordpro/chordpro-introduction/">chordpro</Anchor>{" "}
+          format.
         </Text>
       </Box>
 

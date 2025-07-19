@@ -1,6 +1,7 @@
-import { useContext } from "react";
+import { Switch } from "@mantine/core";
+import { useState } from "react";
 
-import { ArtistsApiContext } from "@src/hooks/Api";
+import { ArtistsApiContext, useArtistsApi } from "@src/hooks/Api";
 import { useScrollPosition } from "@src/hooks/useScrollPosition";
 
 import SearchArtistListItem from "./SearchArtistListItem";
@@ -8,21 +9,37 @@ import { useSearchArtistsContext } from "./SearchContext";
 import SearchEntities from "./SearchEntities";
 
 function SearchArtists() {
-  const artistsApi = useContext(ArtistsApiContext);
+  const artistsApi = useArtistsApi();
 
   // Initialize scroll position management
   useScrollPosition();
 
+  const [inPrivateLibs, setInPrivateLibs] = useState(true);
+
   return (
-    <SearchEntities
-      apiContext={ArtistsApiContext}
-      useSearchContext={useSearchArtistsContext}
-      searchMethod={(params) => artistsApi!.searchArtists(params)}
-      ListItemComponent={SearchArtistListItem}
-      listItemProps={(entity) => ({ entity })}
-      placeholder="Search Artist by Name"
-      entityName="artists"
-    />
+    <>
+      <Switch
+        mb="md"
+        label="In my library"
+        checked={inPrivateLibs}
+        onChange={(e) => {
+          setInPrivateLibs(e.currentTarget.checked);
+        }}
+      />
+      <SearchEntities
+        apiContext={ArtistsApiContext}
+        useSearchContext={useSearchArtistsContext}
+        searchMethod={(params) =>
+          artistsApi!.searchArtists({
+            request: { ...params.request, library_type: inPrivateLibs ? "private" : undefined },
+          })
+        }
+        ListItemComponent={SearchArtistListItem}
+        listItemProps={(entity) => ({ entity })}
+        placeholder="Search Artist by Name"
+        entityName="artists"
+      />
+    </>
   );
 }
 

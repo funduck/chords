@@ -1,7 +1,7 @@
 fix tests
 
 when creating song 
-    fill artist and title from form, or if artist and title are present in song fill form
     if form artist is empty - provide autocomplete
+    check song with same name in private library
 
-display my library
+display errors from API

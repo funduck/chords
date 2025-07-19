@@ -40,6 +40,11 @@ func (m *MockLibraryService) EnsureUserLibrary(ctx context.Context, userID uint)
 	return args.Get(0).(*entity.Library), args.Error(1)
 }
 
+func (m *MockLibraryService) AddArtistToLibrary(ctx context.Context, library *entity.Library, artist *entity.Artist) error {
+	args := m.Called(ctx, library, artist)
+	return args.Error(0)
+}
+
 func (m *MockLibraryService) AddSongToLibrary(ctx context.Context, library *entity.Library, song *entity.Song) error {
 	args := m.Called(ctx, library, song)
 	return args.Error(0)
@@ -73,6 +78,7 @@ func TestCreateSongUseCase_Execute(t *testing.T) {
 		mockArtistService.On("CreateIfNotExists", ctx, "Artist 1").Return(artist1, nil)
 		mockArtistService.On("CreateIfNotExists", ctx, "Artist 2").Return(artist2, nil)
 		mockLibraryService.On("EnsureUserLibrary", ctx, user.ID).Return(&library, nil)
+		mockLibraryService.On("AddArtistToLibrary", ctx, &library, mock.AnythingOfType("*entity.Artist")).Return(nil)
 		mockLibraryService.On("AddSongToLibrary", ctx, &library, mock.AnythingOfType("*entity.Song")).Return(nil)
 
 		uc := &CreateSongUseCase{
@@ -108,6 +114,7 @@ func TestCreateSongUseCase_Execute(t *testing.T) {
 
 		mockArtistService.On("CreateIfNotExists", ctx, "Composer 1").Return(composer1, nil)
 		mockLibraryService.On("EnsureUserLibrary", ctx, user.ID).Return(&library, nil)
+		mockLibraryService.On("AddArtistToLibrary", ctx, &library, mock.AnythingOfType("*entity.Artist")).Return(nil)
 		mockLibraryService.On("AddSongToLibrary", ctx, &library, mock.AnythingOfType("*entity.Song")).Return(nil)
 
 		uc := &CreateSongUseCase{

@@ -4,8 +4,10 @@ import (
 	"context"
 	"testing"
 
+	"chords.com/api/internal/auth"
 	"chords.com/api/internal/config"
 	"chords.com/api/internal/dto"
+	"chords.com/api/internal/entity"
 	"chords.com/api/internal/orm"
 	"gorm.io/gorm"
 )
@@ -216,7 +218,16 @@ func TestArtistService_GetArtistByID(t *testing.T) {
 func TestArtistService_SearchArtists(t *testing.T) {
 	db := initForTest()
 	service := NewArtistService()
+	libraryService := NewLibraryService()
 	ctx := orm.WithDB(context.Background(), db)
+
+	user := &entity.User{}
+	err := db.Create(user).Error
+	if err != nil {
+		t.Fatalf("Failed to create test user: %v", err)
+	}
+	accessToken := &auth.AccessToken{UserID: user.ID}
+	ctx = auth.WithAccessToken(ctx, accessToken)
 
 	// Create test artists
 	testArtists := []string{
@@ -227,10 +238,29 @@ func TestArtistService_SearchArtists(t *testing.T) {
 		"Metallica",
 	}
 
-	for _, name := range testArtists {
-		_, err := service.CreateIfNotExists(ctx, name)
+	pubLib, err := libraryService.EnsurePublicLibrary(ctx, "Test Library")
+	if err != nil {
+		t.Fatalf("Failed to create public library: %v", err)
+	}
+	privLib, err := libraryService.EnsureUserLibrary(ctx, user.ID)
+	if err != nil {
+		t.Fatalf("Failed to create private library: %v", err)
+	}
+
+	for i, name := range testArtists {
+		a, err := service.CreateIfNotExists(ctx, name)
 		if err != nil {
 			t.Fatalf("Failed to create test artist %s: %v", name, err)
+		}
+		err = libraryService.AddArtistToLibrary(ctx, pubLib, a)
+		if err != nil {
+			t.Fatalf("Failed to add artist %s to public library: %v", name, err)
+		}
+		if i == 1 {
+			err = libraryService.AddArtistToLibrary(ctx, privLib, a)
+			if err != nil {
+				t.Fatalf("Failed to add artist %s to private library: %v", name, err)
+			}
 		}
 	}
 
@@ -391,6 +421,29 @@ func TestArtistService_SearchArtists(t *testing.T) {
 
 		if len(response.Artists) != 2 {
 			t.Errorf("Expected 2 artists in response, got %d", len(response.Artists))
+		}
+	})
+
+	t.Run("Search in private library", func(t *testing.T) {
+		req := &dto.SearchArtistRequest{
+			Query:       "Rolling",
+			LibraryType: entity.LibraryType_Private,
+			Limit:       10,
+			ReturnRows:  true,
+			ReturnTotal: true,
+		}
+
+		response, err := service.SearchArtists(ctx, req)
+		if err != nil {
+			t.Fatalf("Expected no error, got %v", err)
+		}
+
+		if response.Total != 1 {
+			t.Errorf("Expected 1 total when ReturnTotal=false, got %d", response.Total)
+		}
+
+		if len(response.Artists) != 1 {
+			t.Errorf("Expected 1 artists in response, got %d", len(response.Artists))
 		}
 	})
 }

@@ -62,6 +62,28 @@ func (s *LibraryService) EnsureUserLibrary(ctx context.Context, userID uint) (*e
 	return &library, err
 }
 
+func (s *LibraryService) AddArtistToLibrary(ctx context.Context, library *entity.Library, artist *entity.Artist) error {
+	log := logger.GetLogger(ctx)
+	tx := orm.GetDB(ctx)
+
+	// Check if the artist already exists in the public library
+	var c int64
+	err := tx.Model(&entity.Artist{}).
+		Joins("JOIN library_artists la ON la.artist_id = artists.id").
+		Where("la.library_id = ?", library.ID).
+		Where("la.artist_id = ?", artist.ID).
+		Count(&c).Error
+	if c > 0 {
+		log.Debugf("Artist already exists in library %d: %d", library.ID, artist.ID)
+		return nil
+	}
+	if err != nil {
+		return err // Some other error occurred
+	}
+	err = tx.Model(&library).Association("Artists").Append([]*entity.Artist{artist})
+	return err
+}
+
 func (s *LibraryService) AddSongToLibrary(ctx context.Context, library *entity.Library, song *entity.Song) error {
 	log := logger.GetLogger(ctx)
 	tx := orm.GetDB(ctx)

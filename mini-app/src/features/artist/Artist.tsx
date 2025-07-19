@@ -1,4 +1,4 @@
-import { Space, Text } from "@mantine/core";
+import { Text } from "@mantine/core";
 import { useSignal } from "@telegram-apps/sdk-react";
 import { useContext, useEffect } from "react";
 import { useParams } from "react-router";
@@ -10,9 +10,7 @@ import { Signals } from "@src/services/signals-registry";
 
 import SearchArtists from "../search/SearchArtists";
 import { useSearchSongsContext } from "../search/SearchContext";
-import SearchEntities from "../search/SearchEntities";
-import SearchResetArtist from "../search/SearchResetArtist";
-import SearchSongListItem from "../search/SearchSongListItem";
+import SearchSongs from "../search/SearchSongs";
 
 function Artist() {
   // Initialize scroll position management
@@ -72,28 +70,7 @@ function Artist() {
     return <SearchArtists />;
   }
 
-  return (
-    <>
-      <SearchResetArtist />
-      <Space h="md" />
-      <SearchEntities
-        apiContext={SongsApiContext}
-        useSearchContext={useSearchSongsContext}
-        searchMethod={(params) =>
-          songsApi!.searchSongs({
-            request: {
-              ...params.request,
-              artist_id: artistId ? parseInt(artistId) : undefined,
-            },
-          })
-        }
-        ListItemComponent={SearchSongListItem}
-        listItemProps={(entity) => ({ song: entity })}
-        placeholder="Search Song by Title or Lyrics"
-        entityName="songs"
-      />
-    </>
-  );
+  return <SearchSongs artistId={artist.id} />;
 }
 
 export default Artist;

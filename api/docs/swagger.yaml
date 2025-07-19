@@ -26,6 +26,8 @@ definitions:
         type: string
       cursor_before:
         type: string
+      library_type:
+        $ref: '#/definitions/chords_com_api_internal_entity.LibraryType'
       limit:
         maximum: 100
         minimum: 1
@@ -144,6 +146,10 @@ definitions:
     type: object
   chords_com_api_internal_entity.Library:
     properties:
+      artists:
+        items:
+          $ref: '#/definitions/chords_com_api_internal_entity.Artist'
+        type: array
       created_at:
         type: string
       deleted_at:

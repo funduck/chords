@@ -12,7 +12,6 @@ import (
 )
 
 type SongService struct {
-	userService *UserService
 }
 
 var songServiceInstance *SongService
@@ -21,9 +20,7 @@ func NewSongService() *SongService {
 	if songServiceInstance != nil {
 		return songServiceInstance
 	}
-	songServiceInstance = &SongService{
-		userService: NewUserService(),
-	}
+	songServiceInstance = &SongService{}
 	return songServiceInstance
 }
 
@@ -70,19 +67,23 @@ func (s *SongService) SearchSongs(ctx context.Context, req *dto.SearchSongReques
 	}
 
 	q := tx.Model(&entity.Song{}).
-		Joins("JOIN library_songs ls ON ls.song_id = songs.id")
+		Joins("JOIN library_songs ON library_songs.song_id = songs.id").
+		Joins("JOIN libraries ON libraries.id = library_songs.library_id")
 
 	if req.LibraryID != 0 {
 		q = q.Where("libraries.id = ?", req.LibraryID)
 	}
+	if req.LibraryType == "" {
+		req.LibraryType = entity.LibraryType_Public
+	}
 	if req.LibraryType != "" {
-		q = q.Where("libraries.library_type = ?", req.LibraryType)
+		q = q.Where("libraries.type = ?", req.LibraryType)
 		if req.LibraryType == entity.LibraryType_Private || req.LibraryType == entity.LibraryType_Favorites {
-			user, err := s.userService.GetActiveUser(ctx)
+			accessToken, err := auth.GetAccessToken(ctx)
 			if err != nil {
 				return nil, err
 			}
-			q = q.Where("libraries.owner_id = ?", user.ID)
+			q = q.Where("libraries.owner_id = ?", accessToken.UserID)
 		}
 	}
 

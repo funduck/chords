@@ -18,12 +18,25 @@ type SearchMethodParams<SP extends SearchParams> = {
   request: SP;
 };
 
+interface SearchState<T> {
+  query: string;
+  entities: T[] | null;
+  total?: number;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+  cursorAfter?: string;
+  cursorBefore?: string;
+  searching?: boolean;
+  loadingMore?: boolean;
+  pageSize: number;
+}
+
 // Generic props interface for the SearchEntities component
 interface SearchEntitiesProps<T, SP extends SearchParams> {
   // API and context
   apiContext: React.Context<any>;
   useSearchContext: () => {
-    searchState: any;
+    searchState: SearchState<T>;
     updateSearchState: (updates: any) => void;
   };
 
@@ -39,12 +52,12 @@ interface SearchEntitiesProps<T, SP extends SearchParams> {
   entityName: string; // "artists" or "songs"
 
   // Optional customizations
-  renderPagination?: (props: PaginationProps) => ReactNode;
+  renderPagination?: (props: PaginationProps<T>) => ReactNode;
   renderResults?: (props: ResultsProps<T>) => ReactNode;
 }
 
-interface PaginationProps {
-  searchState: any;
+interface PaginationProps<T> {
+  searchState: SearchState<T>;
   searching: boolean;
   onLoadMore?: () => void;
   searchMoreButtonRef?: React.RefObject<HTMLButtonElement | null>;
@@ -52,7 +65,7 @@ interface PaginationProps {
 }
 
 interface ResultsProps<T> {
-  searchState: any;
+  searchState: SearchState<T>;
   ListItemComponent: React.ComponentType<any>;
   listItemProps: (entity: T) => any;
 }
