@@ -1,4 +1,5 @@
 import { Anchor, Box, Button, Group, Text, Textarea } from "@mantine/core";
+import { notifications } from "@mantine/notifications";
 import { useSignal } from "@telegram-apps/sdk-react";
 import { useEffect, useRef, useState } from "react";
 
@@ -96,9 +97,21 @@ function SongEditor({ currentSong }: { currentSong?: boolean }) {
   }
 
   function formatSheet() {
-    const formatted = ChordProService.parseToChordproSheet(ref.current!.value, {});
-    ref.current!.value = formatted;
-    setFormattedSheet(formatted);
+    const song = ChordProService.sheetToSong(ref.current!.value, {});
+    if (!song) {
+      notifications.show({
+        title: "Error",
+        message: "Failed to parse song from sheet",
+        color: "red",
+        position: "top-right",
+      });
+      return;
+    }
+    const formatted = ChordProService.songToSheet(song, {});
+    if (formatted) {
+      ref.current!.value = formatted;
+      setFormattedSheet(formatted);
+    }
   }
 
   return (

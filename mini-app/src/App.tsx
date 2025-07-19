@@ -1,5 +1,8 @@
 import { MantineProvider } from "@mantine/core";
 import "@mantine/core/styles.css";
+// ‼️ import notifications styles after core package styles
+import { Notifications } from "@mantine/notifications";
+import "@mantine/notifications/styles.css";
 import { BrowserRouter } from "react-router";
 
 import Router from "./Router";
@@ -17,6 +20,7 @@ import { theme } from "./theme";
 function App() {
   return (
     <MantineProvider theme={theme} defaultColorScheme="auto">
+      <Notifications />
       <BrowserRouter>
         <ApiProvider>
           <WebSocketProvider>

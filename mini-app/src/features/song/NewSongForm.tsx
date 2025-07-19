@@ -1,6 +1,11 @@
 import { Button, Group, Modal, TextInput } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
+import { notifications } from "@mantine/notifications";
+import { useEffect } from "react";
+
+import { ChordProService } from "@src/services/chordpro/chordpro";
+import { getSongArtist } from "@src/utils/song";
 
 import { useSongContext } from "./SongContext";
 
@@ -26,17 +31,52 @@ function NewSongForm({ sheetValue }: NewSongFormProps) {
 
   const [opened, { open, close }] = useDisclosure(false);
 
+  // Parse some values from the sheet when the modal opens
+  useEffect(() => {
+    if (!sheetValue || !opened) return;
+
+    const song = ChordProService.sheetToSong(sheetValue, {});
+    if (!song) return;
+
+    newSongForm.setValues({
+      title: song.title || "",
+      artist: (getSongArtist(song) || []).join(", "),
+    });
+  }, [sheetValue, opened]);
+
   return (
     <>
       <Modal opened={opened} onClose={close} title="Create New Song">
         <form
           onSubmit={newSongForm.onSubmit((values) => {
+            let sheetToSave = sheetValue;
+
+            const song = ChordProService.sheetToSong(sheetValue, {});
+            if (song) {
+              sheetToSave = ChordProService.songToSheet(song);
+              if (!song.title) {
+                sheetToSave = `{title: ${values.title}}\n${sheetToSave}`;
+              }
+              if (!song.artist || song.artist.length === 0) {
+                sheetToSave = `{artist: ${values.artist}}\n${sheetToSave}`;
+              }
+            } else {
+              notifications.show({
+                title: "Error",
+                message: "Failed to parse sheet as ChordPro, please check the format.",
+                color: "red",
+                position: "top-right",
+                autoClose: false,
+              });
+              return;
+            }
+
             createSong({
               song: {
                 format: "chordpro",
                 title: values.title,
                 artists: [values.artist],
-                sheet: sheetValue,
+                sheet: sheetToSave,
               },
             });
             close();
@@ -52,7 +92,7 @@ function NewSongForm({ sheetValue }: NewSongFormProps) {
           <TextInput
             withAsterisk
             label="Artist"
-            placeholder="Artist... Maybe it is you? ;)"
+            placeholder="Maybe you? ;)"
             key={newSongForm.key("artist")}
             {...newSongForm.getInputProps("artist")}
           />

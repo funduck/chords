@@ -23,38 +23,53 @@ export class ChordProService {
     return resLines.join("\n");
   }
 
-  static parseToChordproSheet(
-    sheet: string,
-    options: { parse?: "chordsoverwords" | "chordpro"; maxLineLength?: number } = {},
-  ): string {
-    if (!sheet || !sheet.trim()) {
-      throw new Error("Empty sheet cannot be parsed");
-    }
-    let parser: { parse: (sheet: string) => Song };
-    if (options.parse == "chordpro" || sheet.match(/{(title|artist|composer):/)) {
-      parser = new ChordProParser();
-    } else {
-      parser = new ChordsOverWordsParser();
-    }
-    const song = parser.parse(sheet);
+  static songToSheet(song: Song, options: { maxLineLength?: number } = {}): string {
+    if (!song) return "";
     const formater = new ChordProFormatter();
-    sheet = formater.format(song);
+    let sheet = formater.format(song);
     if (options.maxLineLength) {
       sheet = this.adjustLineLength(sheet, options.maxLineLength);
     }
     return sheet;
   }
 
-  static parseToSong(
+  static sheetToSong(
     sheet: string,
     options: { parse?: "chordsoverwords" | "chordpro"; maxLineLength?: number } = {},
-  ): Song {
-    sheet = this.parseToChordproSheet(sheet, options);
-    const parser = new ChordProParser();
-    return parser.parse(sheet);
+  ): Song | null {
+    try {
+      let parser: { parse: (sheet: string) => Song };
+      if (options.parse == "chordpro" || sheet.match(/{(title|artist|composer):/)) {
+        parser = new ChordProParser();
+      } else {
+        parser = new ChordsOverWordsParser();
+      }
+      return parser.parse(sheet);
+    } catch (error) {
+      console.debug("Failed to parse sheet to Song:", error);
+      return null;
+    }
   }
 
-  static transpose(song: Song, transpose: number): Song {
+  static sheetToChordProSheet(
+    sheet: string,
+    options: { parse?: "chordsoverwords" | "chordpro"; maxLineLength?: number } = {},
+  ): string {
+    if (!sheet || !sheet.trim()) {
+      return "";
+    }
+    const song = this.sheetToSong(sheet, options);
+    if (!song) {
+      console.warn("Failed to parse song from sheet");
+      return "";
+    }
+
+    return this.songToSheet(song, {
+      maxLineLength: options.maxLineLength,
+    });
+  }
+
+  static transposeSong(song: Song, transpose: number): Song {
     let key = song.key;
     if (!key) {
       // Transposition requires a key, so we have to pick one

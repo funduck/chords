@@ -55,11 +55,11 @@ function ChordProViewer({ sheet, transpose }: { sheet: string; transpose?: numbe
       // We track screen changes via "width" but we need to use ref.current.offsetWidth to get the actual width of the container
       const maxLineLength = Math.floor((ref.current.offsetWidth || width) / font.width);
 
-      let song = ChordProService.parseToSong(sheet, {
+      let song = ChordProService.sheetToSong(sheet, {
         maxLineLength,
       });
       if (transpose) {
-        song = ChordProService.transpose(song, transpose);
+        song = ChordProService.transposeSong(song, transpose);
       }
 
       setTitle(song.title || "");
