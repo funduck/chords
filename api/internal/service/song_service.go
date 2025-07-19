@@ -2,7 +2,9 @@ package service
 
 import (
 	"context"
+	"fmt"
 
+	"chords.com/api/internal/auth"
 	"chords.com/api/internal/dto"
 	"chords.com/api/internal/entity"
 	"chords.com/api/internal/orm"
@@ -138,11 +140,20 @@ func (s *SongService) SearchSongs(ctx context.Context, req *dto.SearchSongReques
 func (s *SongService) UpdateSong(ctx context.Context, id uint, req *dto.UpdateSongRequest) (*entity.Song, error) {
 	tx := orm.GetDB(ctx)
 
+	accessToken, err := auth.GetAccessToken(ctx)
+	if err != nil {
+		return nil, err
+	}
+
 	// Check if song exists
 	var song entity.Song
-	err := tx.First(&song, id).Error
+	err = tx.First(&song, id).Error
 	if err != nil {
 		return nil, err // Song not found or other error
+	}
+
+	if song.OwnerID != accessToken.UserID {
+		return nil, fmt.Errorf("you do not have permission to update this song")
 	}
 
 	if req.Sheet != "" {

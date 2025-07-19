@@ -3,7 +3,7 @@ import { useNavigate } from "react-router";
 
 import { RoutesEnum } from "@src/Router";
 import { Config } from "@src/config";
-import { SongEntity, SongsApiContext } from "@src/hooks/Api";
+import { CreateSongParams, SongEntity, SongsApiContext, UpdateSongParams } from "@src/hooks/Api";
 
 export interface AutoScrollOptions {
   enabled?: boolean;
@@ -44,6 +44,9 @@ interface SongContextType {
   loadSong(songId: number): void;
   openSong(): () => void;
   openEditor(): () => void;
+
+  createSong(song: CreateSongParams): Promise<SongEntity>;
+  updateSong(song: UpdateSongParams): Promise<SongEntity>;
 }
 
 const SongContext = createContext<SongContextType | undefined>(undefined);
@@ -177,6 +180,34 @@ export function SongContextProvider({ children }: { children: ReactNode }) {
     };
   }
 
+  function createSong(params: CreateSongParams): Promise<SongEntity> {
+    if (!songsApi) {
+      return Promise.reject(new Error("SongsApiContext is not available"));
+    }
+    return songsApi.createSong(params).then((createdSong) => {
+      updateSongState({
+        songId: createdSong.id,
+        loadedSong: createdSong,
+        songSheet: createdSong.sheet,
+      });
+      navigate(RoutesEnum.Songs(createdSong.id));
+      return createdSong;
+    });
+  }
+
+  function updateSong(params: UpdateSongParams): Promise<SongEntity> {
+    if (!songsApi) {
+      return Promise.reject(new Error("SongsApiContext is not available"));
+    }
+    return songsApi.updateSong(params).then((updatedSong) => {
+      updateSongState({
+        loadedSong: updatedSong,
+        songSheet: updatedSong.sheet,
+      });
+      return updatedSong;
+    });
+  }
+
   return (
     <SongContext.Provider
       value={{
@@ -188,6 +219,8 @@ export function SongContextProvider({ children }: { children: ReactNode }) {
         loadSong,
         openSong,
         openEditor,
+        createSong,
+        updateSong,
       }}
     >
       {children}

@@ -1,12 +1,18 @@
-import { Anchor, Space, Text, Textarea } from "@mantine/core";
+import { Anchor, Button, Group, Modal, Space, Text, TextInput, Textarea } from "@mantine/core";
+import { useForm } from "@mantine/form";
+import { useDisclosure } from "@mantine/hooks";
+import { useSignal } from "@telegram-apps/sdk-react";
 import { useEffect, useRef } from "react";
 
 import { ChordProService } from "@src/services/chordpro/chordpro";
+import { Signals } from "@src/services/signals-registry";
 
 import { useSongContext } from "./SongContext";
 
 function SongEditor({ currentSong }: { currentSong?: boolean }) {
-  const { songState, updateSongState } = useSongContext();
+  const userId = useSignal(Signals.userId);
+
+  const { songState, updateSongState, createSong, updateSong } = useSongContext();
 
   const sheet = currentSong ? songState.songSheet : songState.newSheet;
 
@@ -63,8 +69,82 @@ function SongEditor({ currentSong }: { currentSong?: boolean }) {
     }
   }, [sheet]);
 
+  const newSongForm = useForm({
+    mode: "uncontrolled",
+    initialValues: {
+      title: "",
+      artist: "",
+    },
+
+    validate: {
+      title: (value) => (value.length < 3 ? "Title must be at least 3 characters long" : null),
+      artist: (value) => (value.length < 3 ? "Artist name must be at least 3 characters long" : null),
+    },
+  });
+
+  const [opened, { open, close }] = useDisclosure(false);
+
   return (
     <>
+      {!currentSong && (
+        <>
+          <Modal opened={opened} onClose={close} title="Create New Song">
+            <form
+              onSubmit={newSongForm.onSubmit((values) => {
+                createSong({
+                  song: {
+                    format: "chordpro",
+                    title: values.title,
+                    artists: [values.artist],
+                    sheet: ref.current!.value,
+                  },
+                });
+              })}
+            >
+              <TextInput
+                withAsterisk
+                label="Title"
+                placeholder="Your Song Title"
+                key={newSongForm.key("title")}
+                {...newSongForm.getInputProps("title")}
+              />
+              <TextInput
+                withAsterisk
+                label="Artist"
+                placeholder="Artist... Maybe it is you? ;)"
+                key={newSongForm.key("artist")}
+                {...newSongForm.getInputProps("artist")}
+              />
+
+              <Group justify="flex-start" mt="md">
+                <Button type="submit">Create</Button>
+              </Group>
+            </form>
+          </Modal>
+          <Button variant="default" onClick={open}>
+            Create New Song
+          </Button>
+          <Space h="md" />
+        </>
+      )}
+      {currentSong && songState.loadedSong?.owner_id == userId && (
+        <>
+          <Button
+            variant="default"
+            onClick={() =>
+              updateSong({
+                id: songState.loadedSong!.id,
+                song: {
+                  sheet: ref.current!.value,
+                },
+              })
+            }
+          >
+            Save Changes
+          </Button>
+          <Space h="sm" />
+        </>
+      )}
       <Text>
         Song is displayed using{" "}
         <Anchor href="https://www.chordpro.org/chordpro/chordpro-introduction/">chordpro</Anchor> format.

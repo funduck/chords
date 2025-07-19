@@ -1,7 +1,8 @@
-import { Box, ScrollArea } from "@mantine/core";
+import { Anchor, Box, Divider, ScrollArea } from "@mantine/core";
 import { useEffect, useRef } from "react";
 import { useParams } from "react-router";
 
+import { RoutesEnum } from "@src/Router";
 import ChordDisplayManager from "@src/components/ChordDisplayManager";
 import ChordProViewer from "@src/components/ChordproViewer";
 import { useScrollPosition } from "@src/hooks/useScrollPosition";
@@ -30,6 +31,10 @@ function Song() {
 
   useScrollPosition();
 
+  const artistRefs =
+    (song?.artists || song?.composers)?.map((a) => <Anchor href={RoutesEnum.SearchArtists(a.id)}>{a.name}</Anchor>) ||
+    [];
+
   return (
     <>
       <AutoScrollManager viewportRef={songViewportRef} />
@@ -45,6 +50,8 @@ function Song() {
             paddingTop: "20px",
           }}
         >
+          {artistRefs}
+          <Divider my="md" />
           <Box hidden={displayMode == "render"}>
             <SongEditor currentSong={true} />
           </Box>

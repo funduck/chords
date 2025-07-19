@@ -26,6 +26,9 @@ export type SongEntity = ChordsComApiInternalEntitySong;
 export type SongInfoEntity = ChordsComApiInternalEntitySongInfo;
 export type ArtistInfoEntity = ChordsComApiInternalEntityArtistInfo;
 
+export type CreateSongParams = Parameters<SongsApi["createSong"]>[0];
+export type UpdateSongParams = Parameters<SongsApi["updateSong"]>[0];
+
 export function ApiProvider({ children }: { children: ReactNode }) {
   const [authApi, setAuthApi] = useState<AuthApi | null>(null);
   const [roomsApi, setRoomsApi] = useState<RoomsApi | null>(null);

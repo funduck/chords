@@ -83,10 +83,18 @@ func (a *App) UpdateSong(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	song, err := a.songService.UpdateSong(r.Context(), songID, &req)
+	_, err = a.songService.UpdateSong(r.Context(), songID, &req)
 	if err != nil {
 		a.respondError(w, http.StatusInternalServerError, err)
 		return
 	}
+
+	// Retrieve the updated song with all details
+	song, err := a.songService.GetSongByID(r.Context(), songID)
+	if err != nil {
+		a.respondError(w, http.StatusInternalServerError, err)
+		return
+	}
+
 	a.respondJSON(w, http.StatusOK, song)
 }
