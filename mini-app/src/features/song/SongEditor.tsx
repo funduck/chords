@@ -1,20 +1,17 @@
-import { Anchor, Button, Group, Modal, Space, Text, TextInput, Textarea } from "@mantine/core";
-import { useForm } from "@mantine/form";
-import { useDisclosure } from "@mantine/hooks";
+import { Anchor, Box, Button, Group, Text, Textarea } from "@mantine/core";
 import { useSignal } from "@telegram-apps/sdk-react";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { ChordProService } from "@src/services/chordpro/chordpro";
 import { Signals } from "@src/services/signals-registry";
 
+import NewSongForm from "./NewSongForm";
 import { useSongContext } from "./SongContext";
 
 function SongEditor({ currentSong }: { currentSong?: boolean }) {
   const userId = useSignal(Signals.userId);
 
-  const { songState, updateSongState, createSong, updateSong } = useSongContext();
-
-  const sheet = currentSong ? songState.songSheet : songState.newSheet;
+  const { songState, updateSongState, updateSong } = useSongContext();
 
   const ref = useRef<HTMLTextAreaElement>(null);
 
@@ -34,122 +31,99 @@ function SongEditor({ currentSong }: { currentSong?: boolean }) {
     return "";
   }
 
+  function updateSongSheet(value: string) {
+    if (currentSong) {
+      updateSongState({
+        songSheet: value,
+      });
+    } else {
+      updateSongState({
+        newSheet: value,
+      });
+    }
+  }
+
   function onSheetChanged() {
     const value = ref.current!.value;
+
     if (value && value.length) {
       if (timer.current) {
         clearTimeout(timer.current);
       }
       timer.current = setTimeout(() => {
-        if (currentSong) {
-          updateSongState({
-            songSheet: value,
-          });
-        } else {
-          updateSongState({
-            newSheet: value,
-          });
-        }
+        storeSheetValue(value);
+        updateSongSheet(value);
+
         timer.current = null;
       }, 1000); // Debounce changes by 1 second
     }
   }
 
+  const [savedSheet, setSavedSheet] = useState("");
+  const [formattedSheet, setFormattedSheet] = useState("");
+
   // Load the sheet from localStorage if not provided
   useEffect(() => {
-    if (sheet && sheet.length) {
-      const formattedSheet = ChordProService.parseToChordproSheet(sheet, {});
-      storeSheetValue(formattedSheet);
-      ref.current!.value = formattedSheet;
+    if (currentSong) {
+      if (songState.songSheet) {
+        ref.current!.value = songState.songSheet;
+        setSavedSheet(songState.songSheet);
+        return;
+      }
     } else {
-      const savedSheet = loadSheetValue();
-      if (savedSheet) {
-        ref.current!.value = savedSheet;
+      if (songState.newSheet) {
+        ref.current!.value = songState.newSheet;
+        setSavedSheet(songState.newSheet);
+        return;
       }
     }
-  }, [sheet]);
 
-  const newSongForm = useForm({
-    mode: "uncontrolled",
-    initialValues: {
-      title: "",
-      artist: "",
-    },
+    const storedSheet = loadSheetValue();
+    if (storedSheet) {
+      ref.current!.value = storedSheet;
+      setSavedSheet(storedSheet);
+    }
+  }, []);
 
-    validate: {
-      title: (value) => (value.length < 3 ? "Title must be at least 3 characters long" : null),
-      artist: (value) => (value.length < 3 ? "Artist name must be at least 3 characters long" : null),
-    },
-  });
+  function saveSheet() {
+    setSavedSheet(ref.current!.value);
+    updateSong({
+      id: songState.loadedSong!.id,
+      song: {
+        sheet: ref.current!.value,
+      },
+    });
+  }
 
-  const [opened, { open, close }] = useDisclosure(false);
+  function formatSheet() {
+    const formatted = ChordProService.parseToChordproSheet(ref.current!.value, {});
+    ref.current!.value = formatted;
+    setFormattedSheet(formatted);
+  }
 
   return (
     <>
-      {!currentSong && (
-        <>
-          <Modal opened={opened} onClose={close} title="Create New Song">
-            <form
-              onSubmit={newSongForm.onSubmit((values) => {
-                createSong({
-                  song: {
-                    format: "chordpro",
-                    title: values.title,
-                    artists: [values.artist],
-                    sheet: ref.current!.value,
-                  },
-                });
-              })}
-            >
-              <TextInput
-                withAsterisk
-                label="Title"
-                placeholder="Your Song Title"
-                key={newSongForm.key("title")}
-                {...newSongForm.getInputProps("title")}
-              />
-              <TextInput
-                withAsterisk
-                label="Artist"
-                placeholder="Artist... Maybe it is you? ;)"
-                key={newSongForm.key("artist")}
-                {...newSongForm.getInputProps("artist")}
-              />
+      <Box mb="md">
+        <Text>
+          Song will be displayed using{" "}
+          <Anchor href="https://www.chordpro.org/chordpro/chordpro-introduction/">chordpro</Anchor> format.
+        </Text>
+      </Box>
 
-              <Group justify="flex-start" mt="md">
-                <Button type="submit">Create</Button>
-              </Group>
-            </form>
-          </Modal>
-          <Button variant="default" onClick={open}>
-            Create New Song
-          </Button>
-          <Space h="md" />
-        </>
-      )}
-      {currentSong && songState.loadedSong?.owner_id == userId && (
-        <>
-          <Button
-            variant="default"
-            onClick={() =>
-              updateSong({
-                id: songState.loadedSong!.id,
-                song: {
-                  sheet: ref.current!.value,
-                },
-              })
-            }
-          >
-            Save Changes
-          </Button>
-          <Space h="sm" />
-        </>
-      )}
-      <Text>
-        Song is displayed using{" "}
-        <Anchor href="https://www.chordpro.org/chordpro/chordpro-introduction/">chordpro</Anchor> format.
-        <Space h="sm" />
-      </Text>
+      <Group mb="md">
+        {!currentSong && <NewSongForm sheetValue={ref.current?.value || ""} />}
+        {currentSong && songState.loadedSong?.owner_id == userId && (
+          <>
+            <Button variant="outline" onClick={saveSheet} disabled={savedSheet === ref.current?.value}>
+              Save
+            </Button>
+          </>
+        )}
+        <Button variant="outline" onClick={formatSheet} disabled={formattedSheet == ref.current?.value}>
+          Format
+        </Button>
+      </Group>
+
       <Textarea
         size="lg"
         ref={ref}
