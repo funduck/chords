@@ -5,17 +5,17 @@ import { stringToTitleCase } from "@src/utils/string";
 
 import { useSongContext } from "../song/SongContext";
 
-function SearchSongListItem({ song }: { song: SongInfoEntity }) {
+function SearchSongListItem({ entity }: { entity: SongInfoEntity }) {
   const { loadSong } = useSongContext();
 
-  let title = stringToTitleCase(song.title);
-  const artistOrComposer = (song.artists || song.composers || []).map((a) => a.name).join(", ");
+  let title = stringToTitleCase(entity.title);
+  const artistOrComposer = (entity.artists || entity.composers || []).map((a) => a.name).join(", ");
 
   return (
     <Anchor
       c="primary"
       onClick={() => {
-        loadSong(song.id!);
+        loadSong(entity.id!);
         // navigate(RoutesEnum.Songs(song.id));
         // Signals.publishSongId.set(song.id!);
       }}
@@ -24,7 +24,7 @@ function SearchSongListItem({ song }: { song: SongInfoEntity }) {
         <Text size="lg">{title}</Text>
         {artistOrComposer && <Text c="dimmed">{artistOrComposer}</Text>}
         <Text c="dimmed" size="xs">
-          #{song.id}
+          #{entity.id}
         </Text>
       </Flex>
     </Anchor>

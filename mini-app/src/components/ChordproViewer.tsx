@@ -1,14 +1,14 @@
 import { Box, Divider, Text, Title } from "@mantine/core";
-import * as Parser from "chordproject-parser";
-import { Chord, ChordProParser, HtmlTableFormatter } from "chordsheetjs";
+import { notifications } from "@mantine/notifications";
+import { HtmlTableFormatter } from "chordsheetjs";
 import { useEffect, useRef, useState } from "react";
 
 import { ChordProService } from "@src/services/chordpro/chordpro";
 import { estimateFontSize } from "@src/utils/font";
 
-function ChordProViewer({ sheet, transpose }: { sheet: string; transpose?: number }) {
+function ChordProViewer({ sheet, transpose, active }: { sheet: string; transpose?: number; active?: boolean }) {
+  console.debug("Rendering ChordProViewer", { active });
   const ref = useRef<HTMLDivElement>(null);
-  const [errText, setErrText] = useState("");
   const [width, setWidth] = useState(window.innerWidth);
   const [title, setTitle] = useState("");
   const [artist, setArtist] = useState("");
@@ -46,7 +46,7 @@ function ChordProViewer({ sheet, transpose }: { sheet: string; transpose?: numbe
   }, []);
 
   useEffect(() => {
-    if (!ref.current) {
+    if (!ref.current || !active) {
       return;
     }
     try {
@@ -58,6 +58,9 @@ function ChordProViewer({ sheet, transpose }: { sheet: string; transpose?: numbe
       let song = ChordProService.sheetToSong(sheet, {
         maxLineLength,
       });
+      if (!song) {
+        throw new Error("Failed to parse song from sheet");
+      }
       if (transpose) {
         song = ChordProService.transposeSong(song, transpose);
       }
@@ -70,16 +73,18 @@ function ChordProViewer({ sheet, transpose }: { sheet: string; transpose?: numbe
       const html = formater.format(song);
 
       ref.current.innerHTML = html;
-      setErrText(""); // Clear any previous error
     } catch (e) {
-      console.error("Error parsing song", e);
-      setErrText(String(e));
+      notifications.show({
+        title: "Error",
+        message: "Failed to parse ChordPro sheet in viewer. " + (e as Error).message,
+        color: "red",
+        position: "top-right",
+      });
     }
-  }, [ref, sheet, width, transpose]);
+  }, [ref, sheet, width, transpose, active]);
 
   return (
     <>
-      {errText && <Box>Error parsing song: {errText}</Box>}
       <Title>{title}</Title>
       <Text size="xl">Artist: {artist}</Text>
       <Text size="xl">Composer: {composer}</Text>

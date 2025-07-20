@@ -30,6 +30,10 @@ export class ChordProService {
     if (options.maxLineLength) {
       sheet = this.adjustLineLength(sheet, options.maxLineLength);
     }
+    // Later we want to recognize sheet as ChordPro, so we need to ensure it has a title
+    if (!song.title && !sheet.match(/{title/)) {
+      sheet = `{title}\n${sheet}`;
+    }
     return sheet;
   }
 
@@ -39,12 +43,17 @@ export class ChordProService {
   ): Song | null {
     try {
       let parser: { parse: (sheet: string) => Song };
-      if (options.parse == "chordpro" || sheet.match(/{(title|artist|composer):/)) {
+      if (options.parse == "chordpro" || sheet.match(/{(title|artist|composer)/)) {
         parser = new ChordProParser();
       } else {
         parser = new ChordsOverWordsParser();
       }
-      return parser.parse(sheet);
+      let song = parser.parse(sheet);
+      if (options.maxLineLength) {
+        sheet = this.songToSheet(song, { maxLineLength: options.maxLineLength });
+        song = parser.parse(sheet);
+      }
+      return song;
     } catch (error) {
       console.debug("Failed to parse sheet to Song:", error);
       return null;

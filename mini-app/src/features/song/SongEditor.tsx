@@ -12,7 +12,8 @@ import { useSongContext } from "./SongContext";
 function SongEditor({ currentSong }: { currentSong?: boolean }) {
   const userId = useSignal(Signals.userId);
 
-  const { songState, updateSongState, updateSong } = useSongContext();
+  const songContext = useSongContext();
+  const { songState } = songContext;
 
   const ref = useRef<HTMLTextAreaElement>(null);
 
@@ -20,7 +21,6 @@ function SongEditor({ currentSong }: { currentSong?: boolean }) {
 
   function storeSheetValue(value: string) {
     localStorage.setItem("editor-sheet", value);
-    console.debug("Stored sheet in localStorage", value.length);
   }
 
   function loadSheetValue(): string {
@@ -33,12 +33,13 @@ function SongEditor({ currentSong }: { currentSong?: boolean }) {
   }
 
   function updateSongSheet(value: string) {
+    console.debug("Updating song sheet", value.length);
     if (currentSong) {
-      updateSongState({
+      songContext.updateSongState({
         songSheet: value,
       });
     } else {
-      updateSongState({
+      songContext.updateSongState({
         newSheet: value,
       });
     }
@@ -47,17 +48,15 @@ function SongEditor({ currentSong }: { currentSong?: boolean }) {
   function onSheetChanged() {
     const value = ref.current!.value;
 
-    if (value && value.length) {
-      if (timer.current) {
-        clearTimeout(timer.current);
-      }
-      timer.current = setTimeout(() => {
-        storeSheetValue(value);
-        updateSongSheet(value);
-
-        timer.current = null;
-      }, 1000); // Debounce changes by 1 second
+    if (timer.current) {
+      clearTimeout(timer.current);
     }
+    timer.current = setTimeout(() => {
+      storeSheetValue(value);
+      updateSongSheet(value);
+
+      timer.current = null;
+    }, 1000); // Debounce changes by 1 second
   }
 
   const [savedSheet, setSavedSheet] = useState("");
@@ -69,12 +68,14 @@ function SongEditor({ currentSong }: { currentSong?: boolean }) {
       if (songState.songSheet) {
         ref.current!.value = songState.songSheet;
         setSavedSheet(songState.songSheet);
+        onSheetChanged();
         return;
       }
     } else {
       if (songState.newSheet) {
         ref.current!.value = songState.newSheet;
         setSavedSheet(songState.newSheet);
+        onSheetChanged();
         return;
       }
     }
@@ -83,12 +84,13 @@ function SongEditor({ currentSong }: { currentSong?: boolean }) {
     if (storedSheet) {
       ref.current!.value = storedSheet;
       setSavedSheet(storedSheet);
+      onSheetChanged();
     }
   }, []);
 
   function saveSheet() {
     setSavedSheet(ref.current!.value);
-    updateSong({
+    songContext.updateSong({
       id: songState.loadedSong!.id,
       song: {
         sheet: ref.current!.value,
@@ -111,18 +113,17 @@ function SongEditor({ currentSong }: { currentSong?: boolean }) {
     if (formatted) {
       ref.current!.value = formatted;
       setFormattedSheet(formatted);
+      onSheetChanged();
     }
+  }
+
+  function clearSheet() {
+    ref.current!.value = "";
+    onSheetChanged();
   }
 
   return (
     <>
-      <Box mb="md">
-        <Text>
-          For songs we use <Anchor href="https://www.chordpro.org/chordpro/chordpro-introduction/">chordpro</Anchor>{" "}
-          format.
-        </Text>
-      </Box>
-
       <Group mb="md">
         {!currentSong && <NewSongForm sheetValue={ref.current?.value || ""} />}
         {currentSong && songState.loadedSong?.owner_id == userId && (
@@ -135,15 +136,25 @@ function SongEditor({ currentSong }: { currentSong?: boolean }) {
         <Button variant="outline" onClick={formatSheet} disabled={formattedSheet == ref.current?.value}>
           Format
         </Button>
+        <Button variant="outline" onClick={clearSheet} disabled={"" == ref.current?.value}>
+          Clear
+        </Button>
       </Group>
 
       <Textarea
         size="lg"
         ref={ref}
         autosize
-        placeholder="Paste song lyrics and chords here, it will be automatically formatted."
+        placeholder="Paste song lyrics and chords here."
         onChange={onSheetChanged}
       />
+
+      <Box mt="md">
+        <Text>
+          For songs we use <Anchor href="https://www.chordpro.org/chordpro/chordpro-introduction/">chordpro</Anchor>{" "}
+          format.
+        </Text>
+      </Box>
     </>
   );
 }

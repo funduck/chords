@@ -55,7 +55,7 @@ function SearchSongs({ artistId }: { artistId?: number }) {
           })
         }
         ListItemComponent={SearchSongListItem}
-        listItemProps={(entity) => ({ song: entity })}
+        listItemProps={(entity) => ({ entity })}
         placeholder="Search Song by Title or Lyrics"
         entityName="songs"
       />

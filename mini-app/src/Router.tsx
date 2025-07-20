@@ -182,7 +182,7 @@ function Router() {
             .filter((g) => g.tabs.length)
             .map((group) => (
               <>
-                <Text size="xl">{group.group}</Text>
+                {/* <Text size="xl">{group.group}</Text> */}
                 {group.tabs
                   .filter((t) => !t.hidden)
                   .map(({ id, link, text }) => (
@@ -199,7 +199,7 @@ function Router() {
                       }}
                     >
                       <Anchor>
-                        <Flex align="center">
+                        <Flex align="stretch">
                           {isTabActive(link) && <IconChevronRight />}
                           <Text size="lg">{text}</Text>
                         </Flex>
@@ -209,9 +209,9 @@ function Router() {
               </>
             ))}
         </Stack>
-        <Space h="md" />
+        <Space h="lg" />
         <Text c="dimmed" size="xs">
-          {userId}
+          user: #{userId}
         </Text>
       </AppShell.Navbar>
 

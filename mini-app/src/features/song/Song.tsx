@@ -52,11 +52,11 @@ function Song() {
         >
           {artistRefs}
           <Divider my="md" />
-          <Box hidden={displayMode == "render"}>
+          <Box hidden={displayMode != "editor"}>
             <SongEditor currentSong={true} />
           </Box>
-          <Box hidden={displayMode == "editor"}>
-            <ChordProViewer sheet={sheet} transpose={transposeSong} />
+          <Box hidden={displayMode != "render"}>
+            <ChordProViewer sheet={sheet} transpose={transposeSong} active={displayMode == "render"} />
           </Box>
         </ScrollArea>
       </Box>

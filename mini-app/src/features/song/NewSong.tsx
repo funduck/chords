@@ -38,11 +38,11 @@ function NewSong() {
             paddingTop: "20px",
           }}
         >
-          <Box hidden={displayMode == "render"}>
+          <Box hidden={displayMode != "editor"}>
             <SongEditor currentSong={false} />
           </Box>
-          <Box hidden={displayMode == "editor"}>
-            <ChordProViewer sheet={sheet} transpose={transposeSong} />
+          <Box hidden={displayMode != "render"}>
+            <ChordProViewer sheet={sheet} transpose={transposeSong} active={displayMode == "render"} />
           </Box>
         </ScrollArea>
       </Box>
