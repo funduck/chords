@@ -1,3 +1,5 @@
+import { notifications } from "@mantine/notifications";
+
 import { Config } from "@src/config";
 
 const sessionId = crypto.randomUUID().substring(0, 8); // Generate a short session ID
@@ -32,6 +34,13 @@ export class Logger {
   static error(...args: any[]) {
     console.error(...args);
     sendLogToServer("error", ...args);
+    notifications.show({
+      title: "Error",
+      message: args.map((arg) => (typeof arg === "object" ? JSON.stringify(arg) : arg)).join(" "),
+      color: "red",
+      autoClose: 10000,
+      position: "top-right",
+    });
   }
 
   static log(...args: any[]) {
