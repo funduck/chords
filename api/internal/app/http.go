@@ -4,12 +4,14 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
 
 	"chords.com/api/internal/auth"
 	"chords.com/api/internal/logger"
+	"chords.com/api/internal/usecase"
 	"github.com/go-chi/chi/v5"
 	"gopkg.in/go-playground/validator.v9"
 )
@@ -106,4 +108,20 @@ func (a *App) respondJSON(w http.ResponseWriter, statusCode int, data interface{
 	w.WriteHeader(statusCode)
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(byteResp.Bytes())
+}
+
+func (a *App) handleUseCaseError(w http.ResponseWriter, err error) {
+	var authErr *usecase.UseCaseError
+	if errors.As(err, &authErr) {
+		switch authErr.Type {
+		case usecase.ErrorTypeValidation, usecase.ErrorTypeBusiness:
+			a.respondError(w, http.StatusBadRequest, err)
+		case usecase.ErrorTypeDatabase:
+			a.respondError(w, http.StatusInternalServerError, err)
+		default:
+			a.respondError(w, http.StatusInternalServerError, err)
+		}
+	} else {
+		a.respondError(w, http.StatusInternalServerError, err)
+	}
 }

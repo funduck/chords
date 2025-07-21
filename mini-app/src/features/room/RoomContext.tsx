@@ -1,3 +1,4 @@
+import { notifications } from "@mantine/notifications";
 import { ReactNode, createContext, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 
@@ -34,9 +35,9 @@ interface RoomContextType {
   updateRoomState: (updates: Partial<RoomState>) => void;
 
   // ACTIONS
-  createRoom: () => void;
-  joinRoom: (code: string) => void;
-  leaveRoom: () => void;
+  createRoom: () => Promise<void>;
+  joinRoom: (code: string) => Promise<void>;
+  leaveRoom: () => Promise<void>;
 
   // EVENTS
   publish(eventName: EventNamesEnum, value: any): void;
@@ -92,27 +93,41 @@ export function RoomContextProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const createRoom = () => {
+  const createRoom = async () => {
     if (!roomsApi) {
       throw new Error("Rooms API is not available");
     }
-    roomsApi
+    return roomsApi
       .createRoom()
       .then((r) => handle(r))
-      .catch(console.error);
+      .then(() => {
+        notifications.show({
+          title: "Room Created",
+          message: "You have successfully created a new room",
+          color: "green",
+          position: "top-right",
+        });
+      });
   };
 
-  const joinRoom = (roomCode: string) => {
+  const joinRoom = async (roomCode: string) => {
     if (!roomsApi) {
       throw new Error("Rooms API is not available");
     }
-    roomsApi
+    return roomsApi
       .joinRoom({ request: { room_code: roomCode } })
       .then((r) => handle(r))
-      .catch(console.error);
+      .then(() => {
+        notifications.show({
+          title: "Room Joined",
+          message: `You have successfully joined the room with code ${roomCode}`,
+          color: "green",
+          position: "top-right",
+        });
+      });
   };
 
-  const leaveRoom = () => {
+  const leaveRoom = async () => {
     if (!roomsApi) {
       throw new Error("Rooms API is not available");
     }
@@ -120,12 +135,19 @@ export function RoomContextProvider({ children }: { children: ReactNode }) {
       console.warn("No room to leave");
       return;
     }
-    roomsApi
+    return roomsApi
       .leaveRoom({ id: roomState.room.id })
       .then(() => {
         handle();
       })
-      .catch(console.error);
+      .then(() => {
+        notifications.show({
+          title: "Room Left",
+          message: "You have successfully left the room",
+          color: "green",
+          position: "top-right",
+        });
+      });
   };
 
   const publish = (eventName: EventNamesEnum, value: any) => {
@@ -150,8 +172,7 @@ export function RoomContextProvider({ children }: { children: ReactNode }) {
 
     const storedRoomCode = localStorage.getItem("roomCode");
     if (storedRoomCode) {
-      console.log("Found stored room code:", storedRoomCode);
-      joinRoom(storedRoomCode);
+      navigate(RoutesEnum.Room(storedRoomCode));
     }
   }, [roomsApi, ws]);
 

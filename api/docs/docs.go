@@ -119,6 +119,74 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/auth/confirm/{code}": {
+            "post": {
+                "description": "Confirm email authentication using action code",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Confirm Email Authentication",
+                "operationId": "confirmAuth",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Action Code",
+                        "name": "code",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/internal_app.LoginResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/auth/email": {
+            "post": {
+                "description": "Authenticate with email without password, send sign-in link",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Email Authentication",
+                "operationId": "emailAuth",
+                "parameters": [
+                    {
+                        "description": "Email Auth Request",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/internal_app.EmailAuthRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/internal_app.AuthResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/auth/refresh-token": {
             "post": {
                 "description": "Refresh an access token using a refresh token",
@@ -1029,9 +1097,6 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
-                "isAnonymous": {
-                    "type": "boolean"
-                },
                 "myLibraries": {
                     "type": "array",
                     "items": {
@@ -1056,10 +1121,26 @@ const docTemplate = `{
                         "$ref": "#/definitions/chords_com_api_internal_entity.Room"
                     }
                 },
+                "status": {
+                    "$ref": "#/definitions/chords_com_api_internal_entity.UserStatus"
+                },
                 "updated_at": {
                     "type": "string"
                 }
             }
+        },
+        "chords_com_api_internal_entity.UserStatus": {
+            "type": "string",
+            "enum": [
+                "anonymous",
+                "waiting_for_confirmation",
+                "active"
+            ],
+            "x-enum-varnames": [
+                "UserStatus_Anonymous",
+                "UserStatus_WaitingForConfirmation",
+                "UserStatus_Active"
+            ]
         },
         "chords_com_api_internal_event_bus.Event": {
             "type": "object",
@@ -1081,6 +1162,26 @@ const docTemplate = `{
                 }
             }
         },
+        "internal_app.AuthResponse": {
+            "type": "object",
+            "properties": {
+                "link": {
+                    "description": "TODO remove when email confirmation is implemented",
+                    "type": "string"
+                }
+            }
+        },
+        "internal_app.EmailAuthRequest": {
+            "type": "object",
+            "required": [
+                "email"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                }
+            }
+        },
         "internal_app.LoginResponse": {
             "type": "object",
             "properties": {
@@ -1088,8 +1189,10 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "refresh_token": {
-                    "description": "Optional, can be empty",
                     "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
                 }
             }
         },

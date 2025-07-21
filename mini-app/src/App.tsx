@@ -6,7 +6,8 @@ import "@mantine/notifications/styles.css";
 import { BrowserRouter } from "react-router";
 
 import Router from "./Router";
-import AnonymousLogin from "./features/auth/AnonymousLogin";
+import { AccountProvider } from "./features/account/AccountContext";
+import Login from "./features/account/Login";
 import { RoomContextProvider } from "./features/room/RoomContext";
 import { RoomEventsConsumer, RoomEventsPublisher } from "./features/room/RoomEvents";
 import { SearchProvider } from "./features/search/SearchContext";
@@ -23,20 +24,22 @@ function App() {
       <Notifications />
       <BrowserRouter>
         <ApiProvider>
-          <WebSocketProvider>
-            <SongContextProvider>
-              <RoomContextProvider>
-                <HeaderProvider>
-                  <SearchProvider>
-                    <RoomEventsPublisher />
-                    <RoomEventsConsumer />
-                    <AnonymousLogin />
-                    <Router />
-                  </SearchProvider>
-                </HeaderProvider>
-              </RoomContextProvider>
-            </SongContextProvider>
-          </WebSocketProvider>
+          <AccountProvider>
+            <WebSocketProvider>
+              <SongContextProvider>
+                <RoomContextProvider>
+                  <HeaderProvider>
+                    <SearchProvider>
+                      <RoomEventsPublisher />
+                      <RoomEventsConsumer />
+                      <Login />
+                      <Router />
+                    </SearchProvider>
+                  </HeaderProvider>
+                </RoomContextProvider>
+              </SongContextProvider>
+            </WebSocketProvider>
+          </AccountProvider>
         </ApiProvider>
       </BrowserRouter>
     </MantineProvider>

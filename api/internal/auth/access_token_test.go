@@ -13,8 +13,7 @@ func TestAccessToken(t *testing.T) {
 	t.Run("Encode and Decode", func(t *testing.T) {
 		// Create an access token
 		token := AccessToken{
-			UserID:      12345,
-			IsAnonymous: false,
+			UserID: 12345,
 		}
 
 		secret := "mysecretkey"

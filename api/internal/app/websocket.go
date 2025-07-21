@@ -31,7 +31,6 @@ func (a *App) NewWSHandler() http.HandlerFunc {
 
 		log.Infow("WebSocket connection established",
 			"userID", accessToken.UserID,
-			"isAnonymous", accessToken.IsAnonymous,
 		)
 
 		bus := eventbus.GetEventBus()
@@ -92,6 +91,7 @@ func (a *App) NewWSHandler() http.HandlerFunc {
 }
 
 // PostWSHandler godoc
+//
 //	@Summary		Post WebSocket Handler
 //	@Description	This is a placeholder - only for OpenAPI documentation purposes.
 //	@Tags			WebSocket

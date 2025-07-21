@@ -21,21 +21,15 @@ func TestRoomService(t *testing.T) {
 	code := ""
 
 	tx := orm.GetDBInstance()
-	user := entity.User{
-		IsAnonymous: true,
-	}
+	user := entity.User{}
 	assert.NoError(t, tx.Create(&user).Error, "failed to create test user")
 	token := auth.AccessToken{
-		UserID:      user.ID,
-		IsAnonymous: true,
+		UserID: user.ID,
 	}
-	user2 := entity.User{
-		IsAnonymous: true,
-	}
+	user2 := entity.User{}
 	assert.NoError(t, tx.Create(&user2).Error, "failed to create second test user")
 	token2 := auth.AccessToken{
-		UserID:      user2.ID,
-		IsAnonymous: true,
+		UserID: user2.ID,
 	}
 	room := &entity.Room{}
 	var err error

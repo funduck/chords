@@ -2,6 +2,7 @@ port: 9001
 sqlite_file: dev.sqlite
 secret: topsecret
 access_token_expires_in_seconds: 86400
+confirmation_link: "https://chords.net/confirm/{code}"
 
 # dev | prod
 logger_env: dev

@@ -10,11 +10,51 @@ import (
 	"chords.com/api/internal/config"
 	"chords.com/api/internal/entity"
 	"chords.com/api/internal/orm"
+	"chords.com/api/internal/usecase"
+	"github.com/go-chi/chi/v5"
 )
 
 type LoginResponse struct {
+	UserID       uint   `json:"user_id,omitempty"`
 	AccessToken  string `json:"access_token"`
-	RefreshToken string `json:"refresh_token,omitempty"` // Optional, can be empty
+	RefreshToken string `json:"refresh_token,omitempty"`
+}
+
+func createAccessToken(user *entity.User) *auth.AccessToken {
+	return &auth.AccessToken{
+		UserID: user.ID,
+	}
+}
+
+func createRefreshToken(userID uint) string {
+	return fmt.Sprintf("refresh_token_for_user_%d", userID)
+}
+
+func (a *App) createLoginResponse(user *entity.User) (*LoginResponse, error) {
+	conf := config.New()
+	token := createAccessToken(user)
+
+	tokenString, err := token.Encode(conf.Secret, conf.AccessTokenExpiresInSeconds)
+	if err != nil {
+		return nil, fmt.Errorf("failed to encode access token: %w", err)
+	}
+
+	response := LoginResponse{
+		UserID:       user.ID,
+		AccessToken:  tokenString,
+		RefreshToken: createRefreshToken(user.ID),
+	}
+
+	return &response, nil
+}
+
+func (a *App) respondAccessToken(w http.ResponseWriter, user *entity.User) {
+	response, err := a.createLoginResponse(user)
+	if err != nil {
+		a.respondError(w, http.StatusInternalServerError, err)
+		return
+	}
+	a.respondJSON(w, http.StatusOK, response)
 }
 
 // AnonymousLogIn godoc
@@ -30,30 +70,14 @@ type LoginResponse struct {
 func (a *App) AnonymousLogIn(w http.ResponseWriter, r *http.Request) {
 	tx := orm.GetDB(r.Context())
 	user := entity.User{
-		IsAnonymous: true,
+		Status: entity.UserStatus_Anonymous,
 	}
 	if err := tx.Create(&user).Error; err != nil {
 		a.respondError(w, http.StatusInternalServerError, fmt.Errorf("failed to create anonymous user: %w", err))
 		return
 	}
 
-	token := &auth.AccessToken{
-		UserID:      user.ID,
-		IsAnonymous: true,
-	}
-
-	conf := config.New()
-	tokenString, err := token.Encode(conf.Secret, conf.AccessTokenExpiresInSeconds)
-	if err != nil {
-		a.respondError(w, http.StatusInternalServerError, fmt.Errorf("failed to encode access token: %w", err))
-		return
-	}
-
-	response := LoginResponse{
-		AccessToken:  tokenString,
-		RefreshToken: fmt.Sprintf("refresh_token_for_user_%d", user.ID), // Placeholder for refresh token
-	}
-	a.respondJSON(w, http.StatusOK, response)
+	a.respondAccessToken(w, &user)
 }
 
 type RefreshTokenRequest struct {
@@ -94,21 +118,71 @@ func (a *App) RefreshToken(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	token := &auth.AccessToken{
-		UserID:      user.ID,
-		IsAnonymous: user.IsAnonymous,
-	}
+	a.respondAccessToken(w, &user)
+}
 
-	conf := config.New()
-	tokenString, err := token.Encode(conf.Secret, conf.AccessTokenExpiresInSeconds)
-	if err != nil {
-		a.respondError(w, http.StatusInternalServerError, fmt.Errorf("failed to encode access token: %w", err))
+type EmailAuthRequest struct {
+	Email string `json:"email" validate:"required,email"`
+}
+
+type AuthResponse struct {
+	Link string `json:"link,omitempty"` // TODO remove when email confirmation is implemented
+}
+
+// EmailAuth godoc
+//
+//	@ID				emailAuth
+//	@Summary		Email Authentication
+//	@Description	Authenticate with email without password, send sign-in link
+//	@Tags			Auth
+//	@Accept			json
+//	@Produce		json
+//	@Param			data	body		EmailAuthRequest	true	"Email Auth Request"
+//	@Success		200		{object}	AuthResponse
+//	@Router			/api/auth/email [post]
+func (a *App) EmailAuth(w http.ResponseWriter, r *http.Request) {
+	var req usecase.EmailAuthRequest
+	if err := parseBody(w, r, &req); err != nil {
 		return
 	}
 
-	response := LoginResponse{
-		AccessToken:  tokenString,
-		RefreshToken: req.RefreshToken, // Echo back the refresh token
+	useCase := usecase.NewEmailAuthUseCase(config.New())
+	result, err := useCase.Execute(r.Context(), req)
+	if err != nil {
+		a.handleUseCaseError(w, err)
+		return
+	}
+
+	// TODO: Send email with confirmation link
+
+	response := AuthResponse{
+		Link: result.Link,
 	}
 	a.respondJSON(w, http.StatusOK, response)
+}
+
+// ConfirmAuth godoc
+//
+//	@ID				confirmAuth
+//	@Summary		Confirm Email Authentication
+//	@Description	Confirm email authentication using action code
+//	@Tags			Auth
+//	@Accept			json
+//	@Produce		json
+//	@Param			code	path		string	true	"Action Code"
+//	@Success		200		{object}	LoginResponse
+//	@Router			/api/auth/confirm/{code} [post]
+func (a *App) ConfirmAuth(w http.ResponseWriter, r *http.Request) {
+	code := chi.URLParam(r, "code")
+
+	useCase := usecase.NewConfirmAuthUseCase()
+	result, err := useCase.Execute(r.Context(), usecase.ConfirmAuthRequest{
+		Code: code,
+	})
+	if err != nil {
+		a.handleUseCaseError(w, err)
+		return
+	}
+
+	a.respondAccessToken(w, result.User)
 }

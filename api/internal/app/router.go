@@ -60,6 +60,8 @@ func NewHttpRouter(a *App) *chi.Mux {
 			r.Post("/ws", a.PostWSHandler)
 
 			r.Post("/auth/anonymous", a.AnonymousLogIn)
+			r.Post("/auth/email", a.EmailAuth)
+			r.Post("/auth/confirm/{code}", a.ConfirmAuth)
 			r.Post("/auth/refresh-token", a.RefreshToken)
 
 			r.Group(func(r chi.Router) {

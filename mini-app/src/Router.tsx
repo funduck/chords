@@ -1,12 +1,6 @@
 import { Anchor, AppShell, Burger, Button, Flex, Group, Menu, Space, Text, em } from "@mantine/core";
 import { useDisclosure, useMediaQuery } from "@mantine/hooks";
-import {
-  IconChevronCompactRight,
-  IconChevronRight,
-  IconPoint,
-  IconSettings,
-  IconSettingsFilled,
-} from "@tabler/icons-react";
+import { IconChevronRight, IconSettings, IconSettingsFilled } from "@tabler/icons-react";
 import { useSignal } from "@telegram-apps/sdk-react";
 import { useEffect } from "react";
 import { Route, Routes, useLocation, useNavigate } from "react-router";
@@ -14,6 +8,8 @@ import { Route, Routes, useLocation, useNavigate } from "react-router";
 import Stack from "@components/Stack";
 
 import ThemeSwitch from "./components/ThemeSwitch";
+import Account from "./features/account/Account";
+import Confirm from "./features/account/Confirm";
 import Artist from "./features/artist/Artist";
 import Room from "./features/room/Room";
 import Search from "./features/search/Search";
@@ -24,7 +20,10 @@ import { useHeader } from "./hooks/Header";
 import { Signals } from "./services/signals-registry";
 
 class RoutesEnum {
-  static Room = "/room";
+  static Room = function (roomCode?: string) {
+    if (!roomCode) return "/room";
+    return "/room/join/" + roomCode;
+  };
   static SearchArtists = function (artistId?: number): string {
     if (artistId == null) {
       return "/search/artists";
@@ -38,6 +37,7 @@ class RoutesEnum {
     return "/songs/" + songId;
   };
   static Editor = "/editor";
+  static Account = "/account";
 }
 
 export { RoutesEnum };
@@ -106,7 +106,7 @@ function Router() {
         {
           id: "room",
           text: "Room",
-          link: RoutesEnum.Room,
+          link: RoutesEnum.Room(),
         },
       ],
     },
@@ -125,7 +125,16 @@ function Router() {
         },
       ],
     },
-    { group: "my", tabs: [] },
+    {
+      group: "My",
+      tabs: [
+        {
+          id: "account",
+          text: "Account",
+          link: RoutesEnum.Account,
+        },
+      ],
+    },
   ];
 
   // Function to check if a tab is active
@@ -220,13 +229,15 @@ function Router() {
       <AppShell.Main id="appshellmain" style={{ display: "flex", flex: 1, flexDirection: "column" }}>
         <Routes>
           <Route index element={<Search />} />
-          <Route path="search/songs" element={<Search />} />
-          <Route path="songs/:songId" element={<Song />} />
+          <Route path="account" element={<Account />} />
+          <Route path="artists/:artistId" element={<Artist />} />
+          <Route path="confirm/:code" element={<Confirm />} />
           <Route path="editor" element={<NewSong />} />
           <Route path="room" element={<Room />} />
           <Route path="room/join/:roomCode" element={<Room />} />
           <Route path="search/artists" element={<Artist />} />
-          <Route path="artists/:artistId" element={<Artist />} />
+          <Route path="search/songs" element={<Search />} />
+          <Route path="songs/:songId" element={<Song />} />
         </Routes>
       </AppShell.Main>
 

@@ -5,6 +5,7 @@ type Config struct {
 	SQLiteFile                  string            `mapstructure:"sqlite_file"`
 	Secret                      string            `mapstructure:"secret"`
 	AccessTokenExpiresInSeconds int64             `mapstructure:"access_token_expires_in_seconds"`
+	ConfirmationLink            string            `mapstructure:"confirmation_link"`
 	LoggerEnv                   string            `mapstructure:"logger_env"`
 	LoggerLevel                 string            `mapstructure:"logger_level"`
 	LoggerLevels                map[string]string `mapstructure:"logger_levels"`

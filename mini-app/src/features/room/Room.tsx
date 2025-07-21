@@ -3,7 +3,6 @@ import { IconCopy, IconDoorExit, IconShare3 } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 
-import { Config } from "@src/config";
 import { useRoomsApi } from "@src/hooks/Api";
 import { useHeader } from "@src/hooks/Header";
 import { useScrollPosition } from "@src/hooks/useScrollPosition";
@@ -28,7 +27,7 @@ function Room() {
 
   const currentURL = window.location.href;
   const { roomCode: joinRoomCode } = useParams();
-  // TODO fix
+
   useEffect(() => {
     if (!roomsApi) {
       return;

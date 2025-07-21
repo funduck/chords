@@ -318,8 +318,6 @@ definitions:
         type: string
       id:
         type: integer
-      isAnonymous:
-        type: boolean
       myLibraries:
         items:
           $ref: '#/definitions/chords_com_api_internal_entity.Library'
@@ -336,6 +334,8 @@ definitions:
         items:
           $ref: '#/definitions/chords_com_api_internal_entity.Room'
         type: array
+      status:
+        $ref: '#/definitions/chords_com_api_internal_entity.UserStatus'
       updated_at:
         type: string
     required:
@@ -343,6 +343,16 @@ definitions:
     - id
     - updated_at
     type: object
+  chords_com_api_internal_entity.UserStatus:
+    enum:
+    - anonymous
+    - waiting_for_confirmation
+    - active
+    type: string
+    x-enum-varnames:
+    - UserStatus_Anonymous
+    - UserStatus_WaitingForConfirmation
+    - UserStatus_Active
   chords_com_api_internal_event_bus.Event:
     properties:
       context:
@@ -357,13 +367,27 @@ definitions:
         description: Client specific event type
         type: string
     type: object
+  internal_app.AuthResponse:
+    properties:
+      link:
+        description: TODO remove when email confirmation is implemented
+        type: string
+    type: object
+  internal_app.EmailAuthRequest:
+    properties:
+      email:
+        type: string
+    required:
+    - email
+    type: object
   internal_app.LoginResponse:
     properties:
       access_token:
         type: string
       refresh_token:
-        description: Optional, can be empty
         type: string
+      user_id:
+        type: integer
     type: object
   internal_app.RefreshTokenRequest:
     properties:
@@ -443,6 +467,51 @@ paths:
           schema:
             $ref: '#/definitions/internal_app.LoginResponse'
       summary: Anonymous Log In
+      tags:
+      - Auth
+  /api/auth/confirm/{code}:
+    post:
+      consumes:
+      - application/json
+      description: Confirm email authentication using action code
+      operationId: confirmAuth
+      parameters:
+      - description: Action Code
+        in: path
+        name: code
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_app.LoginResponse'
+      summary: Confirm Email Authentication
+      tags:
+      - Auth
+  /api/auth/email:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate with email without password, send sign-in link
+      operationId: emailAuth
+      parameters:
+      - description: Email Auth Request
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/internal_app.EmailAuthRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_app.AuthResponse'
+      summary: Email Authentication
       tags:
       - Auth
   /api/auth/refresh-token:

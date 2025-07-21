@@ -13,8 +13,7 @@ import (
 var issuer = "chords.com"
 
 type AccessToken struct {
-	UserID      uint
-	IsAnonymous bool
+	UserID uint
 }
 
 type Claims struct {
@@ -43,7 +42,6 @@ func (at *AccessToken) Decode(tokenString string, secretKey string) error {
 		return errors.New("invalid user ID in token")
 	}
 	at.UserID = uint(userID)
-	at.IsAnonymous = claims.IsAnonymous
 
 	return nil
 }
@@ -55,7 +53,6 @@ func (at *AccessToken) Encode(secretKey string, expiresInSeconds int64) (string,
 			Subject:   fmt.Sprint(at.UserID),
 			ExpiresAt: jwt.NewNumericDate(jwt.TimeFunc().Add(time.Duration(expiresInSeconds) * time.Second)),
 		},
-		IsAnonymous: at.IsAnonymous,
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
