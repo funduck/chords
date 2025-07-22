@@ -5,8 +5,6 @@ import (
 	"regexp"
 	"strings"
 
-	"chords.com/api/internal/auth"
-	"chords.com/api/internal/dto"
 	"chords.com/api/internal/entity"
 	"chords.com/api/internal/orm"
 )
@@ -25,7 +23,7 @@ func (s *ArtistService) normalizeName(name string) string {
 	normalized := strings.ToLower(name)
 
 	// Remove special characters and spaces, keep only alphanumeric
-	reg := regexp.MustCompile(`[^a-z0-9а-я]`)
+	reg := regexp.MustCompile(`[^a-zA-Z0-9а-яА-Я]`)
 	normalized = reg.ReplaceAllString(normalized, "")
 
 	// Remove repeated letters
@@ -68,113 +66,23 @@ func (s *ArtistService) GetArtistByID(ctx context.Context, id uint) (*entity.Art
 }
 
 // CreateIfNotExists creates an artist if it doesn't already exist based on name comparison
-func (s *ArtistService) CreateIfNotExists(ctx context.Context, name string) (*entity.Artist, error) {
+func (s *ArtistService) CreateIfNotExists(ctx context.Context, artist *entity.Artist) error {
 	// First check if artist already exists by normalized name
-	normalized := s.normalizeName(name)
+	normalized := s.normalizeName(artist.Name)
 	db := orm.GetDB(ctx)
 
 	var existing entity.Artist
 	err := db.Where("name_normalized = ?", normalized).First(&existing).Error
 	if err == nil {
 		// Artist with same normalized name already exists, return it
-		return &existing, nil
+		*artist = existing
+		return nil
 	}
 	if !orm.IsRecordNotFoundError(err) {
-		return nil, err // Some other error occurred
+		return err // Some other error occurred
 	}
 
-	// Create new artist
-	artist := &entity.Artist{
-		Name:           name,
-		NameNormalized: normalized,
-	}
+	artist.NameNormalized = normalized
 
-	err = db.Create(artist).Error
-	if err != nil {
-		return nil, err
-	}
-
-	return artist, nil
-}
-
-// SearchArtists performs search on artists using either FTS or LIKE search
-func (s *ArtistService) SearchArtists(ctx context.Context, req *dto.SearchArtistRequest) (*entity.ArtistsList, error) {
-	tx := orm.GetDB(ctx)
-
-	if req.Limit <= 0 {
-		req.Limit = -1 // Default to no limit
-	}
-
-	q := tx.Model(&entity.Artist{})
-
-	// Apply library filtering if specified
-	if req.LibraryType == "" {
-		req.LibraryType = entity.LibraryType_Public
-	}
-	if req.LibraryType != entity.LibraryType_Public {
-		q = q.Joins("JOIN library_artists la ON la.artist_id = artists.id").
-			Joins("JOIN libraries l ON l.id = la.library_id").
-			Where("l.type = ?", req.LibraryType)
-
-		if req.LibraryType == entity.LibraryType_Private || req.LibraryType == entity.LibraryType_Favorites {
-			accessToken, err := auth.GetAccessToken(ctx)
-			if err != nil {
-				return nil, err
-			}
-			q = q.Where("l.owner_id = ?", accessToken.UserID)
-		}
-	}
-
-	if req.Query != "" {
-		normalizedName := s.normalizeName(req.Query)
-		if len(normalizedName) > 3 {
-			q = q.Where("("+orm.SearchFTS("artists")+"OR name_normalized LIKE ?)", req.Query, "%"+normalizedName+"%")
-		} else {
-			q = q.Where(orm.SearchFTS("artists"), req.Query)
-		}
-	}
-
-	// Count total number of matching artists
-	var total int64
-	if req.ReturnTotal {
-		err := q.Count(&total).Error
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	artistsList := []*entity.ArtistInfo{}
-	if req.ReturnRows {
-		var artists []*entity.Artist
-
-		if req.CursorAfter != "" {
-			// Use cursor for pagination
-			normalizedCursor := s.normalizeName(req.CursorAfter)
-			q = q.Where("name_normalized > ?", normalizedCursor)
-		}
-		if req.CursorBefore != "" {
-			// Use cursor for pagination
-			normalizedCursor := s.normalizeName(req.CursorBefore)
-			q = q.Where("name_normalized < ?", normalizedCursor)
-		}
-
-		// Find artists with pagination
-		err := q.
-			Order("artists.name_normalized ASC").
-			Limit(req.Limit).
-			Find(&artists).Error
-		if err != nil {
-			return nil, err
-		}
-		// Populate cursors for pagination
-		for _, artist := range artists {
-			listItem := &entity.ArtistInfo{
-				Artist: *artist,
-				Cursor: artist.NameNormalized,
-			}
-			artistsList = append(artistsList, listItem)
-		}
-	}
-
-	return &entity.ArtistsList{Artists: artistsList, Total: total}, nil
+	return db.Create(artist).Error
 }

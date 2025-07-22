@@ -32,13 +32,12 @@ func TestCreateRoomHandler(t *testing.T) {
 	conf := config.New()
 
 	tx := orm.GetDBInstance()
+
 	// Mock access token
 	user1 := entity.User{}
-	err := tx.Create(&user1).Error
-	assert.NoError(t, err)
+	orm.CreateOrPanicInTest(&user1)
 	user2 := entity.User{}
-	err = tx.Create(&user2).Error
-	assert.NoError(t, err)
+	orm.CreateOrPanicInTest(&user2)
 
 	accessToken1 := &auth.AccessToken{UserID: user1.ID}
 	tokenString1, err := accessToken1.Encode(conf.Secret, conf.AccessTokenExpiresInSeconds)
@@ -52,6 +51,11 @@ func TestCreateRoomHandler(t *testing.T) {
 	client := &http.Client{}
 
 	t.Run("Create Room Handler", func(t *testing.T) {
+		c := int64(0)
+		err = tx.Model(&entity.Room{}).Count(&c).Error
+		assert.NoError(t, err)
+		assert.Equal(t, int64(0), c, "expected no rooms before creation")
+
 		req, err := http.NewRequest(http.MethodPost, server.URL+"/api/rooms", bytes.NewBuffer([]byte{}))
 		assert.NoError(t, err)
 		req.Header.Set("Content-Type", "application/json")

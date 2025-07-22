@@ -4,9 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"chords.com/api/internal/auth"
 	"chords.com/api/internal/config"
-	"chords.com/api/internal/dto"
 	"chords.com/api/internal/entity"
 	"chords.com/api/internal/orm"
 	"gorm.io/gorm"
@@ -60,6 +58,10 @@ func TestArtistService_normalizeName(t *testing.T) {
 			input:    "A C C D C",
 			expected: "acdc",
 		},
+		{name: "Cyrillic characters",
+			input:    "Пример",
+			expected: "пример",
+		},
 	}
 
 	for _, tt := range tests {
@@ -78,7 +80,8 @@ func TestArtistService_CreateIfNotExists(t *testing.T) {
 	ctx := orm.WithDB(context.Background(), db)
 
 	t.Run("Create new artist", func(t *testing.T) {
-		artist, err := service.CreateIfNotExists(ctx, "John Doe")
+		artist := &entity.Artist{Name: "John Doe"}
+		err := service.CreateIfNotExists(ctx, artist)
 		if err != nil {
 			t.Fatalf("Expected no error, got %v", err)
 		}
@@ -98,13 +101,15 @@ func TestArtistService_CreateIfNotExists(t *testing.T) {
 
 	t.Run("Return existing artist with same normalized name", func(t *testing.T) {
 		// Create first artist
-		artist1, err := service.CreateIfNotExists(ctx, "AC/DC")
+		artist1 := &entity.Artist{Name: "AC/DC"}
+		err := service.CreateIfNotExists(ctx, artist1)
 		if err != nil {
 			t.Fatalf("Expected no error, got %v", err)
 		}
 
 		// Try to create artist with different formatting but same normalized name
-		artist2, err := service.CreateIfNotExists(ctx, "A C D C")
+		artist2 := &entity.Artist{Name: "A C D C"}
+		err = service.CreateIfNotExists(ctx, artist2)
 		if err != nil {
 			t.Fatalf("Expected no error, got %v", err)
 		}
@@ -119,12 +124,14 @@ func TestArtistService_CreateIfNotExists(t *testing.T) {
 	})
 
 	t.Run("Create different artists with different normalized names", func(t *testing.T) {
-		artist1, err := service.CreateIfNotExists(ctx, "The Beatles")
+		artist1 := &entity.Artist{Name: "The Beatles"}
+		err := service.CreateIfNotExists(ctx, artist1)
 		if err != nil {
 			t.Fatalf("Expected no error, got %v", err)
 		}
 
-		artist2, err := service.CreateIfNotExists(ctx, "The Rolling Stones")
+		artist2 := &entity.Artist{Name: "The Rolling Stones"}
+		err = service.CreateIfNotExists(ctx, artist2)
 		if err != nil {
 			t.Fatalf("Expected no error, got %v", err)
 		}
@@ -145,7 +152,8 @@ func TestArtistService_FindByName(t *testing.T) {
 	ctx := orm.WithDB(context.Background(), db)
 
 	// Create test artist
-	created, err := service.CreateIfNotExists(ctx, "Test Artist")
+	created := &entity.Artist{Name: "Test Artist"}
+	err := service.CreateIfNotExists(ctx, created)
 	if err != nil {
 		t.Fatalf("Failed to create test artist: %v", err)
 	}
@@ -183,7 +191,8 @@ func TestArtistService_GetArtistByID(t *testing.T) {
 	ctx := orm.WithDB(context.Background(), db)
 
 	// Create test artist
-	created, err := service.CreateIfNotExists(ctx, "Test Artist")
+	created := &entity.Artist{Name: "Test Artist"}
+	err := service.CreateIfNotExists(ctx, created)
 	if err != nil {
 		t.Fatalf("Failed to create test artist: %v", err)
 	}
@@ -211,239 +220,6 @@ func TestArtistService_GetArtistByID(t *testing.T) {
 		_, err := service.GetArtistByID(ctx, 999) // Non-existent ID
 		if err == nil {
 			t.Error("Expected error for non-existent artist, got nil")
-		}
-	})
-}
-
-func TestArtistService_SearchArtists(t *testing.T) {
-	db := initForTest()
-	service := NewArtistService()
-	libraryService := NewLibraryService()
-	ctx := orm.WithDB(context.Background(), db)
-
-	user := &entity.User{}
-	err := db.Create(user).Error
-	if err != nil {
-		t.Fatalf("Failed to create test user: %v", err)
-	}
-	accessToken := &auth.AccessToken{UserID: user.ID}
-	ctx = auth.WithAccessToken(ctx, accessToken)
-
-	// Create test artists
-	testArtists := []string{
-		"The Beatles",
-		"The Rolling Stones",
-		"Beatles Tribute Band",
-		"AC/DC",
-		"Metallica",
-	}
-
-	pubLib, err := libraryService.EnsurePublicLibrary(ctx, "Test Library")
-	if err != nil {
-		t.Fatalf("Failed to create public library: %v", err)
-	}
-	privLib, err := libraryService.EnsureUserLibrary(ctx, user.ID)
-	if err != nil {
-		t.Fatalf("Failed to create private library: %v", err)
-	}
-
-	for i, name := range testArtists {
-		a, err := service.CreateIfNotExists(ctx, name)
-		if err != nil {
-			t.Fatalf("Failed to create test artist %s: %v", name, err)
-		}
-		err = libraryService.AddArtistToLibrary(ctx, pubLib, a)
-		if err != nil {
-			t.Fatalf("Failed to add artist %s to public library: %v", name, err)
-		}
-		if i == 1 {
-			err = libraryService.AddArtistToLibrary(ctx, privLib, a)
-			if err != nil {
-				t.Fatalf("Failed to add artist %s to private library: %v", name, err)
-			}
-		}
-	}
-
-	t.Run("Search with LIKE query", func(t *testing.T) {
-		req := &dto.SearchArtistRequest{
-			Query:       "Beatles",
-			Limit:       10,
-			ReturnRows:  true,
-			ReturnTotal: true,
-		}
-
-		response, err := service.SearchArtists(ctx, req)
-		if err != nil {
-			t.Fatalf("Expected no error, got %v", err)
-		}
-
-		if response.Total != 2 {
-			t.Errorf("Expected 2 artists, got %d", response.Total)
-		}
-
-		if len(response.Artists) != 2 {
-			t.Errorf("Expected 2 artists in response, got %d", len(response.Artists))
-		}
-
-		// Check that both Beatles-related artists are returned
-		foundNames := make(map[string]bool)
-		for _, artist := range response.Artists {
-			foundNames[artist.Name] = true
-		}
-
-		if !foundNames["The Beatles"] {
-			t.Error("Expected to find 'The Beatles' in search results")
-		}
-		if !foundNames["Beatles Tribute Band"] {
-			t.Error("Expected to find 'Beatles Tribute Band' in search results")
-		}
-	})
-
-	t.Run("Search with case insensitive", func(t *testing.T) {
-		req := &dto.SearchArtistRequest{
-			Query:       "metallica",
-			Limit:       10,
-			ReturnRows:  true,
-			ReturnTotal: true,
-		}
-
-		response, err := service.SearchArtists(ctx, req)
-		if err != nil {
-			t.Fatalf("Expected no error, got %v", err)
-		}
-
-		if response.Total != 1 {
-			t.Errorf("Expected 1 artist, got %d", response.Total)
-		}
-
-		if len(response.Artists) != 1 {
-			t.Errorf("Expected 1 artist in response, got %d", len(response.Artists))
-		}
-
-		if response.Artists[0].Name != "Metallica" {
-			t.Errorf("Expected 'Metallica', got %q", response.Artists[0].Name)
-		}
-	})
-
-	t.Run("Search with pagination", func(t *testing.T) {
-		req := &dto.SearchArtistRequest{
-			Query:       "The",
-			Limit:       1,
-			ReturnRows:  true,
-			ReturnTotal: true,
-		}
-
-		response, err := service.SearchArtists(ctx, req)
-		if err != nil {
-			t.Fatalf("Expected no error, got %v", err)
-		}
-
-		if response.Total != 2 {
-			t.Errorf("Expected total 2 artists, got %d", response.Total)
-		}
-
-		if len(response.Artists) != 1 {
-			t.Errorf("Expected 1 artist in response (due to limit), got %d", len(response.Artists))
-		}
-
-		// Test second page
-		req.CursorAfter = response.Artists[0].Cursor
-		response, err = service.SearchArtists(ctx, req)
-		if err != nil {
-			t.Fatalf("Expected no error, got %v", err)
-		}
-
-		if len(response.Artists) != 1 {
-			t.Errorf("Expected 1 artist in second page, got %d", len(response.Artists))
-		}
-	})
-
-	t.Run("Search with no results", func(t *testing.T) {
-		req := &dto.SearchArtistRequest{
-			Query:       "NonExistentArtist",
-			Limit:       10,
-			ReturnRows:  true,
-			ReturnTotal: true,
-		}
-
-		response, err := service.SearchArtists(ctx, req)
-		if err != nil {
-			t.Fatalf("Expected no error, got %v", err)
-		}
-
-		if response.Total != 0 {
-			t.Errorf("Expected 0 artists, got %d", response.Total)
-		}
-
-		if len(response.Artists) != 0 {
-			t.Errorf("Expected 0 artists in response, got %d", len(response.Artists))
-		}
-	})
-
-	t.Run("Search with ReturnRows false", func(t *testing.T) {
-		req := &dto.SearchArtistRequest{
-			Query:       "Beatles",
-			Limit:       10,
-			ReturnRows:  false,
-			ReturnTotal: true,
-		}
-
-		response, err := service.SearchArtists(ctx, req)
-		if err != nil {
-			t.Fatalf("Expected no error, got %v", err)
-		}
-
-		if response.Total != 2 {
-			t.Errorf("Expected 2 artists, got %d", response.Total)
-		}
-
-		if len(response.Artists) != 0 {
-			t.Errorf("Expected 0 artists in response when ReturnRows=false, got %d", len(response.Artists))
-		}
-	})
-
-	t.Run("Search with ReturnTotal false", func(t *testing.T) {
-		req := &dto.SearchArtistRequest{
-			Query:       "Beatles",
-			Limit:       10,
-			ReturnRows:  true,
-			ReturnTotal: false,
-		}
-
-		response, err := service.SearchArtists(ctx, req)
-		if err != nil {
-			t.Fatalf("Expected no error, got %v", err)
-		}
-
-		if response.Total != 0 {
-			t.Errorf("Expected 0 total when ReturnTotal=false, got %d", response.Total)
-		}
-
-		if len(response.Artists) != 2 {
-			t.Errorf("Expected 2 artists in response, got %d", len(response.Artists))
-		}
-	})
-
-	t.Run("Search in private library", func(t *testing.T) {
-		req := &dto.SearchArtistRequest{
-			Query:       "Rolling",
-			LibraryType: entity.LibraryType_Private,
-			Limit:       10,
-			ReturnRows:  true,
-			ReturnTotal: true,
-		}
-
-		response, err := service.SearchArtists(ctx, req)
-		if err != nil {
-			t.Fatalf("Expected no error, got %v", err)
-		}
-
-		if response.Total != 1 {
-			t.Errorf("Expected 1 total when ReturnTotal=false, got %d", response.Total)
-		}
-
-		if len(response.Artists) != 1 {
-			t.Errorf("Expected 1 artists in response, got %d", len(response.Artists))
 		}
 	})
 }

@@ -25,9 +25,25 @@ type MockArtistService struct {
 	mock.Mock
 }
 
-func (m *MockArtistService) CreateIfNotExists(ctx context.Context, name string) (*entity.Artist, error) {
-	args := m.Called(ctx, name)
-	return args.Get(0).(*entity.Artist), args.Error(1)
+func (m *MockArtistService) CreateIfNotExists(ctx context.Context, artist *entity.Artist) error {
+	args := m.Called(ctx, artist)
+	if args.Get(0) != nil {
+		return args.Error(0)
+	}
+	return nil
+}
+
+// MockSongService for testing
+type MockSongService struct {
+	mock.Mock
+}
+
+func (m *MockSongService) CreateIfNotExists(ctx context.Context, song *entity.Song) error {
+	args := m.Called(ctx, song)
+	if args.Get(0) != nil {
+		return args.Error(0)
+	}
+	return nil
 }
 
 // MockLibraryService for testing
@@ -71,19 +87,19 @@ func TestCreateSongUseCase_Execute(t *testing.T) {
 	t.Run("successful song creation with artists", func(t *testing.T) {
 		mockArtistService := new(MockArtistService)
 		mockLibraryService := new(MockLibraryService)
+		mockSongService := new(MockSongService)
 
-		artist1 := &entity.Artist{BaseEntity: entity.BaseEntity{ID: 1}, Name: "Artist 1"}
-		artist2 := &entity.Artist{BaseEntity: entity.BaseEntity{ID: 2}, Name: "Artist 2"}
-
-		mockArtistService.On("CreateIfNotExists", ctx, "Artist 1").Return(artist1, nil)
-		mockArtistService.On("CreateIfNotExists", ctx, "Artist 2").Return(artist2, nil)
+		mockArtistService.On("CreateIfNotExists", ctx, mock.AnythingOfType("*entity.Artist")).Return(nil)
+		mockArtistService.On("CreateIfNotExists", ctx, mock.AnythingOfType("*entity.Artist")).Return(nil)
 		mockLibraryService.On("EnsureUserLibrary", ctx, user.ID).Return(&library, nil)
 		mockLibraryService.On("AddArtistToLibrary", ctx, &library, mock.AnythingOfType("*entity.Artist")).Return(nil)
 		mockLibraryService.On("AddSongToLibrary", ctx, &library, mock.AnythingOfType("*entity.Song")).Return(nil)
+		mockSongService.On("CreateIfNotExists", ctx, mock.AnythingOfType("*entity.Song")).Return(nil)
 
 		uc := &CreateSongUseCase{
 			artistService:  mockArtistService,
 			libraryService: mockLibraryService,
+			songService:    mockSongService,
 		}
 
 		req := &dto.CreateSongRequest{
@@ -109,17 +125,18 @@ func TestCreateSongUseCase_Execute(t *testing.T) {
 	t.Run("successful song creation with composers", func(t *testing.T) {
 		mockArtistService := new(MockArtistService)
 		mockLibraryService := new(MockLibraryService)
+		mockSongService := new(MockSongService)
 
-		composer1 := &entity.Artist{BaseEntity: entity.BaseEntity{ID: 3}, Name: "Composer 1"}
-
-		mockArtistService.On("CreateIfNotExists", ctx, "Composer 1").Return(composer1, nil)
+		mockArtistService.On("CreateIfNotExists", ctx, mock.AnythingOfType("*entity.Artist")).Return(nil)
 		mockLibraryService.On("EnsureUserLibrary", ctx, user.ID).Return(&library, nil)
 		mockLibraryService.On("AddArtistToLibrary", ctx, &library, mock.AnythingOfType("*entity.Artist")).Return(nil)
 		mockLibraryService.On("AddSongToLibrary", ctx, &library, mock.AnythingOfType("*entity.Song")).Return(nil)
+		mockSongService.On("CreateIfNotExists", ctx, mock.AnythingOfType("*entity.Song")).Return(nil)
 
 		uc := &CreateSongUseCase{
 			artistService:  mockArtistService,
 			libraryService: mockLibraryService,
+			songService:    mockSongService,
 		}
 
 		req := &dto.CreateSongRequest{

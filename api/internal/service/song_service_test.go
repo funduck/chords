@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"chords.com/api/internal/config"
-	"chords.com/api/internal/dto"
 	"chords.com/api/internal/entity"
 	"chords.com/api/internal/orm"
 	"github.com/stretchr/testify/assert"
@@ -58,79 +57,76 @@ func TestSongService(t *testing.T) {
 		assert.Equal(t, song.Format, res.Format, "expected song format %q, got %q", song.Format, res.Format)
 	})
 
-	t.Run("Search finds some", func(t *testing.T) {
-		res, err := svc.SearchSongs(context.Background(), &dto.SearchSongRequest{
-			Query:       "Test",
-			Limit:       10,
-			ReturnRows:  true,
-			ReturnTotal: true,
-		})
-		assert.NoError(t, err, "expected no error when searching songs")
-		assert.NotNil(t, res, "expected search results to be returned")
-
-		assert.Equal(t, int64(1), res.Total, "expected total %d, got %d", 1, res.Total)
-		assert.Len(t, res.Songs, 1)
-		assert.Equal(t, "Test Song", res.Songs[0].Title, "expected song title %q, got %q", "Test Song", res.Songs[0].Title)
+	t.Run("GetSongByID returns error for non-existent song", func(t *testing.T) {
+		_, err := svc.GetSongByID(context.Background(), 9999) // Non-existent ID
+		assert.Error(t, err, "expected error when getting non-existent song")
 	})
 
-	t.Run("Search by lyrics finds some", func(t *testing.T) {
-		res, err := svc.SearchSongs(context.Background(), &dto.SearchSongRequest{
-			Query:       "with some lyrics",
-			Limit:       10,
-			ReturnRows:  true,
-			ReturnTotal: true,
-		})
-		assert.NoError(t, err, "expected no error when searching songs")
-		assert.NotNil(t, res, "expected search results to be returned")
+	t.Run("CreateIfNotExists creates new song", func(t *testing.T) {
+		newSong := &entity.Song{
+			Title:   "New Test Song",
+			Artists: []*entity.Artist{&artist},
+			Format:  "chordpro",
+			Sheet: `
+			{title: New Test Song}
+			{artist: Test Artist}
+			Verse 1:
+			[C]This is a [G]new [C]test [Am]song`,
+		}
 
-		assert.Equal(t, int64(1), res.Total, "expected total %d, got %d", 1, res.Total)
-		assert.Len(t, res.Songs, 1)
-		assert.Equal(t, "Test Song", res.Songs[0].Title, "expected song title %q, got %q", "Test Song", res.Songs[0].Title)
+		err = svc.CreateIfNotExists(context.Background(), newSong)
+		assert.NoError(t, err, "expected no error when creating new song")
+
+		res, err := svc.GetSongByID(context.Background(), newSong.ID)
+		assert.NoError(t, err, "expected no error when getting newly created song")
+		assert.NotNil(t, res, "expected newly created song to be returned")
+		assert.Equal(t, newSong.Title, res.Title, "expected new song title %q, got %q", newSong.Title, res.Title)
 	})
 
-	t.Run("Search by artist finds some", func(t *testing.T) {
-		res, err := svc.SearchSongs(context.Background(), &dto.SearchSongRequest{
-			ArtistID:    artist.ID,
-			Limit:       10,
-			ReturnRows:  true,
-			ReturnTotal: true,
-		})
-		assert.NoError(t, err, "expected no error when searching by artist")
-		assert.NotNil(t, res, "expected search results to be returned")
+	t.Run("CreateIfNotExists returns existing song", func(t *testing.T) {
+		existingSong := &entity.Song{
+			Title:   "Test Song", // Same title as existing song
+			Artists: []*entity.Artist{&artist},
+			Format:  "chordpro",
+		}
 
-		assert.Equal(t, int64(1), res.Total, "expected total %d, got %d", 1, res.Total)
-		assert.Len(t, res.Songs, 1)
-		assert.Equal(t, "Test Song", res.Songs[0].Title, "expected song title %q, got %q", "Test Song", res.Songs[0].Title)
+		err = svc.CreateIfNotExists(context.Background(), existingSong)
+		assert.NoError(t, err, "expected no error when creating existing song")
+
+		res, err := svc.GetSongByID(context.Background(), existingSong.ID)
+		assert.NoError(t, err, "expected no error when getting existing song")
+		assert.NotNil(t, res, "expected existing song to be returned")
+		assert.Equal(t, song.ID, res.ID, "expected existing song ID %d, got %d", song.ID, res.ID)
 	})
 
-	t.Run("Search by non-existing artist is empty", func(t *testing.T) {
-		res, err := svc.SearchSongs(context.Background(), &dto.SearchSongRequest{
-			ArtistID:    999, // Non-existing artist ID
-			Limit:       10,
-			ReturnRows:  true,
-			ReturnTotal: true,
-		})
-		assert.NoError(t, err, "expected no error when searching by non-existing artist")
-		assert.NotNil(t, res, "expected search results to be returned")
-		assert.Equal(t, int64(0), res.Total, "expected total %d, got %d", 0, res.Total)
-		assert.Empty(t, res.Songs, "expected no songs to be returned for non-existing artist")
+	t.Run("CreateIfNotExists creates new song because another artist added", func(t *testing.T) {
+		anotherArtist := entity.Artist{Name: "Another Artist"}
+		err = tx.Create(&anotherArtist).Error
+		assert.NoError(t, err, "failed to create another test artist")
+
+		newSong := &entity.Song{
+			Title:   "Test Song",
+			Artists: []*entity.Artist{&artist, &anotherArtist},
+			Format:  "chordpro",
+			Sheet: `
+			{title: Test Song}
+			{artist: Test Artist, Another Artist}
+			Verse 1:
+			[C]This is a [G]test [C]song with [Am]another artist`,
+		}
+
+		err = svc.CreateIfNotExists(context.Background(), newSong)
+		assert.NoError(t, err, "expected no error when creating song with another artist")
+
+		resNewSong, err := svc.GetSongByID(context.Background(), newSong.ID)
+		assert.NoError(t, err, "expected no error when getting newly created song with another artist")
+
+		resSong, err := svc.GetSongByID(context.Background(), song.ID)
+		assert.NoError(t, err, "expected no error when getting original song")
+
+		assert.NotEqual(t, resNewSong.ID, resSong.ID, "expected ids not to match, got %d and %d", resNewSong.ID, resSong.ID)
+		assert.Equal(t, resNewSong.Title, resSong.Title, "expected titles to match, got %q and %q", resNewSong.Title, resSong.Title)
+		assert.NotEqual(t, resNewSong.Sheet, resSong.Sheet, "expected sheets to be different, got same content")
 	})
 
-	t.Run("Search is empty", func(t *testing.T) {
-		res, err := svc.SearchSongs(context.Background(), &dto.SearchSongRequest{
-			Query: "Test",
-		})
-		assert.NoError(t, err, "expected no error when searching songs")
-		assert.NotNil(t, res, "expected search results to be returned")
-		assert.Empty(t, res.Songs, "expected no songs to be returned when ReturnRows is false")
-	})
-
-	t.Run("Search by lyrics is empty", func(t *testing.T) {
-		res, err := svc.SearchSongs(context.Background(), &dto.SearchSongRequest{
-			Query: "nonexistent lyrics",
-		})
-		assert.NoError(t, err, "expected no error when searching songs")
-		assert.NotNil(t, res, "expected search results to be returned")
-		assert.Empty(t, res.Songs, "expected no songs to be returned for nonexistent lyrics")
-	})
 }

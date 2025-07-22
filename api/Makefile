@@ -12,7 +12,7 @@ dev:
 	air
 
 test:
-	go test --tags fts5 -v ./...
+	go test --tags fts5 ./...
 
 build-api:
 	go build --tags fts5 -o bin/api ./cmd/api/main.go

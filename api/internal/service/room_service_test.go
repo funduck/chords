@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"fmt"
 	"testing"
 
 	"chords.com/api/internal/auth"
@@ -83,7 +82,6 @@ func TestRoomService(t *testing.T) {
 		assert.NoError(t, err, "expected no error when updating room")
 		assert.NotNil(t, room, "expected room to be updated")
 		assert.NotNil(t, room.State, "expected room state to be updated")
-		fmt.Printf("Updated room state: %+v\n", room.State)
 	})
 
 	t.Run("Leave", func(t *testing.T) {

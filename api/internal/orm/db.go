@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 
 	"chords.com/api/internal/config"
 	"chords.com/api/internal/logger"
@@ -58,6 +59,8 @@ func GetDB(ctx context.Context) *gorm.DB {
 func InitSQLite() (*gorm.DB, *sql.DB) {
 	file := config.New().SQLiteFile
 	log := NewGormLogger()
+	fmt.Printf("Connecting to SQLite database %s", file)
+
 	gormdb, err := gorm.Open(sqlite.Open(file), &gorm.Config{
 		Logger: log,
 	})
@@ -66,7 +69,7 @@ func InitSQLite() (*gorm.DB, *sql.DB) {
 	}
 	SetDBInstance(gormdb)
 
-	db, err := gormdb.DB()
+	sqldb, err := gormdb.DB()
 	if err != nil {
 		panic(err)
 	}
@@ -82,18 +85,18 @@ func InitSQLite() (*gorm.DB, *sql.DB) {
 	}
 	log.Infoln("Initialized FTS for entities")
 
-	return gormdb, db
+	return gormdb, sqldb
 }
 
 func Close() {
 	if gormInstance != nil {
 		log := logger.NewForModule("db")
-		sqlDB, err := gormInstance.DB()
+		sqldb, err := gormInstance.DB()
 		if err != nil {
 			log.Error("Failed to get SQL DB from GORM instance: ", err)
 			return
 		}
-		if err := sqlDB.Close(); err != nil {
+		if err := sqldb.Close(); err != nil {
 			log.Error("Failed to close SQL DB: ", err)
 		} else {
 			log.Info("Closed database connection")

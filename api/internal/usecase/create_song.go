@@ -6,12 +6,11 @@ import (
 	"chords.com/api/internal/auth"
 	"chords.com/api/internal/dto"
 	"chords.com/api/internal/entity"
-	"chords.com/api/internal/orm"
 	"chords.com/api/internal/service"
 )
 
 type ICreateSongArtistService interface {
-	CreateIfNotExists(ctx context.Context, name string) (*entity.Artist, error)
+	CreateIfNotExists(ctx context.Context, artist *entity.Artist) error
 }
 
 type ICreateSongLibraryService interface {
@@ -20,21 +19,25 @@ type ICreateSongLibraryService interface {
 	AddSongToLibrary(ctx context.Context, library *entity.Library, song *entity.Song) error
 }
 
+type ICreateSongSongService interface {
+	CreateIfNotExists(ctx context.Context, song *entity.Song) error
+}
+
 type CreateSongUseCase struct {
 	artistService  ICreateSongArtistService
 	libraryService ICreateSongLibraryService
+	songService    ICreateSongSongService
 }
 
 func NewCreateSongUseCase() *CreateSongUseCase {
 	return &CreateSongUseCase{
 		artistService:  service.NewArtistService(),
 		libraryService: service.NewLibraryService(),
+		songService:    service.NewSongService(),
 	}
 }
 
 func (uc *CreateSongUseCase) Execute(ctx context.Context, req *dto.CreateSongRequest) (*entity.Song, error) {
-	tx := orm.GetDB(ctx)
-
 	accessToken, err := auth.GetAccessToken(ctx)
 	if err != nil {
 		return nil, err
@@ -48,7 +51,8 @@ func (uc *CreateSongUseCase) Execute(ctx context.Context, req *dto.CreateSongReq
 	var artists []*entity.Artist
 	if len(req.Artists) > 0 {
 		for _, artistName := range req.Artists {
-			artist, err := uc.artistService.CreateIfNotExists(ctx, artistName)
+			artist := &entity.Artist{Name: artistName}
+			err = uc.artistService.CreateIfNotExists(ctx, artist)
 			if err != nil {
 				return nil, err
 			}
@@ -63,7 +67,8 @@ func (uc *CreateSongUseCase) Execute(ctx context.Context, req *dto.CreateSongReq
 	var composers []*entity.Artist
 	if len(req.Composers) > 0 {
 		for _, composerName := range req.Composers {
-			composer, err := uc.artistService.CreateIfNotExists(ctx, composerName)
+			composer := &entity.Artist{Name: composerName}
+			err = uc.artistService.CreateIfNotExists(ctx, composer)
 			if err != nil {
 				return nil, err
 			}
@@ -84,7 +89,7 @@ func (uc *CreateSongUseCase) Execute(ctx context.Context, req *dto.CreateSongReq
 		Title:     req.Title,
 	}
 
-	err = tx.Create(song).Error
+	err = uc.songService.CreateIfNotExists(ctx, song)
 	if err != nil {
 		return nil, err
 	}

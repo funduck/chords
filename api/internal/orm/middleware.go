@@ -6,7 +6,6 @@ import (
 
 /* Adds logger with request id label to context */
 func Middleware(next http.Handler) http.Handler {
-
 	f := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 		ctx = WithDB(ctx, GetDBInstance().WithContext(ctx))

@@ -5,6 +5,7 @@ import (
 
 	"chords.com/api/internal/dto"
 	_ "chords.com/api/internal/entity"
+	"chords.com/api/internal/service"
 )
 
 // SearchArtists godoc
@@ -27,7 +28,8 @@ func (a *App) SearchArtists(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	res, err := a.artistService.SearchArtists(r.Context(), &req)
+	search := service.NewSearchService()
+	res, err := search.SearchArtists(r.Context(), &req)
 	if err != nil {
 		a.respondError(w, http.StatusInternalServerError, err)
 		return

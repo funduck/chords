@@ -118,7 +118,8 @@ func main() {
 		// Create or find artists and composers
 		var artists []*entity.Artist
 		if songInfo.Artist != "" {
-			artist, err := artistService.CreateIfNotExists(ctx, songInfo.Artist)
+			artist := &entity.Artist{Name: songInfo.Artist}
+			err := artistService.CreateIfNotExists(ctx, artist)
 			if err != nil {
 				log.Error("Failed to create or find artist: ", songInfo.Artist, " Error: ", err)
 				errs = append(errs, file)
@@ -128,13 +129,14 @@ func main() {
 		}
 		var composers []*entity.Artist
 		if songInfo.Composer != "" {
-			com, err := artistService.CreateIfNotExists(ctx, songInfo.Composer)
+			composer := &entity.Artist{Name: songInfo.Composer}
+			err := artistService.CreateIfNotExists(ctx, composer)
 			if err != nil {
 				log.Error("Failed to create or find composer: ", songInfo.Composer, " Error: ", err)
 				errs = append(errs, file)
 				continue
 			}
-			composers = append(composers, com)
+			composers = append(composers, composer)
 		}
 
 		// Save the song to the public library
@@ -145,7 +147,7 @@ func main() {
 			Format:    entity.SheetFormat_Chordpro,
 			Sheet:     fileContent,
 		}
-		if song, err := songService.CreateIfNotExists(ctx, song); err != nil {
+		if err = songService.CreateIfNotExists(ctx, song); err != nil {
 			log.Error("Failed to create or find song: ", song.Title, " Error: ", err)
 			errs = append(errs, file)
 			continue

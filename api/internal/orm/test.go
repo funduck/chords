@@ -21,27 +21,28 @@ func InitForTest() (*gorm.DB, *sql.DB) {
 
 	gormdb, err := gorm.Open(sqlite.Open(file), &gorm.Config{
 		Logger: log,
-	},
-	)
+	})
 	if err != nil {
 		panic(err)
 	}
-	db, err := gormdb.DB()
+	sqldb, err := gormdb.DB()
 	if err != nil {
 		panic(err)
 	}
 	if err := gormdb.AutoMigrate(entities...); err != nil {
 		panic(err)
 	}
+	log.Infof("Migrated entities: %v", len(entities))
 	if err := initFTS(gormdb); err != nil {
 		panic(err)
 	}
+	log.Infof("Initialized FTS")
 
 	SetDBInstance(gormdb)
 
-	log.Infof("Connected to SQLite in-memory database at %s", file)
+	log.Infof("Connected to Test SQLite in-memory database at %s", file)
 
-	return gormdb, db
+	return gormdb, sqldb
 }
 
 func CreateOrPanicInTest(value interface{}) {
