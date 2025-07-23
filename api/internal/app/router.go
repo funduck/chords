@@ -67,6 +67,8 @@ func NewHttpRouter(a *App) *chi.Mux {
 			r.Group(func(r chi.Router) {
 				r.Use(auth.Middleware)
 
+				r.Get("/auths", a.GetAuths)
+
 				r.Post("/rooms", a.CreateRoom)
 				r.Post("/rooms/join", a.JoinRoom)
 				r.Patch("/rooms/{id}", a.UpdateRoom)

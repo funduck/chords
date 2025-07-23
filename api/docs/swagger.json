@@ -211,6 +211,30 @@
                 }
             }
         },
+        "/api/auths": {
+            "get": {
+                "description": "Get all auths for the current user",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Get Auths",
+                "operationId": "getAuths",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/chords_com_api_internal_entity.Auth"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/rooms": {
             "post": {
                 "security": [
@@ -827,6 +851,70 @@
                     "type": "integer"
                 }
             }
+        },
+        "chords_com_api_internal_entity.Auth": {
+            "type": "object",
+            "required": [
+                "created_at",
+                "id",
+                "updated_at"
+            ],
+            "properties": {
+                "action_code": {
+                    "description": "Action code for email confirmation or other actions",
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "deleted_at": {
+                    "type": "string",
+                    "example": "2025-06-18T15:04:05Z"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "identity": {
+                    "description": "Unique identity for the auth method (e.g., email)",
+                    "type": "string"
+                },
+                "status": {
+                    "$ref": "#/definitions/chords_com_api_internal_entity.AuthStatus"
+                },
+                "type": {
+                    "$ref": "#/definitions/chords_com_api_internal_entity.AuthType"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "user": {
+                    "$ref": "#/definitions/chords_com_api_internal_entity.User"
+                },
+                "user_id": {
+                    "description": "Foreign key to User",
+                    "type": "integer"
+                }
+            }
+        },
+        "chords_com_api_internal_entity.AuthStatus": {
+            "type": "string",
+            "enum": [
+                "waiting_for_confirmation",
+                "active"
+            ],
+            "x-enum-varnames": [
+                "AuthStatus_WaitingForConfirmation",
+                "AuthStatus_Active"
+            ]
+        },
+        "chords_com_api_internal_entity.AuthType": {
+            "type": "string",
+            "enum": [
+                "email"
+            ],
+            "x-enum-varnames": [
+                "AuthType_Email"
+            ]
         },
         "chords_com_api_internal_entity.JoinRoomRequest": {
             "type": "object",

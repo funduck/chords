@@ -3,7 +3,7 @@ import { useNavigate } from "react-router";
 
 import { RoutesEnum } from "@src/Router";
 import { Config } from "@src/config";
-import { CreateSongParams, SongEntity, SongsApiContext, UpdateSongParams } from "@src/hooks/Api";
+import { CreateSongParams, SongEntity, UpdateSongParams, useSongsApi } from "@src/hooks/Api";
 
 export interface AutoScrollOptions {
   enabled?: boolean;
@@ -64,7 +64,7 @@ export function SongContextProvider({ children }: { children: ReactNode }) {
     },
   });
 
-  const songsApi = useContext(SongsApiContext);
+  const songsApi = useSongsApi();
 
   const navigate = useNavigate();
 

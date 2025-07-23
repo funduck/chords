@@ -1,9 +1,9 @@
 import { Text } from "@mantine/core";
 import { useSignal } from "@telegram-apps/sdk-react";
-import { useContext, useEffect } from "react";
+import { useEffect } from "react";
 import { useParams } from "react-router";
 
-import { ArtistsApiContext, SongsApiContext } from "@src/hooks/Api";
+import { useArtistsApi, useSongsApi } from "@src/hooks/Api";
 import { useHeader } from "@src/hooks/Header";
 import { useScrollPosition } from "@src/hooks/useScrollPosition";
 import { Signals } from "@src/services/signals-registry";
@@ -22,8 +22,8 @@ function Artist() {
   }, []);
 
   const { artistId } = useParams<{ artistId: string }>();
-  const songsApi = useContext(SongsApiContext);
-  const artistsApi = useContext(ArtistsApiContext);
+  const songsApi = useSongsApi();
+  const artistsApi = useArtistsApi();
   const artist = useSignal(Signals.artist);
   const { updateSearchState } = useSearchSongsContext();
 

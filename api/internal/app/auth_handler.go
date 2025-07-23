@@ -186,3 +186,30 @@ func (a *App) ConfirmAuth(w http.ResponseWriter, r *http.Request) {
 
 	a.respondAccessToken(w, result.User)
 }
+
+// GetAuths godoc
+//
+//	@ID				getAuths
+//	@Summary		Get Auths
+//	@Description	Get all auths for the current user
+//	@Tags			User
+//	@Produce		json
+//	@Success		200	{array}	entity.Auth
+//	@Router			/api/auths [get]
+func (a *App) GetAuths(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	accessToken, err := auth.GetAccessToken(ctx)
+	if err != nil {
+		a.respondError(w, http.StatusUnauthorized, fmt.Errorf("failed to get access token: %w", err))
+		return
+	}
+
+	auths := []entity.Auth{}
+	tx := orm.GetDB(ctx)
+	if err := tx.Where("user_id = ?", accessToken.UserID).Find(&auths).Error; err != nil {
+		a.respondError(w, http.StatusInternalServerError, fmt.Errorf("failed to fetch auths: %w", err))
+		return
+	}
+
+	a.respondJSON(w, http.StatusOK, auths)
+}

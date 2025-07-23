@@ -46,7 +46,7 @@ function Login() {
             {...loginByEmailForm.getInputProps("email")}
           />
 
-          <Group justify="flex-start" mt="md">
+          <Group justify="flex-end" mt="md">
             <Button type="submit">Login by email</Button>
           </Group>
         </form>

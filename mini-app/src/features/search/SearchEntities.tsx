@@ -34,7 +34,6 @@ interface SearchState<T> {
 // Generic props interface for the SearchEntities component
 interface SearchEntitiesProps<T, SP extends SearchParams> {
   // API and context
-  apiContext: React.Context<any>;
   useSearchContext: () => {
     searchState: SearchState<T>;
     updateSearchState: (updates: any) => void;
@@ -71,7 +70,6 @@ interface ResultsProps<T> {
 }
 
 function SearchEntities<T extends { id?: number; cursor?: string }, SP extends SearchParams>({
-  apiContext,
   useSearchContext,
   searchMethod,
   ListItemComponent,
@@ -86,7 +84,6 @@ function SearchEntities<T extends { id?: number; cursor?: string }, SP extends S
       offset: 60,
     });
 
-  const api = useContext(apiContext);
   const { searchState, updateSearchState } = useSearchContext();
 
   const handleSearch = () => {
@@ -123,7 +120,7 @@ function SearchEntities<T extends { id?: number; cursor?: string }, SP extends S
 
   // Perform search when searching state changes and api is available
   useEffect(() => {
-    if ((searchState.searching || searchState.loadingMore) && api) {
+    if (searchState.searching || searchState.loadingMore) {
       const isInitialSearch = searchState.searching && !searchState.loadingMore;
 
       const searchParams: { request: SP } = {
@@ -168,11 +165,7 @@ function SearchEntities<T extends { id?: number; cursor?: string }, SP extends S
           });
         });
     }
-  }, [searchState.searching, searchState.loadingMore, api]);
-
-  if (!api) {
-    return <div>Loading...</div>;
-  }
+  }, [searchState.searching, searchState.loadingMore]);
 
   return (
     <>

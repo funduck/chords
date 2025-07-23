@@ -5,11 +5,11 @@ tmp_dir = "tmp"
 [build]
   args_bin = []
   bin = "./bin/api"
-  cmd = "go build --tags fts5 -o bin/api ./cmd/api/main.go"
+  cmd = "swag init --parseDependency -g cmd/api/main.go ; swag fmt -g cmd/api/main.go ; go build --tags fts5 -o bin/api ./cmd/api/main.go"
   delay = 1000
   exclude_dir = ["assets", "tmp", "vendor", "testdata", "dist", "bin"]
   exclude_file = []
-  exclude_regex = ["_test.go"]
+  exclude_regex = ["_test.go", "docs/"]
   exclude_unchanged = false
   follow_symlink = false
   full_bin = ""

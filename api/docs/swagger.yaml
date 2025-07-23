@@ -139,6 +139,51 @@ definitions:
       total:
         type: integer
     type: object
+  chords_com_api_internal_entity.Auth:
+    properties:
+      action_code:
+        description: Action code for email confirmation or other actions
+        type: string
+      created_at:
+        type: string
+      deleted_at:
+        example: "2025-06-18T15:04:05Z"
+        type: string
+      id:
+        type: integer
+      identity:
+        description: Unique identity for the auth method (e.g., email)
+        type: string
+      status:
+        $ref: '#/definitions/chords_com_api_internal_entity.AuthStatus'
+      type:
+        $ref: '#/definitions/chords_com_api_internal_entity.AuthType'
+      updated_at:
+        type: string
+      user:
+        $ref: '#/definitions/chords_com_api_internal_entity.User'
+      user_id:
+        description: Foreign key to User
+        type: integer
+    required:
+    - created_at
+    - id
+    - updated_at
+    type: object
+  chords_com_api_internal_entity.AuthStatus:
+    enum:
+    - waiting_for_confirmation
+    - active
+    type: string
+    x-enum-varnames:
+    - AuthStatus_WaitingForConfirmation
+    - AuthStatus_Active
+  chords_com_api_internal_entity.AuthType:
+    enum:
+    - email
+    type: string
+    x-enum-varnames:
+    - AuthType_Email
   chords_com_api_internal_entity.JoinRoomRequest:
     properties:
       room_code:
@@ -535,6 +580,22 @@ paths:
       summary: Refresh Access Token
       tags:
       - Auth
+  /api/auths:
+    get:
+      description: Get all auths for the current user
+      operationId: getAuths
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/chords_com_api_internal_entity.Auth'
+            type: array
+      summary: Get Auths
+      tags:
+      - User
   /api/rooms:
     post:
       consumes:

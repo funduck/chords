@@ -1,7 +1,7 @@
 import { Switch } from "@mantine/core";
 import { useState } from "react";
 
-import { ArtistsApiContext, useArtistsApi } from "@src/hooks/Api";
+import { useArtistsApi } from "@src/hooks/Api";
 import { useScrollPosition } from "@src/hooks/useScrollPosition";
 
 import SearchArtistListItem from "./SearchArtistListItem";
@@ -27,7 +27,6 @@ function SearchArtists() {
         }}
       />
       <SearchEntities
-        apiContext={ArtistsApiContext}
         useSearchContext={useSearchArtistsContext}
         searchMethod={(params) =>
           artistsApi!.searchArtists({

@@ -1,9 +1,7 @@
 import { useSignal } from "@telegram-apps/sdk-react";
 import { cloneDeep, isEqual } from "lodash";
 import { useEffect } from "react";
-import { useNavigate } from "react-router";
 
-import { RoutesEnum } from "@src/Router";
 import { useRoomsApi } from "@src/hooks/Api";
 import { useWebSocket } from "@src/hooks/WebSocket";
 import { Signals } from "@src/services/signals-registry";
@@ -267,8 +265,6 @@ export function RoomEventsConsumer() {
 
   const { updateSongState } = useSongContext();
 
-  const navigate = useNavigate();
-
   useEffect(() => {
     // Handling messages only if we are in room and have a userId
     if (!ws || !userId || !room) {
@@ -326,7 +322,9 @@ export function RoomEventsConsumer() {
         }
         case "song_id": {
           apply("song_id", dto.data.songId);
-          navigate(RoutesEnum.Songs(dto.data.songId));
+          updateSongState({
+            songId: dto.data.songId,
+          });
           break;
         }
         default:

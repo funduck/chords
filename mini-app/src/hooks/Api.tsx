@@ -6,21 +6,38 @@ import {
   ArtistsApi,
   AuthApi,
   ChordsComApiInternalEntityArtistInfo,
+  ChordsComApiInternalEntityAuth,
   ChordsComApiInternalEntityRoom,
   ChordsComApiInternalEntitySong,
   ChordsComApiInternalEntitySongInfo,
   Configuration,
   RoomsApi,
   SongsApi,
+  UserApi,
 } from "@src/generated/api";
 import { Logger } from "@src/services/logger.service";
 import { Signals } from "@src/services/signals-registry";
 
-export const AuthApiContext = createContext<AuthApi | null>(null);
-export const RoomsApiContext = createContext<RoomsApi | null>(null);
-export const ArtistsApiContext = createContext<ArtistsApi | null>(null);
-export const SongsApiContext = createContext<SongsApi | null>(null);
+interface PublicApiContextType {
+  authApi: AuthApi | null;
+}
 
+const PublicApiContext = createContext<PublicApiContextType>({ authApi: null });
+
+interface PrivateApiContextType {
+  roomsApi: RoomsApi | null;
+  artistsApi: ArtistsApi | null;
+  songsApi: SongsApi | null;
+  userApi: UserApi | null;
+}
+const PrivateApiContext = createContext<PrivateApiContextType>({
+  roomsApi: null,
+  artistsApi: null,
+  songsApi: null,
+  userApi: null,
+});
+
+export type AuthEntity = ChordsComApiInternalEntityAuth;
 export type RoomEntity = ChordsComApiInternalEntityRoom;
 export type SongEntity = ChordsComApiInternalEntitySong;
 export type SongInfoEntity = ChordsComApiInternalEntitySongInfo;
@@ -34,6 +51,8 @@ export function ApiProvider({ children }: { children: ReactNode }) {
   const [roomsApi, setRoomsApi] = useState<RoomsApi | null>(null);
   const [artistsApi, setArtistsApi] = useState<ArtistsApi | null>(null);
   const [songsApi, setSongsApi] = useState<SongsApi | null>(null);
+  const [userApi, setUserApi] = useState<UserApi | null>(null);
+
   const accessToken = useSignal(Signals.accessToken);
 
   useEffect(() => {
@@ -105,6 +124,8 @@ export function ApiProvider({ children }: { children: ReactNode }) {
     setArtistsApi(artistsAPI);
     const songsAPI = new SongsApi(conf);
     setSongsApi(songsAPI);
+    const userAPI = new UserApi(conf);
+    setUserApi(userAPI);
 
     Logger.log("Private API connected");
 
@@ -113,30 +134,29 @@ export function ApiProvider({ children }: { children: ReactNode }) {
       setRoomsApi(null);
       setArtistsApi(null);
       setSongsApi(null);
+      setUserApi(null);
     };
   }, [accessToken]);
 
   return (
-    <AuthApiContext.Provider value={authApi}>
-      <RoomsApiContext.Provider value={roomsApi}>
-        <ArtistsApiContext.Provider value={artistsApi}>
-          <SongsApiContext.Provider value={songsApi}>{children}</SongsApiContext.Provider>
-        </ArtistsApiContext.Provider>
-      </RoomsApiContext.Provider>
-    </AuthApiContext.Provider>
+    <PublicApiContext.Provider value={{ authApi }}>
+      <PrivateApiContext.Provider value={{ roomsApi, artistsApi, songsApi, userApi }}>
+        {children}
+      </PrivateApiContext.Provider>
+    </PublicApiContext.Provider>
   );
 }
 
 export function useAuthApi() {
-  const api = useContext(AuthApiContext);
-  if (!api) {
-    throw new Error("Auth API is not available. Make sure to wrap your component with ApiProvider.");
-  }
+  const { authApi: api } = useContext(PublicApiContext);
+  // if (!api) {
+  //   throw new Error("Auth API is not available. Make sure to wrap your component with ApiProvider.");
+  // }
   return api;
 }
 
 export function useRoomsApi() {
-  const api = useContext(RoomsApiContext);
+  const { roomsApi: api } = useContext(PrivateApiContext);
   // if (!api) {
   //   throw new Error("Rooms API is not available. Make sure to wrap your component with ApiProvider.");
   // }
@@ -144,7 +164,7 @@ export function useRoomsApi() {
 }
 
 export function useArtistsApi() {
-  const api = useContext(ArtistsApiContext);
+  const { artistsApi: api } = useContext(PrivateApiContext);
   // if (!api) {
   //   throw new Error("Artists API is not available. Make sure to wrap your component with ApiProvider.");
   // }
@@ -152,9 +172,17 @@ export function useArtistsApi() {
 }
 
 export function useSongsApi() {
-  const api = useContext(SongsApiContext);
+  const { songsApi: api } = useContext(PrivateApiContext);
   // if (!api) {
   //   throw new Error("Songs API is not available. Make sure to wrap your component with ApiProvider.");
+  // }
+  return api;
+}
+
+export function useUserApi() {
+  const { userApi: api } = useContext(PrivateApiContext);
+  // if (!api) {
+  //   throw new Error("User API is not available. Make sure to wrap your component with ApiProvider.");
   // }
   return api;
 }

@@ -1,15 +1,18 @@
-import { Box, Button, Flex, Text } from "@mantine/core";
-import { useSignal } from "@telegram-apps/sdk-react";
+import { Box, Button, Flex, Stack, Text } from "@mantine/core";
+import { useEffect } from "react";
 
 import { useAccountContext } from "@src/features/account/AccountContext";
-import { Signals } from "@src/services/signals-registry";
 
 import Login from "./Login";
 
 function Account() {
-  const { logout } = useAccountContext();
-  const accessToken = useSignal(Signals.accessToken);
-  const userId = useSignal(Signals.userId);
+  const { accessToken, userId, auths, getAuths, logout } = useAccountContext();
+
+  useEffect(() => {
+    if (accessToken) {
+      getAuths();
+    }
+  }, [accessToken, getAuths]);
 
   if (!accessToken) {
     return <Login />;
@@ -18,6 +21,15 @@ function Account() {
   return (
     <Flex direction={"column"} gap={"md"}>
       <Text>Logged in as user #{userId}</Text>
+      {auths?.length && (
+        <Stack>
+          {auths.map((a) => (
+            <Text>
+              {a.type}: {a.identity}
+            </Text>
+          ))}
+        </Stack>
+      )}
       <Box>
         <Button onClick={logout} color="orange" variant="outline">
           Logout

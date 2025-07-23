@@ -1,7 +1,7 @@
 import { Space, Switch } from "@mantine/core";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
-import { SongsApiContext } from "@src/hooks/Api";
+import { useSongsApi } from "@src/hooks/Api";
 import { useScrollPosition } from "@src/hooks/useScrollPosition";
 
 import { useSearchSongsContext } from "./SearchContext";
@@ -10,7 +10,7 @@ import SearchResetArtist from "./SearchResetArtist";
 import SearchSongListItem from "./SearchSongListItem";
 
 function SearchSongs({ artistId }: { artistId?: number }) {
-  const songsApi = useContext(SongsApiContext);
+  const songsApi = useSongsApi();
 
   // Initialize scroll position management
   useScrollPosition();
@@ -43,7 +43,6 @@ function SearchSongs({ artistId }: { artistId?: number }) {
         }}
       />
       <SearchEntities
-        apiContext={SongsApiContext}
         useSearchContext={useSearchSongsContext}
         searchMethod={(params) =>
           songsApi!.searchSongs({
