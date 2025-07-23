@@ -67,11 +67,7 @@ export function RoomContextProvider({ children }: { children: ReactNode }) {
     }
     if (state.song_settings) {
       console.log("Applying room state:", state);
-      // Signals.applySongSettings.set(new SongSettingsDto().fromJson(state.song_settings));
-    }
-    if (state.song_id) {
-      console.log("Navigating to song:", state.song_id);
-      navigate(RoutesEnum.Songs(state.song_id));
+      // TODO: Apply the room state to the song context or wherever needed
     }
   };
 
