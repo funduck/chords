@@ -1,7 +1,6 @@
 package app
 
 import (
-	"fmt"
 	"io"
 	"net/http"
 
@@ -12,11 +11,14 @@ import (
 	_ "chords.com/api/docs" // Import the generated Swagger docs
 	"chords.com/api/internal/auth"
 	"chords.com/api/internal/cors"
+	"chords.com/api/internal/logger"
 	"chords.com/api/internal/orm"
 )
 
 func NewHttpRouter(a *App) *chi.Mux {
 	r := chi.NewRouter()
+
+	clientLog := logger.NewForModule("client")
 
 	r.Get("/health", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
@@ -40,7 +42,8 @@ func NewHttpRouter(a *App) *chi.Mux {
 			http.Error(w, "Failed to read request body", http.StatusInternalServerError)
 			return
 		}
-		fmt.Printf("Received log message: %s\n", body)
+		// fmt.Printf("Received log message: %s\n", body)
+		clientLog.Info("Client log: " + string(body))
 
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("ok"))

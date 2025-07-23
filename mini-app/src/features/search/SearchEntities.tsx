@@ -1,6 +1,6 @@
 import { Button, Divider, Flex, Space, Text } from "@mantine/core";
 import { useScrollIntoView } from "@mantine/hooks";
-import { ReactNode, useContext, useEffect, useRef } from "react";
+import { ReactNode, useEffect } from "react";
 
 import QueryInput from "@components/QueryInput";
 import Stack from "@components/Stack";

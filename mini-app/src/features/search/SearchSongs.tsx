@@ -30,6 +30,10 @@ function SearchSongs({ artistId }: { artistId?: number }) {
 
   const [inPrivateLibs, setInPrivateLibs] = useState(true);
 
+  if (!songsApi) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <>
       <SearchResetArtist />

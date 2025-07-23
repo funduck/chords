@@ -37,6 +37,10 @@ function Room() {
     }
   }, [roomsApi]);
 
+  if (!roomsApi) {
+    return <div>Loading...</div>;
+  }
+
   if (!room) {
     return (
       <>

@@ -16,6 +16,10 @@ function SearchArtists() {
 
   const [inPrivateLibs, setInPrivateLibs] = useState(true);
 
+  if (!artistsApi) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <>
       <Switch
