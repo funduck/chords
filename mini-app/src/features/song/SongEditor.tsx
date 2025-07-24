@@ -1,4 +1,4 @@
-import { Anchor, Box, Button, Group, Text, Textarea } from "@mantine/core";
+import { Anchor, Box, Button, Group, Menu, Text, Textarea } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { useSignal } from "@telegram-apps/sdk-react";
 import { useEffect, useRef, useState } from "react";
@@ -62,7 +62,6 @@ function SongEditor({ currentSong }: { currentSong?: boolean }) {
   }
 
   const [savedSheet, setSavedSheet] = useState("");
-  const [formattedSheet, setFormattedSheet] = useState("");
 
   // Load the sheet from localStorage if not provided
   useEffect(() => {
@@ -110,7 +109,7 @@ function SongEditor({ currentSong }: { currentSong?: boolean }) {
     });
   }
 
-  function formatSheet() {
+  function formatSheet(format: "chordpro" | "chordsoverwords") {
     const song = ChordProService.sheetToSong(ref.current!.value, {});
     if (!song) {
       notifications.show({
@@ -121,10 +120,9 @@ function SongEditor({ currentSong }: { currentSong?: boolean }) {
       });
       return;
     }
-    const formatted = ChordProService.songToSheet(song, {});
+    const formatted = ChordProService.songToSheet(song, { format });
     if (formatted) {
       ref.current!.value = formatted;
-      setFormattedSheet(formatted);
       onSheetChanged();
     }
   }
@@ -146,9 +144,24 @@ function SongEditor({ currentSong }: { currentSong?: boolean }) {
             </Button>
           </>
         )}
-        <Button variant="outline" onClick={formatSheet} disabled={formattedSheet == ref.current?.value}>
-          Format
-        </Button>
+        <Menu shadow="md" width={200}>
+          <Menu.Target>
+            <Button variant="outline">Format</Button>
+          </Menu.Target>
+
+          <Menu.Dropdown>
+            <Menu.Item>
+              <Button variant="outline" onClick={() => formatSheet("chordpro")}>
+                ChordPro
+              </Button>
+            </Menu.Item>
+            <Menu.Item>
+              <Button variant="outline" onClick={() => formatSheet("chordsoverwords")}>
+                Chords Over Words
+              </Button>
+            </Menu.Item>
+          </Menu.Dropdown>
+        </Menu>
         <Button variant="outline" onClick={clearSheet} disabled={"" == ref.current?.value}>
           Clear
         </Button>

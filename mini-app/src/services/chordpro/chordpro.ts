@@ -1,7 +1,17 @@
-import { Chord, ChordProFormatter, ChordProParser, ChordsOverWordsParser, Song } from "chordsheetjs";
+import {
+  Chord,
+  ChordProFormatter,
+  ChordProParser,
+  ChordsOverWordsFormatter,
+  ChordsOverWordsParser,
+  Song,
+} from "chordsheetjs";
 
 export class ChordProService {
-  static adjustLineLength(sheet: string, maxLineLength: number): string {
+  static adjustLineLength(song: Song, maxLineLength: number): Song {
+    const formater = new ChordProFormatter();
+    let sheet = formater.format(song);
+
     const resLines: string[] = [];
     const lines = sheet.split("\n");
     for (const line of lines) {
@@ -20,20 +30,32 @@ export class ChordProService {
         resLines.push(line);
       }
     }
-    return resLines.join("\n");
+
+    const parser = new ChordProParser();
+    const newSong = parser.parse(resLines.join("\n"));
+    return newSong;
   }
 
-  static songToSheet(song: Song, options: { maxLineLength?: number } = {}): string {
+  static songToSheet(
+    song: Song,
+    options: { format?: "chordsoverwords" | "chordpro"; maxLineLength?: number } = {},
+  ): string {
     if (!song) return "";
-    const formater = new ChordProFormatter();
-    let sheet = formater.format(song);
+
     if (options.maxLineLength) {
-      sheet = this.adjustLineLength(sheet, options.maxLineLength);
+      song = this.adjustLineLength(song, options.maxLineLength);
     }
-    // Later we want to recognize sheet as ChordPro, so we need to ensure it has a title
-    if (!song.title && !sheet.match(/{title/)) {
-      sheet = `{title}\n${sheet}`;
+
+    const formater = options.format == "chordsoverwords" ? new ChordsOverWordsFormatter() : new ChordProFormatter();
+    let sheet = formater.format(song);
+
+    if (options.format != "chordsoverwords") {
+      // Later we want to recognize sheet as ChordPro, so we need to ensure it has a title
+      if (!song.title && !sheet.match(/{title/)) {
+        sheet = `{title}\n${sheet}`;
+      }
     }
+
     return sheet;
   }
 
