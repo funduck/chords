@@ -45,7 +45,7 @@ function SongEditor({ currentSong }: { currentSong?: boolean }) {
     }
   }
 
-  function onSheetChanged() {
+  function onSheetChanged(updateSongState = true) {
     const value = ref.current!.value;
 
     if (timer.current) {
@@ -53,10 +53,12 @@ function SongEditor({ currentSong }: { currentSong?: boolean }) {
     }
     timer.current = setTimeout(() => {
       storeSheetValue(value);
-      updateSongSheet(value);
+      if (updateSongState) {
+        updateSongSheet(value);
+      }
 
       timer.current = null;
-    }, 1000); // Debounce changes by 1 second
+    }, 3000); // Debounce changes by 3 seconds
   }
 
   const [savedSheet, setSavedSheet] = useState("");
@@ -67,15 +69,13 @@ function SongEditor({ currentSong }: { currentSong?: boolean }) {
     if (currentSong) {
       if (songState.songSheet) {
         ref.current!.value = songState.songSheet;
-        setSavedSheet(songState.songSheet);
-        onSheetChanged();
+        onSheetChanged(false);
         return;
       }
     } else {
       if (songState.newSheet) {
         ref.current!.value = songState.newSheet;
-        setSavedSheet(songState.newSheet);
-        onSheetChanged();
+        onSheetChanged(false);
         return;
       }
     }
@@ -83,10 +83,22 @@ function SongEditor({ currentSong }: { currentSong?: boolean }) {
     const storedSheet = loadSheetValue();
     if (storedSheet) {
       ref.current!.value = storedSheet;
-      setSavedSheet(storedSheet);
       onSheetChanged();
     }
   }, []);
+
+  // Apply song sheet changes to the editor
+  useEffect(() => {
+    if (currentSong && songState.songSheet && songState.songSheet !== ref.current!.value) {
+      ref.current!.value = songState.songSheet;
+      onSheetChanged(false);
+    }
+
+    if (!currentSong && songState.newSheet && songState.newSheet !== ref.current!.value) {
+      ref.current!.value = songState.newSheet;
+      onSheetChanged(false);
+    }
+  }, [songState.songSheet, songState.newSheet]);
 
   function saveSheet() {
     setSavedSheet(ref.current!.value);
@@ -126,6 +138,7 @@ function SongEditor({ currentSong }: { currentSong?: boolean }) {
     <>
       <Group mb="md">
         {!currentSong && <NewSongForm sheetValue={ref.current?.value || ""} />}
+
         {currentSong && songState.loadedSong?.owner_id == userId && (
           <>
             <Button variant="outline" onClick={saveSheet} disabled={savedSheet === ref.current?.value}>
@@ -146,7 +159,7 @@ function SongEditor({ currentSong }: { currentSong?: boolean }) {
         ref={ref}
         autosize
         placeholder="Paste song lyrics and chords here."
-        onChange={onSheetChanged}
+        onChange={() => onSheetChanged()}
       />
 
       <Box mt="md">
