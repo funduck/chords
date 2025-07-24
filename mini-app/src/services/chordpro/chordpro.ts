@@ -63,6 +63,9 @@ export class ChordProService {
     sheet: string,
     options: { parse?: "chordsoverwords" | "chordpro"; maxLineLength?: number } = {},
   ): Song | null {
+    // Change Hm to Bm
+    sheet = sheet.replace(/(\s|^)(Hm)(|7|aj|7maj|dim)(\s|$)/g, "$1Bm$3$4");
+
     try {
       let parser: { parse: (sheet: string) => Song };
       if (options.parse == "chordpro" || sheet.match(/{(title|artist|composer)/)) {
