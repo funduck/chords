@@ -8,7 +8,7 @@
     "build": "tsc && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0 && yarn run stylelint",
     "stylelint": "stylelint '**/*.css' --cache",
-    "preview": "vite preview --host --port 80",
+    "preview": "vite preview --host --port 8080",
     "codegen:openapi": "openapi -i http://api/api/json -o ./src/services/openapi",
     "test": "node --test"
   },

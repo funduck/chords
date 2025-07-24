@@ -10,7 +10,7 @@ caddy-dev:
 	caddy run --config Caddyfile.local
 
 mini-app-dev:
-	cd mini-app && yarn run dev
+	cd mini-app && make dev
 
 api-dev:
 	cd api && make dev
@@ -31,3 +31,26 @@ dev:
 		"make caddy-dev" \
 		"make mini-app-dev" \
 		"make api-dev"
+
+# Build and start
+mini-app-build:
+	cd mini-app && make build
+
+mini-app-start:
+	cd mini-app && make start
+
+api-build:
+	cd api && make build-api
+
+api-start:
+	cd api && make start
+
+build:
+	make mini-app-build
+	make api-build
+
+start:
+	concurrently \
+		"make caddy-dev" \
+		"make mini-app-start" \
+		"make api-start"

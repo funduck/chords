@@ -17,7 +17,7 @@ function Login() {
     },
 
     validate: {
-      email: (value) => (/^\S+@\S+\.\S+$/.test(value) ? null : "Invalid email"),
+      email: (value: string) => (/^\S+@\S+\.\S+$/.test(value) ? null : "Invalid email"),
     },
   });
 

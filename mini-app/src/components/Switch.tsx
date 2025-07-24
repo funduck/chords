@@ -1,4 +1,4 @@
-import { Box, Switch as MantineSwitch, Text } from "@mantine/core";
+import { Box, Switch as MantineSwitch } from "@mantine/core";
 
 type SwitchProps = {
   label?: string;

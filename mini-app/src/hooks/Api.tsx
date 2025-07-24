@@ -1,7 +1,6 @@
 import { useSignal } from "@telegram-apps/sdk-react";
 import { ReactNode, createContext, useContext, useEffect, useState } from "react";
 
-import { Config } from "@src/config";
 import {
   ArtistsApi,
   AuthApi,
@@ -14,7 +13,9 @@ import {
   RoomsApi,
   SongsApi,
   UserApi,
-} from "@src/generated/api";
+} from "@generated/api";
+
+import { Config } from "@src/config";
 import { Logger } from "@src/services/logger.service";
 import { Signals } from "@src/services/signals-registry";
 

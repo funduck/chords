@@ -1,4 +1,4 @@
-import { Box, Flex, Modal } from "@mantine/core";
+import { Flex, Modal } from "@mantine/core";
 import { useEffect, useState } from "react";
 
 import ChordDiagram from "./ChordDiagram";

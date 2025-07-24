@@ -26,4 +26,4 @@ docs
 *.sln
 *.sw?
 
-src/generated
+generated/api

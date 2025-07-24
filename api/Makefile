@@ -19,3 +19,6 @@ build-api:
 
 build-uploader:
 	go build --tags fts5 -o bin/uploader ./cmd/uploader/main.go
+
+start:
+	./bin/api

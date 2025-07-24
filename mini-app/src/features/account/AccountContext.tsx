@@ -3,8 +3,9 @@ import { notifications } from "@mantine/notifications";
 import { ReactNode, createContext, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 
+import { InternalAppLoginResponse } from "@generated/api";
+
 import { RoutesEnum } from "@src/Router";
-import { InternalAppLoginResponse } from "@src/generated/api";
 import { AuthEntity, useAuthApi, useUserApi } from "@src/hooks/Api";
 import { Signals } from "@src/services/signals-registry";
 

@@ -24,8 +24,8 @@ function NewSongForm({ sheetValue }: NewSongFormProps) {
     },
 
     validate: {
-      title: (value) => (value.length < 3 ? "Title must be at least 3 characters long" : null),
-      artist: (value) => (value.length < 3 ? "Artist name must be at least 3 characters long" : null),
+      title: (value: string) => (value.length < 3 ? "Title must be at least 3 characters long" : null),
+      artist: (value: string) => (value.length < 3 ? "Artist name must be at least 3 characters long" : null),
     },
   });
 
