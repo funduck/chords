@@ -32,7 +32,6 @@ dev:
 		"make mini-app-dev" \
 		"make api-dev"
 
-# Build and start
 caddy-start:
 	bash -c './start-caddy.sh'
 

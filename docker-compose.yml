@@ -1,19 +1,21 @@
 services:
-  caddy:
-    image: caddy:2.4.5-alpine
-    restart: unless-stopped
-    ports:
-      - "1986:80"
-      - "1988:443"
-    volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile
-      - ./mini-app/docs:/mini-app/docs
-    environment:
-      - DOMAIN=${DOMAIN}
-      - EMAIL=${EMAIL}
-      - CADDY_LOG_LEVEL=${CADDY_LOG_LEVEL}
-      - API_PORT=${DOCKER_API_PORT}
-      - MINI_APP_PORT=${DOCKER_MINI_APP_PORT}
+  # caddy:
+  #   image: caddy:2.4.5-alpine
+  #   restart: unless-stopped
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
+  #   volumes:
+  #     - ./Caddyfile:/etc/caddy/Caddyfile
+  #     - ./mini-app/docs:/mini-app/docs
+  #   environment:
+  #     - DOMAIN=${DOMAIN}
+  #     - EMAIL=${EMAIL}
+  #     - CADDY_LOG_LEVEL=${CADDY_LOG_LEVEL}
+  #     - API_HOST=${DOCKER_API_HOSTNAME}
+  #     - API_PORT=${DOCKER_API_PORT}
+  #   networks:
+  #     - default
 
   api:
     container_name: ${DOCKER_API_HOSTNAME}
@@ -23,14 +25,13 @@ services:
       context: ./api
       dockerfile: Dockerfile
     volumes:
-      - ./data/api:/data
-    ports:
-      - "${DOCKER_API_PORT}:80"
-      - "${DOCKER_API_DEBUG_PORT}:9229"
+      - ./api/api.yaml:/app/api.yaml
+      - ./data:/data
+
     networks:
       - default
 
 networks:
   default:
     driver: bridge
-    name: ${DOCKER_NETWORK}
+    name: chords_network

@@ -1,6 +1,6 @@
 .idea
 .env
-.env.dev
+api.yaml
 coverage
 dist
 node_modules
