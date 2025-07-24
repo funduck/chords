@@ -150,16 +150,8 @@ function SongEditor({ currentSong }: { currentSong?: boolean }) {
           </Menu.Target>
 
           <Menu.Dropdown>
-            <Menu.Item>
-              <Button variant="outline" onClick={() => formatSheet("chordpro")}>
-                ChordPro
-              </Button>
-            </Menu.Item>
-            <Menu.Item>
-              <Button variant="outline" onClick={() => formatSheet("chordsoverwords")}>
-                Chords Over Words
-              </Button>
-            </Menu.Item>
+            <Menu.Item onClick={() => formatSheet("chordpro")}>to ChordPro</Menu.Item>
+            <Menu.Item onClick={() => formatSheet("chordsoverwords")}>to Chords Over Words</Menu.Item>
           </Menu.Dropdown>
         </Menu>
         <Button variant="outline" onClick={clearSheet} disabled={"" == ref.current?.value}>

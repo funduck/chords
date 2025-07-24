@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { Config } from "@src/config";
 import { useScrollPosition } from "@src/hooks/useScrollPosition";
@@ -22,9 +22,12 @@ function AutoScrollManager({ viewportRef }: { viewportRef: React.RefObject<HTMLD
   // This is used to debounce the scroll events when user scrolls manually
   const emittingScrollTimeout = useRef(null as ReturnType<typeof setTimeout> | null);
 
+  // Track touch state to temporarily disable auto-scroll on mobile
+  const [isTouching, setIsTouching] = useState(false);
+
   // Auto scrolling
   useEffect(() => {
-    if (viewportRef.current && enabled && interval && speed) {
+    if (viewportRef.current && enabled && interval && speed && !isTouching) {
       // Get font size in pixels
       const { height } = estimateFontSize({});
 
@@ -52,7 +55,7 @@ function AutoScrollManager({ viewportRef }: { viewportRef: React.RefObject<HTMLD
         clearInterval(_interval);
       };
     }
-  }, [viewportRef.current, enabled, interval, speed]);
+  }, [viewportRef.current, enabled, interval, speed, isTouching]);
 
   // Emitting scroll events
   function onScrollPositionChange() {
@@ -102,6 +105,40 @@ function AutoScrollManager({ viewportRef }: { viewportRef: React.RefObject<HTMLD
         viewportRef.current.onscroll = null;
         viewportRef.current.onscrollend = null;
       }
+    };
+  }, [viewportRef.current]);
+
+  // Touch event listeners to disable auto-scroll during touch
+  useEffect(() => {
+    if (!viewportRef.current) {
+      console.debug("Song container not found, skipping touch event listeners");
+      return;
+    }
+
+    const handleTouchStart = () => {
+      console.debug("Touch start detected - disabling auto-scroll");
+      setIsTouching(true);
+    };
+
+    const handleTouchEnd = () => {
+      console.debug("Touch end detected - enabling auto-scroll");
+      setIsTouching(false);
+    };
+
+    const handleTouchCancel = () => {
+      console.debug("Touch cancel detected - enabling auto-scroll");
+      setIsTouching(false);
+    };
+
+    const element = viewportRef.current;
+    element.addEventListener("touchstart", handleTouchStart, { passive: true });
+    element.addEventListener("touchend", handleTouchEnd, { passive: true });
+    element.addEventListener("touchcancel", handleTouchCancel, { passive: true });
+
+    return () => {
+      element.removeEventListener("touchstart", handleTouchStart);
+      element.removeEventListener("touchend", handleTouchEnd);
+      element.removeEventListener("touchcancel", handleTouchCancel);
     };
   }, [viewportRef.current]);
 
