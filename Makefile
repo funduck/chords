@@ -33,6 +33,9 @@ dev:
 		"make api-dev"
 
 # Build and start
+caddy-start:
+	bash -c './start-caddy.sh'
+
 mini-app-build:
 	cd mini-app && make build
 
@@ -51,6 +54,5 @@ build:
 
 start:
 	concurrently \
-		"make caddy-dev" \
-		"make mini-app-start" \
+		"make caddy-start" \
 		"make api-start"

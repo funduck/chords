@@ -3,25 +3,59 @@
         log {
                 output stdout
                 format console
-                level INFO
+                level {$CADDY_LOG_LEVEL}
         }
 }
 
-funduck.ddns.net {
+{$DOMAIN} {
         tls {$EMAIL}
         encode zstd gzip
 
         handle /api* {
-                reverse_proxy api:{$API_PORT} {
+                reverse_proxy {$API_HOST}:{$API_PORT} {
                         header_up Host {http.request.host}
                         header_up X-Real-IP {http.request.remote}
                         header_up X-Forwarded-For {http.request.remote}
                 }
         }
 
+        handle /log {
+		reverse_proxy {$API_HOST}:{$API_PORT} {
+			header_up Host {http.request.host}
+			header_up X-Real-IP {http.request.remote}
+			header_up X-Forwarded-For {http.request.remote}
+		}
+	}
+
         # Serve static files directly
         handle /* {
-                root * /mini-app/docs/
+                root * mini-app/docs/
+                file_server
+        }
+}
+
+localhost:80 {
+        encode zstd gzip
+
+        handle /api* {
+                reverse_proxy {$API_HOST}:{$API_PORT} {
+                        header_up Host {http.request.host}
+                        header_up X-Real-IP {http.request.remote}
+                        header_up X-Forwarded-For {http.request.remote}
+                }
+        }
+
+        handle /log {
+		reverse_proxy {$API_HOST}:{$API_PORT} {
+			header_up Host {http.request.host}
+			header_up X-Real-IP {http.request.remote}
+			header_up X-Forwarded-For {http.request.remote}
+		}
+	}
+
+        # Serve static files directly
+        handle /* {
+                root * mini-app/docs/
                 file_server
         }
 }
