@@ -41,3 +41,7 @@ docker-compose.yml
 
 # Makefile
 Makefile
+
+# Environment files
+.env
+.env.example

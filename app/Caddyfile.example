@@ -7,12 +7,12 @@
         }
 }
 
-{$DOMAIN} {
-        tls {$EMAIL}
+{$CADDY_DOMAIN} {
+        tls {$CADDY_EMAIL}
         encode zstd gzip
 
         handle /api* {
-                reverse_proxy {$API_HOST}:{$API_PORT} {
+                reverse_proxy {$CADDY_API_HOST}:{$CADDY_API_PORT} {
                         header_up Host {http.request.host}
                         header_up X-Real-IP {http.request.remote}
                         header_up X-Forwarded-For {http.request.remote}
@@ -20,7 +20,7 @@
         }
 
         handle /log {
-		reverse_proxy {$API_HOST}:{$API_PORT} {
+		reverse_proxy {$CADDY_API_HOST}:{$CADDY_API_PORT} {
 			header_up Host {http.request.host}
 			header_up X-Real-IP {http.request.remote}
 			header_up X-Forwarded-For {http.request.remote}
@@ -29,7 +29,7 @@
 
         # Serve static files and handle React Router
         handle /* {
-                root * /mini-app/docs/
+                root * /app/docs/
                 try_files {path} /index.html
                 file_server
         }

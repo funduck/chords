@@ -22,5 +22,6 @@ WORKDIR /app
 
 COPY --from=build_base /app/bin/api ./api
 COPY --from=build_base /app/docs ./docs
+COPY ./prod.api.yaml ./api.yaml
 
 CMD ["/app/api"]

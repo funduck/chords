@@ -11,6 +11,7 @@ RUN yarn install --frozen-lockfile
 
 # Copy source files
 COPY . .
+COPY prod.env .env
 
 # Build the application
 RUN yarn run build
@@ -19,10 +20,10 @@ RUN yarn run build
 FROM caddy:2.4.5-alpine
 
 # Copy built static files from builder stage
-COPY --from=builder /app/docs /usr/share/caddy
+COPY --from=builder /app/docs /app/docs
 
 # Copy Caddyfile if you have one, otherwise Caddy will serve files from /usr/share/caddy
-COPY Caddyfile /etc/caddy/Caddyfile
+COPY prod.Caddyfile /etc/caddy/Caddyfile
 
 # Expose port 80
 EXPOSE 80

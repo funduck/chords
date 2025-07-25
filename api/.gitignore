@@ -1,7 +1,7 @@
 # Add files or directories to ignore
 /tmp
 /*.sqlite
-/api.env
-/api.json
 /api.yaml
 /bin
+/data
+/docs

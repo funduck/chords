@@ -13,7 +13,7 @@ dist-ssr
 *.local
 
 # Vite build
-docs
+/docs
 
 # Editor directories and files
 .vscode/*
@@ -26,4 +26,6 @@ docs
 *.sln
 *.sw?
 
-generated/api
+/generated/api
+
+/Caddyfile

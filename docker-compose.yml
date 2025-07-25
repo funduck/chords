@@ -1,46 +1,19 @@
 services:
-  caddy:
-    image: caddy:2.4.5-alpine
-    restart: unless-stopped
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile
-      - ./mini-app/docs:/mini-app/docs
-    environment:
-      - DOMAIN=${DOMAIN}
-      - EMAIL=${EMAIL}
-      - CADDY_LOG_LEVEL=${CADDY_LOG_LEVEL}
-      - API_HOST=${DOCKER_API_HOSTNAME}
-      - API_PORT=${DOCKER_API_PORT}
-    networks:
-      - default
-    depends_on:
-      - api
-
   api:
-    container_name: ${DOCKER_API_HOSTNAME}
-    hostname: ${DOCKER_API_HOSTNAME}
-    tty: true
-    build:
-      context: ./api
-      dockerfile: Dockerfile
+    image: mychords/api:latest
+    restart: unless-stopped
     volumes:
-      - ./api/api.yaml:/app/api.yaml
       - ./data:/data
     networks:
       - default
 
-  mini-app:
-    build:
-      context: ./mini-app
-      dockerfile: Dockerfile
-    volumes:
-      - ./mini-app/docs:/app/docs
-      - ./mini-app/.env:/app/.env
+  app:
+    image: mychords/app:latest
+    restart: unless-stopped
     networks:
       - default
+    depends_on:
+      - api
 
 networks:
   default:
