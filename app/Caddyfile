@@ -27,9 +27,10 @@
 		}
 	}
 
-        # Serve static files directly
+        # Serve static files and handle React Router
         handle /* {
                 root * /mini-app/docs/
+                try_files {path} /index.html
                 file_server
         }
 }

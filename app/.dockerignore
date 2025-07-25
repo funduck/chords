@@ -1,0 +1,43 @@
+# Dependencies
+node_modules
+.cache
+
+# Git files
+.git
+.gitignore
+
+# Documentation
+README.md
+*.md
+
+# IDE files
+.vscode
+.idea
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Log files
+*.log
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Build outputs (will be created during build)
+docs/
+dist/
+
+# Development files
+*.tsbuildinfo
+
+# Docker files
+Dockerfile
+.dockerignore
+docker-compose.yml
+
+# Makefile
+Makefile
