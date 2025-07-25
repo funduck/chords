@@ -19,12 +19,3 @@ build-api:
 
 build-uploader:
 	go build --tags fts5 -o bin/uploader ./cmd/uploader/main.go
-
-build:
-	docker build -t mychords/api:latest .
-
-start-dev:
-	docker run --rm -p 9000:80 --volume api.yaml:/app/api.yaml --volume data:/data mychords/api:latest
-
-start-prod:
-	docker run --rm -p 9000:80 --volume prod.api.yaml:/app/api.yaml --volume data:/data mychords/api:latest
