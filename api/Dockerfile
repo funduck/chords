@@ -13,7 +13,8 @@ COPY ./go.mod .
 COPY ./go.sum .
 RUN go mod download
 
-COPY . .
+COPY cmd ./cmd
+COPY internal ./internal
 RUN swag init --parseDependency -g cmd/api/main.go
 RUN go build --tags fts5 -o bin/api ./cmd/api/main.go
 

@@ -1,6 +1,5 @@
 *.sqlite
 .air.toml
-api.yaml
 bin
 tmp
 data
