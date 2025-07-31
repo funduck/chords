@@ -36,8 +36,9 @@
 }
 
 .chordpro tr:has(.chord) {
-    position: relative; top: 0.3em;
-    height: 1.5em;  
+    position: relative;
+    top: 0.3em;
+    height: 1.5em;
 }
 
 /* Song needs slightly different font size for mobile */
@@ -46,6 +47,7 @@
         font-size: 1.2em;
         font-weight: 700;
     }
+
     .chordpro .lyrics {
         font-size: 1.1em;
         font-weight: 500;
@@ -55,7 +57,6 @@
 .chordpro .chorus {
     /* margin-left: 1em; */
     padding-left: 3em;
-    border-left: 0.5em inset var(--mantine-color-chorus-1);
 }
 
 .chordpro .chord:hover {

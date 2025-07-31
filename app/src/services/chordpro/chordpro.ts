@@ -5,6 +5,7 @@ import {
   ChordsOverWordsFormatter,
   ChordsOverWordsParser,
   Song,
+  UltimateGuitarParser,
 } from "chordsheetjs";
 
 export class ChordProService {
@@ -61,17 +62,29 @@ export class ChordProService {
 
   static sheetToSong(
     sheet: string,
-    options: { parse?: "chordsoverwords" | "chordpro"; maxLineLength?: number } = {},
+    options: { parse?: "chordsoverwords" | "chordpro" | "ultimateguitar"; maxLineLength?: number } = {},
   ): Song | null {
     // Change Hm to Bm
     sheet = sheet.replace(/(\s|^)(Hm)(|7|aj|7maj|dim)(\s|$)/g, "$1Bm$3$4");
 
     try {
-      let parser: { parse: (sheet: string) => Song };
-      if (options.parse == "chordpro" || sheet.match(/{(title|artist|composer)/)) {
-        parser = new ChordProParser();
-      } else {
-        parser = new ChordsOverWordsParser();
+      let parser: { parse: (sheet: string) => Song } = new ChordProParser();
+      if (!options.parse && sheet.match(/{(title|artist|composer)/)) {
+        options.parse = "chordpro";
+      }
+      if (!options.parse && sheet.match(/\[(Chorus|Verse)\]/)) {
+        options.parse = "ultimateguitar";
+      }
+      switch (options.parse) {
+        case "chordsoverwords":
+          parser = new ChordsOverWordsParser();
+          break;
+        case "ultimateguitar":
+          parser = new UltimateGuitarParser();
+          break;
+        case "chordpro":
+        default:
+        // Already set above
       }
       let song = parser.parse(sheet);
       if (options.maxLineLength) {
@@ -87,7 +100,7 @@ export class ChordProService {
 
   static sheetToChordProSheet(
     sheet: string,
-    options: { parse?: "chordsoverwords" | "chordpro"; maxLineLength?: number } = {},
+    options: { parse?: "chordsoverwords" | "chordpro" | "ultimateguitar"; maxLineLength?: number } = {},
   ): string {
     if (!sheet || !sheet.trim()) {
       return "";
