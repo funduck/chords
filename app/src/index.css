@@ -10,6 +10,8 @@
 .chordpro {
     font-family: monospace;
     /* font-family: "Roboto Mono", "Courier New", monospace; */
+    white-space: nowrap;
+    overflow-x: scroll;
 }
 
 .chordpro .title {
@@ -62,4 +64,13 @@
 .chordpro .chord:hover {
     cursor: pointer;
     text-decoration: underline;
+}
+
+.chordpro .row {
+    display: flex;
+    align-items: flex-end;
+}
+
+.chordpro .column {
+    margin-right: 1em;
 }

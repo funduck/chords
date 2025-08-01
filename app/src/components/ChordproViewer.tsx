@@ -1,6 +1,6 @@
 import { Box, Divider, Text, Title } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
-import { HtmlTableFormatter } from "chordsheetjs";
+import { HtmlDivFormatter, HtmlTableFormatter } from "chordsheetjs";
 import { useEffect, useRef, useState } from "react";
 
 import { ChordProService } from "@src/services/chordpro/chordpro";
@@ -69,6 +69,7 @@ function ChordProViewer({ sheet, transpose, active }: { sheet: string; transpose
       setArtists(song.artist);
       setComposers(song.composer);
 
+      // const formater = new HtmlDivFormatter();
       const formater = new HtmlTableFormatter();
       const html = formater.format(song);
 

@@ -15,8 +15,17 @@ export class ChordProService {
 
     const resLines: string[] = [];
     const lines = sheet.split("\n");
+    let isTab = false;
+    let isDirective = false;
     for (const line of lines) {
-      if (!line.startsWith("{") && line.length > maxLineLength) {
+      isDirective = line.startsWith("{");
+      if (isDirective && line.match(/^\{(sot|start_of_tab)/)) {
+        isTab = true;
+      }
+      if (isDirective && line.match(/^\{(eot|end_of_tab)/)) {
+        isTab = false;
+      }
+      if (!isDirective && !isTab && line.length > maxLineLength) {
         const rest = line.split(" ").reduce((acc, word) => {
           if (acc.length + word.length + 1 > maxLineLength) {
             resLines.push(acc);
