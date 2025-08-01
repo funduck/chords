@@ -46,11 +46,34 @@ export class ChordProService {
     return newSong;
   }
 
+  static fixForFormatting(song: Song): Song {
+    const formater = new ChordProFormatter();
+    let sheet = formater.format(song);
+
+    const resLines: string[] = [];
+    const lines = sheet.split("\n");
+
+    for (const line of lines) {
+      if (line.match(/^\{(sot|start_of_tab|soc|start_of_chorus|sov|start_of_verse)/)) {
+        if (resLines.at(-1) != "") {
+          resLines.push(""); // Add an empty line before the start of tab/chorus
+        }
+      }
+      resLines.push(line);
+    }
+
+    const parser = new ChordProParser();
+    const newSong = parser.parse(resLines.join("\n"));
+    return newSong;
+  }
+
   static songToSheet(
     song: Song,
     options: { format?: "chordsoverwords" | "chordpro"; maxLineLength?: number } = {},
   ): string {
     if (!song) return "";
+
+    song = this.fixForFormatting(song);
 
     if (options.maxLineLength) {
       song = this.adjustLineLength(song, options.maxLineLength);

@@ -1,8 +1,6 @@
 import { notifications } from "@mantine/notifications";
 import { ReactNode, createContext, useContext, useEffect, useState } from "react";
-import { useNavigate } from "react-router";
 
-import { RoutesEnum } from "@src/Router";
 import { RoomEntity, useRoomsApi } from "@src/hooks/Api";
 import { useWebSocket } from "@src/hooks/WebSocket";
 
@@ -53,8 +51,6 @@ export function RoomContextProvider({ children }: { children: ReactNode }) {
 
   const roomsApi = useRoomsApi();
   const ws = useWebSocket();
-
-  const navigate = useNavigate();
 
   const updateRoomState = (updates: Partial<RoomState>) => {
     setRoomState((prev) => ({ ...prev, ...updates }));
