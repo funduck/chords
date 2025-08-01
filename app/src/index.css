@@ -29,12 +29,14 @@
     color: var(--mantine-color-chord-4);
     font-weight: 500;
     font-size: 1.1em;
+    padding: 0;
 }
 
 .chordpro .lyrics {
     color: var(--mantine-color-lyrics-9);
     font-weight: 500;
     font-size: 1em;
+    padding: 0;
 }
 
 .chordpro tr:has(.chord) {
@@ -68,9 +70,27 @@
 
 .chordpro .row {
     display: flex;
-    align-items: flex-end;
+    /* align-items: flex-end; */
+    line-height: 150%;
 }
 
-.chordpro .column {
+/* .chordpro .column {
     margin-right: 1em;
+} */
+
+.chordpro .chord:after,
+.lyrics:after {
+    content: '\200b'
+}
+
+.chordpro .empty-line {
+    height: 1em;
+}
+
+.chordpro .chord:not(:last-child) {
+    padding-right: 0.5em;
+}
+
+.chordpro .paragraph {
+    margin-bottom: 1em;
 }
