@@ -235,3 +235,19 @@ export function useSongContext() {
   }
   return context;
 }
+
+// // Custom hook that excludes scroll position to prevent unnecessary re-renders
+// export function useSongContextWithoutScroll() {
+//   const context = useContext(SongContext);
+//   if (!context) {
+//     throw new Error("useSongContextWithoutScroll must be used within a SongContextProvider");
+//   }
+
+//   // Create a version of songState without scroll-related fields
+//   const { scrollPosition, applyScrollPosition, ...songStateWithoutScroll } = context.songState;
+
+//   return {
+//     ...context,
+//     songState: songStateWithoutScroll,
+//   };
+// }

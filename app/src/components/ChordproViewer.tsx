@@ -2,7 +2,7 @@ import { Box, Divider, Text, Title } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { HtmlDivFormatter } from "chordsheetjs";
 // import { HtmlTableFormatter } from "chordsheetjs";
-import { useEffect, useRef, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 
 import { ChordProService } from "@src/services/chordpro/chordpro";
 import { estimateFontSize } from "@src/utils/font";
@@ -98,4 +98,12 @@ function ChordProViewer({ sheet, transpose, active }: { sheet: string; transpose
   );
 }
 
-export default ChordProViewer;
+// Memoize the component to prevent re-renders when only scroll position changes
+export default memo(ChordProViewer, (prevProps, nextProps) => {
+  // Only re-render if the props that actually affect the content change
+  return (
+    prevProps.sheet === nextProps.sheet &&
+    prevProps.transpose === nextProps.transpose &&
+    prevProps.active === nextProps.active
+  );
+});

@@ -1,7 +1,7 @@
 import { Anchor, Box, Button, Group, Menu, Text, Textarea } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { useSignal } from "@telegram-apps/sdk-react";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { ChordProService } from "@src/services/chordpro/chordpro";
 import { Signals } from "@src/services/signals-registry";
@@ -19,47 +19,53 @@ function SongEditor({ currentSong }: { currentSong?: boolean }) {
 
   const timer = useRef(null as ReturnType<typeof setTimeout> | null);
 
-  function storeSheetValue(value: string) {
+  const storeSheetValue = useCallback((value: string) => {
     localStorage.setItem("editor-sheet", value);
-  }
+  }, []);
 
-  function loadSheetValue(): string {
+  const loadSheetValue = useCallback(() => {
     const value = localStorage.getItem("editor-sheet");
     if (value && value.length) {
       console.debug("Loaded sheet from localStorage", value.length);
       return value;
     }
     return "";
-  }
+  }, []);
 
-  function updateSongSheet(value: string) {
-    console.debug("Updating song sheet", value.length);
-    if (currentSong) {
-      songContext.updateSongState({
-        songSheet: value,
-      });
-    } else {
-      songContext.updateSongState({
-        newSheet: value,
-      });
-    }
-  }
-
-  function onSheetChanged(updateSongState = true) {
-    const value = ref.current!.value;
-
-    if (timer.current) {
-      clearTimeout(timer.current);
-    }
-    timer.current = setTimeout(() => {
-      storeSheetValue(value);
-      if (updateSongState) {
-        updateSongSheet(value);
+  const updateSongSheet = useCallback(
+    (value: string) => {
+      console.debug("Updating song sheet", value.length);
+      if (currentSong) {
+        songContext.updateSongState({
+          songSheet: value,
+        });
+      } else {
+        songContext.updateSongState({
+          newSheet: value,
+        });
       }
+    },
+    [currentSong, songContext],
+  );
 
-      timer.current = null;
-    }, 3000); // Debounce changes by 3 seconds
-  }
+  const onSheetChanged = useCallback(
+    (updateSongState = true) => {
+      const value = ref.current!.value;
+
+      if (timer.current) {
+        clearTimeout(timer.current);
+      }
+      timer.current = setTimeout(() => {
+        storeSheetValue(value);
+        if (updateSongState) {
+          updateSongSheet(value);
+        }
+
+        timer.current = null;
+      }, 3000); // Debounce changes by 3 seconds
+    },
+    [storeSheetValue, updateSongSheet],
+  );
 
   const [savedSheet, setSavedSheet] = useState("");
 
@@ -99,7 +105,7 @@ function SongEditor({ currentSong }: { currentSong?: boolean }) {
     }
   }, [songState.songSheet, songState.newSheet]);
 
-  function saveSheet() {
+  const saveSheet = useCallback(() => {
     setSavedSheet(ref.current!.value);
     songContext.updateSong({
       id: songState.loadedSong!.id,
@@ -107,30 +113,33 @@ function SongEditor({ currentSong }: { currentSong?: boolean }) {
         sheet: ref.current!.value,
       },
     });
-  }
+  }, [songContext, songState.loadedSong, ref, setSavedSheet]);
 
-  function formatSheet(format: "chordpro" | "chordsoverwords") {
-    const song = ChordProService.sheetToSong(ref.current!.value, {});
-    if (!song) {
-      notifications.show({
-        title: "Error",
-        message: "Failed to parse song from sheet",
-        color: "red",
-        position: "top-right",
-      });
-      return;
-    }
-    const formatted = ChordProService.songToSheet(song, { format });
-    if (formatted) {
-      ref.current!.value = formatted;
-      onSheetChanged();
-    }
-  }
+  const formatSheet = useCallback(
+    (format: "chordpro" | "chordsoverwords") => {
+      const song = ChordProService.sheetToSong(ref.current!.value, {});
+      if (!song) {
+        notifications.show({
+          title: "Error",
+          message: "Failed to parse song from sheet",
+          color: "red",
+          position: "top-right",
+        });
+        return;
+      }
+      const formatted = ChordProService.songToSheet(song, { format });
+      if (formatted) {
+        ref.current!.value = formatted;
+        onSheetChanged();
+      }
+    },
+    [songContext, ref, onSheetChanged],
+  );
 
-  function clearSheet() {
+  const clearSheet = useCallback(() => {
     ref.current!.value = "";
     onSheetChanged();
-  }
+  }, [ref, onSheetChanged]);
 
   return (
     <>
