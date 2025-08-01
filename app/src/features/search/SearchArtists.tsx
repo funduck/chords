@@ -1,5 +1,5 @@
 import { Switch } from "@mantine/core";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { useArtistsApi } from "@src/hooks/Api";
 import { useScrollPosition } from "@src/hooks/useScrollPosition";
@@ -13,6 +13,19 @@ function SearchArtists() {
 
   // Initialize scroll position management
   useScrollPosition();
+
+  const { updateSearchState } = useSearchArtistsContext();
+
+  useEffect(() => {
+    // Reset search state when component mounts
+    updateSearchState({
+      cursorAfter: undefined,
+      cursorBefore: undefined,
+      loadingMore: false,
+      searching: true,
+      query: "",
+    });
+  }, [artistsApi]);
 
   const [inPrivateLibs, setInPrivateLibs] = useState(true);
 
