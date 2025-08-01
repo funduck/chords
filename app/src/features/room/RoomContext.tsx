@@ -110,6 +110,10 @@ export function RoomContextProvider({ children }: { children: ReactNode }) {
     if (!roomsApi) {
       throw new Error("Rooms API is not available");
     }
+
+    // Remove stored code
+    localStorage.removeItem("roomCode");
+
     return roomsApi
       .joinRoom({ request: { room_code: roomCode } })
       .then((r) => handle(r))
@@ -168,7 +172,7 @@ export function RoomContextProvider({ children }: { children: ReactNode }) {
 
     const storedRoomCode = localStorage.getItem("roomCode");
     if (storedRoomCode) {
-      navigate(RoutesEnum.Room(storedRoomCode));
+      joinRoom(storedRoomCode);
     }
   }, [roomsApi, ws]);
 
