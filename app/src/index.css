@@ -39,6 +39,7 @@
     padding: 0;
 }
 
+/* Make Chords closer to corresponding Lyrics */
 .chordpro tr:has(.chord) {
     position: relative;
     top: 0.3em;
@@ -58,25 +59,26 @@
     }
 }
 
+/* Mark Chorus */
 .chordpro .chorus {
     /* margin-left: 1em; */
     padding-left: 3em;
 }
 
+/* Chord hover */
 .chordpro .chord:hover {
     cursor: pointer;
     text-decoration: underline;
 }
 
+/* For correct display using Div Formatter */
 .chordpro .row {
     display: flex;
-    /* align-items: flex-end; */
     line-height: 150%;
-}
 
-/* .chordpro .column {
-    margin-right: 1em;
-} */
+    /* Make Chords closer to corresponding Lyrics  */
+    margin-bottom: 1em;
+}
 
 .chordpro .chord:after,
 .lyrics:after {
