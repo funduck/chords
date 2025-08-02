@@ -1,4 +1,4 @@
-import { Group, Space, Switch, Text } from "@mantine/core";
+import { Group, Space, Switch } from "@mantine/core";
 import { useEffect, useState } from "react";
 
 import { useSongsApi } from "@src/hooks/Api";
