@@ -326,11 +326,15 @@ func (s *RoomService) UpdateRoom(ctx context.Context, accessToken *auth.AccessTo
 		return nil, tx.Error
 	}
 
+	found := false
 	for _, user := range room.Users {
 		if user.ID == accessToken.UserID {
 			// User is part of the room, proceed with update
+			found = true
 			break
 		}
+	}
+	if !found {
 		return nil, fmt.Errorf("user %d is not in room %d", accessToken.UserID, roomID)
 	}
 

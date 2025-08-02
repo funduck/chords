@@ -1,4 +1,4 @@
-import { Box, Button, Divider, Flex, Group, Space, Stack, Text, Title } from "@mantine/core";
+import { Box, Button, Flex, Group, Space, Stack, Text, Title } from "@mantine/core";
 import { useEffect } from "react";
 
 import { useAccountContext } from "@src/features/account/AccountContext";

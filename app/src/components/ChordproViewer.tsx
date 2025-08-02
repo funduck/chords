@@ -1,4 +1,4 @@
-import { Box, Divider, Text, Title } from "@mantine/core";
+import { Box, Divider, Text } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { HtmlDivFormatter } from "chordsheetjs";
 // import { HtmlTableFormatter } from "chordsheetjs";
@@ -11,28 +11,6 @@ function ChordProViewer({ sheet, transpose, active }: { sheet: string; transpose
   console.debug("Rendering ChordProViewer", { active });
   const ref = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(window.innerWidth);
-  const [title, setTitle] = useState("");
-  const [artist, setArtist] = useState("");
-  const [composer, setComposer] = useState("");
-
-  function setArtists(artist: string | string[] | null) {
-    if (Array.isArray(artist)) {
-      setArtist(artist.join(", "));
-    } else if (typeof artist === "string") {
-      setArtist(artist);
-    } else {
-      setArtist("");
-    }
-  }
-  function setComposers(composer: string | string[] | null) {
-    if (Array.isArray(composer)) {
-      setComposer(composer.join(", "));
-    } else if (typeof composer === "string") {
-      setComposer(composer);
-    } else {
-      setComposer("");
-    }
-  }
 
   useEffect(() => {
     const handleWidthChange = () => {
@@ -65,10 +43,6 @@ function ChordProViewer({ sheet, transpose, active }: { sheet: string; transpose
       if (transpose) {
         song = ChordProService.transposeSong(song, transpose);
       }
-
-      setTitle(song.title || "");
-      setArtists(song.artist);
-      setComposers(song.composer);
 
       const formater = new HtmlDivFormatter();
       // const formater = new HtmlTableFormatter();
