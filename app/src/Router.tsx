@@ -1,4 +1,4 @@
-import { Anchor, AppShell, Box, Burger, Button, Flex, Group, Menu, Space, Text, em } from "@mantine/core";
+import { Anchor, AppShell, Burger, Button, Flex, Group, Menu, Text, em } from "@mantine/core";
 import { useDisclosure, useMediaQuery } from "@mantine/hooks";
 import { IconChevronRight, IconSettings, IconSettingsFilled } from "@tabler/icons-react";
 import { useSignal } from "@telegram-apps/sdk-react";
@@ -156,8 +156,6 @@ function Router() {
       openNavbar(); // Open navbar on desktop
     }
   }, [isMobile]);
-
-  const userId = useSignal(Signals.userId);
 
   return (
     <AppShell
