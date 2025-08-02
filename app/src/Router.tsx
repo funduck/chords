@@ -190,7 +190,7 @@ function Router() {
           {tabs
             .filter((g) => g.tabs.length)
             .map((group) => (
-              <Box key={group.group}>
+              <Flex direction={"column"} key={group.group} gap={"lg"} m={0} p={0}>
                 {/* <Text size="xl">{group.group}</Text> */}
                 {group.tabs
                   .filter((t) => !t.hidden)
@@ -215,13 +215,9 @@ function Router() {
                       </Anchor>
                     </Button>
                   ))}
-              </Box>
+              </Flex>
             ))}
         </Stack>
-        <Space h="lg" />
-        <Text c="dimmed" size="xs">
-          user: #{userId}
-        </Text>
       </AppShell.Navbar>
 
       {/* <AppShell.Aside>Aside</AppShell.Aside> */}
