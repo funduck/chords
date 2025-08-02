@@ -1,6 +1,8 @@
-import { Anchor, Box, Button, Group, Menu, Text, Textarea } from "@mantine/core";
+import { Anchor, Box, Button, Group, Menu, Text } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { useSignal } from "@telegram-apps/sdk-react";
+import { okaidia } from "@uiw/codemirror-theme-okaidia";
+import CodeMirror, { ReactCodeMirrorRef } from "@uiw/react-codemirror";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { ChordProService } from "@src/services/chordpro/chordpro";
@@ -15,7 +17,23 @@ function SongEditor({ currentSong }: { currentSong?: boolean }) {
   const songContext = useSongContext();
   const { songState } = songContext;
 
-  const ref = useRef<HTMLTextAreaElement>(null);
+  // const ref = useRef<HTMLTextAreaElement>(null);
+  const ref = useRef<ReactCodeMirrorRef>(null);
+  const [value, setValue] = useState("");
+  const getEditorValue = useCallback(() => {
+    return value;
+  }, [value]);
+  const setEditorValue = useCallback(
+    (value: string) => {
+      console.debug("Setting editor value", value.length);
+      if (ref.current?.view) {
+        ref.current.view.dispatch({
+          changes: { from: 0, to: ref.current.view.state.doc.length, insert: value },
+        });
+      } else console.warn("CodeMirror ref is not ready yet, cannot set value");
+    },
+    [ref],
+  );
 
   const timer = useRef(null as ReturnType<typeof setTimeout> | null);
 
@@ -49,8 +67,8 @@ function SongEditor({ currentSong }: { currentSong?: boolean }) {
   );
 
   const onSheetChanged = useCallback(
-    (updateSongState = true) => {
-      const value = ref.current!.value;
+    (value: string, updateSongState = true) => {
+      console.debug("SongEditor: onSheetChanged", value.length);
 
       if (timer.current) {
         clearTimeout(timer.current);
@@ -71,53 +89,61 @@ function SongEditor({ currentSong }: { currentSong?: boolean }) {
 
   // Load the sheet from localStorage if not provided
   useEffect(() => {
+    if (!setEditorValue) {
+      return;
+    }
+
+    console.debug("SongEditor: useEffect: setEditorValue is ready");
+
     if (currentSong) {
       if (songState.songSheet) {
-        ref.current!.value = songState.songSheet;
-        onSheetChanged(false);
+        setEditorValue(songState.songSheet);
+        onSheetChanged(songState.songSheet, false);
         return;
       }
     } else {
       if (songState.newSheet) {
-        ref.current!.value = songState.newSheet;
-        onSheetChanged(false);
+        setEditorValue(songState.newSheet);
+        onSheetChanged(songState.newSheet, false);
         return;
       }
     }
 
     const storedSheet = loadSheetValue();
     if (storedSheet) {
-      ref.current!.value = storedSheet;
-      onSheetChanged();
+      setEditorValue(storedSheet);
+      onSheetChanged(storedSheet);
     }
-  }, []);
+  }, [setEditorValue]);
 
   // Apply song sheet changes to the editor
   useEffect(() => {
-    if (currentSong && songState.songSheet && songState.songSheet !== ref.current!.value) {
-      ref.current!.value = songState.songSheet;
-      onSheetChanged(false);
+    const value = getEditorValue();
+    if (currentSong && songState.songSheet && songState.songSheet !== value) {
+      setSavedSheet(songState.songSheet);
+      onSheetChanged(songState.songSheet, false);
     }
 
-    if (!currentSong && songState.newSheet && songState.newSheet !== ref.current!.value) {
-      ref.current!.value = songState.newSheet;
-      onSheetChanged(false);
+    if (!currentSong && songState.newSheet && songState.newSheet !== value) {
+      setEditorValue(songState.newSheet);
+      onSheetChanged(songState.newSheet, false);
     }
   }, [songState.songSheet, songState.newSheet]);
 
   const saveSheet = useCallback(() => {
-    setSavedSheet(ref.current!.value);
+    const value = getEditorValue();
+    setSavedSheet(value);
     songContext.updateSong({
       id: songState.loadedSong!.id,
       song: {
-        sheet: ref.current!.value,
+        sheet: value,
       },
     });
-  }, [songContext, songState.loadedSong, ref, setSavedSheet]);
+  }, [songContext, songState.loadedSong, setSavedSheet, getEditorValue]);
 
   const formatSheet = useCallback(
     (format: "chordpro" | "chordsoverwords") => {
-      const song = ChordProService.sheetToSong(ref.current!.value, {});
+      const song = ChordProService.sheetToSong(getEditorValue(), {});
       if (!song) {
         notifications.show({
           title: "Error",
@@ -129,26 +155,31 @@ function SongEditor({ currentSong }: { currentSong?: boolean }) {
       }
       const formatted = ChordProService.songToSheet(song, { format });
       if (formatted) {
-        ref.current!.value = formatted;
-        onSheetChanged();
+        setEditorValue(formatted);
+        onSheetChanged(formatted);
       }
     },
-    [songContext, ref, onSheetChanged],
+    [songContext, onSheetChanged, getEditorValue, setEditorValue],
   );
 
   const clearSheet = useCallback(() => {
-    ref.current!.value = "";
-    onSheetChanged();
-  }, [ref, onSheetChanged]);
+    setEditorValue("");
+    onSheetChanged("");
+  }, [onSheetChanged, setEditorValue]);
+
+  const onEditorChange = useCallback((value) => {
+    setValue(value);
+    onSheetChanged(value, true);
+  }, []);
 
   return (
     <>
       <Group mb="md">
-        {!currentSong && <NewSongForm sheetValue={ref.current?.value || ""} />}
+        {!currentSong && <NewSongForm sheetValue={getEditorValue() || ""} />}
 
         {currentSong && songState.loadedSong?.owner_id == userId && (
           <>
-            <Button variant="outline" onClick={saveSheet} disabled={savedSheet === ref.current?.value}>
+            <Button variant="outline" onClick={saveSheet} disabled={savedSheet === getEditorValue()}>
               Save
             </Button>
           </>
@@ -163,18 +194,12 @@ function SongEditor({ currentSong }: { currentSong?: boolean }) {
             <Menu.Item onClick={() => formatSheet("chordsoverwords")}>to Chords Over Words</Menu.Item>
           </Menu.Dropdown>
         </Menu>
-        <Button variant="outline" onClick={clearSheet} disabled={"" == ref.current?.value}>
+        <Button variant="outline" onClick={clearSheet} disabled={"" == getEditorValue()}>
           Clear
         </Button>
       </Group>
 
-      <Textarea
-        size="lg"
-        ref={ref}
-        autosize
-        placeholder="Paste song lyrics and chords here."
-        onChange={() => onSheetChanged()}
-      />
+      <CodeMirror ref={ref} onChange={onEditorChange} theme={okaidia} />
 
       <Box mt="md">
         <Text>

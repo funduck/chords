@@ -89,6 +89,9 @@ export class ChordProService {
       }
     }
 
+    // Replace empty sections [  ]
+    sheet = sheet.replace(/\[\s*\]/g, "");
+
     return sheet;
   }
 
