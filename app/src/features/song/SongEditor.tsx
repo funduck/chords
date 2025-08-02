@@ -89,7 +89,7 @@ function SongEditor({ currentSong }: { currentSong?: boolean }) {
 
   // Load the sheet from localStorage if not provided
   useEffect(() => {
-    if (!setEditorValue) {
+    if (!setEditorValue || !ref.current?.view) {
       return;
     }
 
@@ -114,10 +114,13 @@ function SongEditor({ currentSong }: { currentSong?: boolean }) {
       setEditorValue(storedSheet);
       onSheetChanged(storedSheet);
     }
-  }, [setEditorValue]);
+  }, [ref.current?.view, setEditorValue]);
 
   // Apply song sheet changes to the editor
   useEffect(() => {
+    if (!setEditorValue || !ref.current?.view) {
+      return;
+    }
     const value = getEditorValue();
     if (currentSong && songState.songSheet && songState.songSheet !== value) {
       setSavedSheet(songState.songSheet);
@@ -128,7 +131,7 @@ function SongEditor({ currentSong }: { currentSong?: boolean }) {
       setEditorValue(songState.newSheet);
       onSheetChanged(songState.newSheet, false);
     }
-  }, [songState.songSheet, songState.newSheet]);
+  }, [ref.current?.view, setEditorValue, songState.songSheet, songState.newSheet]);
 
   const saveSheet = useCallback(() => {
     const value = getEditorValue();
@@ -159,18 +162,21 @@ function SongEditor({ currentSong }: { currentSong?: boolean }) {
         onSheetChanged(formatted);
       }
     },
-    [songContext, onSheetChanged, getEditorValue, setEditorValue],
+    [ref.current?.view, setEditorValue, songContext, onSheetChanged, getEditorValue],
   );
 
   const clearSheet = useCallback(() => {
     setEditorValue("");
     onSheetChanged("");
-  }, [onSheetChanged, setEditorValue]);
+  }, [ref.current?.view, setEditorValue, onSheetChanged]);
 
-  const onEditorChange = useCallback((value) => {
-    setValue(value);
-    onSheetChanged(value, true);
-  }, []);
+  const onEditorChange = useCallback(
+    (value) => {
+      setValue(value);
+      onSheetChanged(value, true);
+    },
+    [onSheetChanged],
+  );
 
   return (
     <>

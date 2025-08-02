@@ -33,9 +33,18 @@ function Song() {
 
   useScrollPosition();
 
-  const artistRefs = song?.artists?.map((a) => <Anchor href={RoutesEnum.SearchArtists(a.id)}>{a.name}</Anchor>) || [];
+  const artistRefs =
+    song?.artists?.map((a) => (
+      <Anchor key={a.id} href={RoutesEnum.SearchArtists(a.id)}>
+        {a.name}
+      </Anchor>
+    )) || [];
   const composerRefs =
-    song?.composers?.map((a) => <Anchor href={RoutesEnum.SearchArtists(a.id)}>{a.name}</Anchor>) || [];
+    song?.composers?.map((a) => (
+      <Anchor key={a.id} href={RoutesEnum.SearchArtists(a.id)}>
+        {a.name}
+      </Anchor>
+    )) || [];
 
   return (
     <>
@@ -52,14 +61,14 @@ function Song() {
             paddingTop: "20px",
           }}
         >
-          <Box>Song #{song?.id || songId}</Box>
-          {artistRefs.length > 0 && <Box>Artists: {artistRefs}</Box>}
-          {composerRefs.length > 0 && <Box>Composers: {composerRefs}</Box>}
+          <Box key="song">Song #{song?.id || songId}</Box>
+          {artistRefs.length > 0 && <Box key="artists">Artists: {artistRefs}</Box>}
+          {composerRefs.length > 0 && <Box key="composers">Composers: {composerRefs}</Box>}
           <Divider my="md" />
-          <Box hidden={displayMode != "editor"}>
+          <Box key="song_editor" hidden={displayMode != "editor"}>
             <SongEditor currentSong={true} />
           </Box>
-          <Box hidden={displayMode != "render"}>
+          <Box key="song_viewer" hidden={displayMode != "render"}>
             <ChordProViewer sheet={sheet} transpose={transposeSong} active={displayMode == "render"} />
           </Box>
         </ScrollArea>

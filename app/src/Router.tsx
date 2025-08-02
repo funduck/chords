@@ -1,4 +1,4 @@
-import { Anchor, AppShell, Burger, Button, Flex, Group, Menu, Space, Text, em } from "@mantine/core";
+import { Anchor, AppShell, Box, Burger, Button, Flex, Group, Menu, Space, Text, em } from "@mantine/core";
 import { useDisclosure, useMediaQuery } from "@mantine/hooks";
 import { IconChevronRight, IconSettings, IconSettingsFilled } from "@tabler/icons-react";
 import { useSignal } from "@telegram-apps/sdk-react";
@@ -67,7 +67,7 @@ function SettingsMenu() {
 
         {settingsContent.length > 0 && <Menu.Divider />}
         {/* Theme switch is always in menu */}
-        <Menu.Item component="div">
+        <Menu.Item component="div" key="theme-switch">
           <Flex align={"center"} ta={"center"} justify={"center"}>
             <ThemeSwitch />
           </Flex>
@@ -190,7 +190,7 @@ function Router() {
           {tabs
             .filter((g) => g.tabs.length)
             .map((group) => (
-              <>
+              <Box key={group.group}>
                 {/* <Text size="xl">{group.group}</Text> */}
                 {group.tabs
                   .filter((t) => !t.hidden)
@@ -215,7 +215,7 @@ function Router() {
                       </Anchor>
                     </Button>
                   ))}
-              </>
+              </Box>
             ))}
         </Stack>
         <Space h="lg" />
