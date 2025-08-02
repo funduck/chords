@@ -1,4 +1,4 @@
-import { Space, Switch } from "@mantine/core";
+import { Group, Space, Switch, Text } from "@mantine/core";
 import { useEffect, useState } from "react";
 
 import { useSongsApi } from "@src/hooks/Api";
@@ -29,6 +29,7 @@ function SearchSongs({ artistId }: { artistId?: number }) {
   }, [songsApi]);
 
   const [inPrivateLibs, setInPrivateLibs] = useState(true);
+  const [byLyrics, setByLyrics] = useState(true);
 
   if (!songsApi) {
     return <div>Loading...</div>;
@@ -38,14 +39,24 @@ function SearchSongs({ artistId }: { artistId?: number }) {
     <>
       <SearchResetArtist />
       <Space h="md" />
-      <Switch
-        mb="md"
-        label="In my library"
-        checked={inPrivateLibs}
-        onChange={(e) => {
-          setInPrivateLibs(e.currentTarget.checked);
-        }}
-      />
+      <Group>
+        <Switch
+          label="in my library"
+          mb="md"
+          checked={inPrivateLibs}
+          onChange={(e) => {
+            setInPrivateLibs(e.currentTarget.checked);
+          }}
+        />
+        <Switch
+          label="by lyrics"
+          mb="md"
+          checked={byLyrics}
+          onChange={(e) => {
+            setByLyrics(e.currentTarget.checked);
+          }}
+        />
+      </Group>
       <SearchEntities
         useSearchContext={useSearchSongsContext}
         searchMethod={(params) =>
@@ -54,6 +65,7 @@ function SearchSongs({ artistId }: { artistId?: number }) {
               ...params.request,
               artist_id: artistId || undefined,
               library_type: inPrivateLibs ? "private" : undefined,
+              by_lyrics: byLyrics,
             },
           })
         }

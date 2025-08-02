@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"strings"
 
 	"chords.com/api/internal/auth"
 	"chords.com/api/internal/dto"
@@ -132,8 +133,14 @@ func (s *SearchService) SearchSongs(ctx context.Context, req *dto.SearchSongRequ
 		q = q.Where("songs.id IN (SELECT song_id FROM song_artists WHERE artist_id = ?) OR songs.id IN (SELECT song_id FROM song_composers WHERE artist_id = ?)", req.ArtistID, req.ArtistID)
 	}
 
+	req.Query = strings.Trim(req.Query, " ")
 	if req.Query != "" {
-		q = q.Where(orm.SearchFTS("songs"), req.Query)
+		if req.ByLyrics {
+			q = q.Where(orm.SearchFTS("songs"), req.Query)
+		} else {
+			req.Query = strings.ToLower(req.Query)
+			q = q.Where("lower(songs.title) LIKE ?", "%"+req.Query+"%")
+		}
 	}
 
 	// Count total number of matching songs
