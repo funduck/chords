@@ -190,7 +190,7 @@ function SearchEntities<T extends { id?: number; cursor?: string }, SP extends S
 
       <Space h="xl" />
 
-      {searchState.entities && (
+      {searchState.entities && searchState.entities.length > 0 && (
         <>
           {renderResults ? (
             renderResults({

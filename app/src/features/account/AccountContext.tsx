@@ -120,7 +120,8 @@ export function AccountProvider({ children }: { children: ReactNode }) {
           title: "Email Confirmation",
           message: (
             <Box>
-              Email confirmation is not implemented yet, so{" "}
+              Lets pretend that we sent you an email to {email} with a link to confirm your account. So, if you want to
+              continue,{" "}
               <Anchor href={res.link} target="_blank" rel="noopener noreferrer">
                 click here
               </Anchor>

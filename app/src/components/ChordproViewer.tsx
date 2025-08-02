@@ -87,10 +87,6 @@ function ChordProViewer({ sheet, transpose, active }: { sheet: string; transpose
 
   return (
     <>
-      <Title>{title}</Title>
-      <Text size="xl">Artist: {artist}</Text>
-      <Text size="xl">Composer: {composer}</Text>
-      <Divider my="md" />
       <Box className="chordpro" ref={ref} />
       <Divider my="md" />
       <Text style={{ fontStyle: "italic" }}>End</Text>

@@ -1,4 +1,4 @@
-import { Box, ScrollArea } from "@mantine/core";
+import { Box, Divider, ScrollArea } from "@mantine/core";
 import { useEffect, useRef } from "react";
 
 import ChordDisplayManager from "@src/components/ChordDisplayManager";
@@ -38,6 +38,8 @@ function NewSong() {
             paddingTop: "20px",
           }}
         >
+          <Box>New Song</Box>
+          <Divider my="md" />
           <Box hidden={displayMode != "editor"}>
             <SongEditor currentSong={false} />
           </Box>

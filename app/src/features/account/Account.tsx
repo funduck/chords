@@ -1,4 +1,4 @@
-import { Box, Button, Flex, Stack, Text } from "@mantine/core";
+import { Box, Button, Divider, Flex, Group, Space, Stack, Text, Title } from "@mantine/core";
 import { useEffect } from "react";
 
 import { useAccountContext } from "@src/features/account/AccountContext";
@@ -22,21 +22,34 @@ function Account() {
 
   return (
     <Flex direction={"column"} gap={"md"}>
-      <Text>Logged in as user #{userId}</Text>
-      {auths?.length && (
-        <Stack>
-          {auths.map((a) => (
-            <Text>
-              {a.type}: {a.identity}
-            </Text>
-          ))}
-        </Stack>
-      )}
+      <Title order={2}>Account</Title>
+      <Group>
+        <Text fw={700}>User</Text>
+        <Text>#{userId}</Text>
+      </Group>
       <Box>
         <Button onClick={logout} color="orange" variant="outline">
           Logout
         </Button>
       </Box>
+      <Space h="md" />
+
+      <Title order={3}>Auth</Title>
+      {auths && auths.length > 0 && (
+        <Stack>
+          {auths.map((a) => (
+            <Group key={a.type}>
+              <Text fw={700}>{a.type}</Text>
+              <Text>{a.identity}</Text>
+            </Group>
+          ))}
+        </Stack>
+      )}
+      {!auths?.length && (
+        <Group>
+          <Text fw={700}>Anonymous</Text>
+        </Group>
+      )}
     </Flex>
   );
 }

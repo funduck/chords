@@ -31,9 +31,9 @@ function Song() {
 
   useScrollPosition();
 
-  const artistRefs =
-    (song?.artists || song?.composers)?.map((a) => <Anchor href={RoutesEnum.SearchArtists(a.id)}>{a.name}</Anchor>) ||
-    [];
+  const artistRefs = song?.artists?.map((a) => <Anchor href={RoutesEnum.SearchArtists(a.id)}>{a.name}</Anchor>) || [];
+  const composerRefs =
+    song?.composers?.map((a) => <Anchor href={RoutesEnum.SearchArtists(a.id)}>{a.name}</Anchor>) || [];
 
   return (
     <>
@@ -50,7 +50,9 @@ function Song() {
             paddingTop: "20px",
           }}
         >
-          {artistRefs}
+          <Box>Song #{song?.id || songId}</Box>
+          {artistRefs.length > 0 && <Box>Artists: {artistRefs}</Box>}
+          {composerRefs.length > 0 && <Box>Composers: {composerRefs}</Box>}
           <Divider my="md" />
           <Box hidden={displayMode != "editor"}>
             <SongEditor currentSong={true} />
