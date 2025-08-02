@@ -31,14 +31,14 @@
     {
       "previewLimit": 50,
       "driver": "SQLite",
-      "name": "dev",
-      "database": "${workspaceFolder:chords}/api/dev.sqlite"
+      "name": "test",
+      "database": "${workspaceFolder:chords}/api/internal/app/test.sqlite"
     },
     {
       "previewLimit": 50,
       "driver": "SQLite",
-      "name": "test",
-      "database": "${workspaceFolder:chords}/api/internal/app/test.sqlite"
+      "name": "dev",
+      "database": "${workspaceFolder:chords}/data/dev.sqlite"
     }
   ]
 }

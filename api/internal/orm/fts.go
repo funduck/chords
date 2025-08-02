@@ -30,27 +30,27 @@ func initSongsFTS(db *gorm.DB) error {
 
 		// Create FTS5 virtual table for songs
 		`CREATE VIRTUAL TABLE IF NOT EXISTS songs_fts USING fts5(
-			title, sheet, content='songs', content_rowid='id'
+			title, lyrics, content='songs', content_rowid='id'
 		)`,
 
 		// Trigger to keep songs FTS table in sync when inserting
 		`CREATE TRIGGER IF NOT EXISTS songs_ai AFTER INSERT ON songs BEGIN
-			INSERT INTO songs_fts(rowid, title, sheet) 
-			VALUES (new.id, new.title, new.sheet);
+			INSERT INTO songs_fts(rowid, title, lyrics) 
+			VALUES (new.id, new.title, new.lyrics);
 		END`,
 
 		// Trigger to keep songs FTS table in sync when updating
 		`CREATE TRIGGER IF NOT EXISTS songs_au AFTER UPDATE ON songs BEGIN
-			INSERT INTO songs_fts(songs_fts, rowid, title, sheet) 
-			VALUES('delete', old.id, old.title, old.sheet);
-			INSERT INTO songs_fts(rowid, title, sheet) 
-			VALUES (new.id, new.title, new.sheet);
+			INSERT INTO songs_fts(songs_fts, rowid, title, lyrics) 
+			VALUES('delete', old.id, old.title, old.lyrics);
+			INSERT INTO songs_fts(rowid, title, lyrics) 
+			VALUES (new.id, new.title, new.lyrics);
 		END`,
 
 		// Trigger to keep songs FTS table in sync when deleting
 		`CREATE TRIGGER IF NOT EXISTS songs_ad AFTER DELETE ON songs BEGIN
-			INSERT INTO songs_fts(songs_fts, rowid, title, sheet) 
-			VALUES('delete', old.id, old.title, old.sheet);
+			INSERT INTO songs_fts(songs_fts, rowid, title, lyrics) 
+			VALUES('delete', old.id, old.title, old.lyrics);
 		END`,
 	}
 

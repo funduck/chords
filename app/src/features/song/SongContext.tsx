@@ -1,9 +1,11 @@
+import { notifications } from "@mantine/notifications";
 import { ReactNode, createContext, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 
 import { RoutesEnum } from "@src/Router";
 import { Config } from "@src/config";
 import { CreateSongParams, SongEntity, UpdateSongParams, useSongsApi } from "@src/hooks/Api";
+import { ChordProService } from "@src/services/chordpro/chordpro";
 
 export interface AutoScrollOptions {
   enabled?: boolean;
@@ -184,7 +186,16 @@ export function SongContextProvider({ children }: { children: ReactNode }) {
     if (!songsApi) {
       return Promise.reject(new Error("SongsApiContext is not available"));
     }
+    if (!params.song.lyrics) {
+      params.song.lyrics = ChordProService.extractLyrics(params.song.sheet || "");
+    }
     return songsApi.createSong(params).then((createdSong) => {
+      notifications.show({
+        title: "Song Created",
+        message: `Song "${createdSong.title}" has been successfully created`,
+        color: "green",
+        position: "top-right",
+      });
       updateSongState({
         songId: createdSong.id,
         loadedSong: createdSong,
@@ -199,7 +210,16 @@ export function SongContextProvider({ children }: { children: ReactNode }) {
     if (!songsApi) {
       return Promise.reject(new Error("SongsApiContext is not available"));
     }
+    if (!params.song.lyrics) {
+      params.song.lyrics = ChordProService.extractLyrics(params.song.sheet || "");
+    }
     return songsApi.updateSong(params).then((updatedSong) => {
+      notifications.show({
+        title: "Song updated",
+        message: `Song "${updatedSong.title}" has been successfully updated`,
+        color: "green",
+        position: "top-right",
+      });
       updateSongState({
         loadedSong: updatedSong,
         songSheet: updatedSong.sheet,

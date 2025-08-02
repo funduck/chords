@@ -84,6 +84,7 @@ func (uc *CreateSongUseCase) Execute(ctx context.Context, req *dto.CreateSongReq
 		Artists:   artists,
 		Composers: composers,
 		Format:    req.Format,
+		Lyrics:    req.Lyrics,
 		OwnerID:   accessToken.UserID,
 		Sheet:     req.Sheet,
 		Title:     req.Title,

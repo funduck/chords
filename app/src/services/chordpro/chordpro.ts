@@ -163,4 +163,16 @@ export class ChordProService {
     const newKey = song.requireCurrentKey().transpose(transpose);
     return song.changeKey(newKey);
   }
+
+  static extractLyrics(sheet: string): string {
+    const song = this.sheetToSong(sheet, { parse: "chordpro" });
+    if (!song) {
+      console.warn("Failed to parse song from sheet for lyrics extraction");
+      return "";
+    }
+    const chordproSheet = this.songToSheet(song, { format: "chordpro" });
+    return chordproSheet
+      .replace(/\{.*?\}/g, "") // Remove all directives
+      .replace(/\[.*?\]/g, ""); // Remove all sections and chords
+  }
 }

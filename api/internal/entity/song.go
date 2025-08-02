@@ -12,6 +12,7 @@ type Song struct {
 	Title     string      `gorm:"not null" json:"title" validate:"required"`
 	Artists   []*Artist   `gorm:"many2many:song_artists;" json:"artists,omitempty"`
 	Composers []*Artist   `gorm:"many2many:song_composers;" json:"composers,omitempty"`
+	Lyrics    string      `gorm:"not null" json:"-"`
 	Sheet     string      `gorm:"not null" json:"sheet" validate:"required"`
 	Format    SheetFormat `gorm:"not null" json:"format" validate:"required"`
 	OwnerID   uint        `gorm:"not null" json:"owner_id"` // ID of the user who uploaded this song

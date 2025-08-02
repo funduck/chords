@@ -93,6 +93,9 @@ func (s *SongService) UpdateSong(ctx context.Context, id uint, req *dto.UpdateSo
 	if req.Sheet != "" {
 		song.Sheet = req.Sheet
 	}
+	if req.Lyrics != "" {
+		song.Lyrics = req.Lyrics
+	}
 
 	err = tx.Save(&song).Error
 	if err != nil {
