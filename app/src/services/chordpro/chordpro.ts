@@ -110,6 +110,10 @@ export class ChordProService {
       if (!options.parse && sheet.match(/\[(Chorus|Verse)\]/)) {
         options.parse = "ultimateguitar";
       }
+      if (!options.parse) {
+        options.parse = "chordsoverwords";
+      }
+      console.log("Parsing sheet with options:", options);
       switch (options.parse) {
         case "chordsoverwords":
           parser = new ChordsOverWordsParser();

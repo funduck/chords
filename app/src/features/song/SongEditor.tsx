@@ -150,17 +150,31 @@ function SongEditor({ currentSong }: { currentSong?: boolean }) {
       if (!song) {
         notifications.show({
           title: "Error",
-          message: "Failed to parse song from sheet",
+          message: "Failed to parse sheet",
           color: "red",
           position: "top-right",
         });
         return;
       }
       const formatted = ChordProService.songToSheet(song, { format });
-      if (formatted) {
-        setEditorValue(formatted);
-        onSheetChanged(formatted);
+      if (!formatted) {
+        notifications.show({
+          title: "Error",
+          message: "Failed to format song",
+          color: "red",
+          position: "top-right",
+        });
+        return;
       }
+
+      setEditorValue(formatted);
+      onSheetChanged(formatted);
+      notifications.show({
+        title: "Success",
+        message: `Song formatted to ${format}`,
+        color: "green",
+        position: "top-right",
+      });
     },
     [ref.current?.view, setEditorValue, songContext, onSheetChanged, getEditorValue],
   );
@@ -190,16 +204,11 @@ function SongEditor({ currentSong }: { currentSong?: boolean }) {
             </Button>
           </>
         )}
-        <Menu shadow="md" width={200}>
-          <Menu.Target>
-            <Button variant="outline">Format</Button>
-          </Menu.Target>
 
-          <Menu.Dropdown>
-            <Menu.Item onClick={() => formatSheet("chordpro")}>to ChordPro</Menu.Item>
-            <Menu.Item onClick={() => formatSheet("chordsoverwords")}>to Chords Over Words</Menu.Item>
-          </Menu.Dropdown>
-        </Menu>
+        <Button variant="outline" onClick={() => formatSheet("chordpro")}>
+          Format
+        </Button>
+
         <Button variant="outline" onClick={clearSheet} disabled={"" == getEditorValue()}>
           Clear
         </Button>
