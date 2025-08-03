@@ -193,25 +193,26 @@ function Router() {
                 {group.tabs
                   .filter((t) => !t.hidden)
                   .map(({ id, link, text }) => (
-                    <Button
+                    <Anchor
                       variant="subtle"
-                      justify="start"
                       key={id}
                       id={id}
-                      onClick={() => {
+                      onClick={(e) => {
+                        e.preventDefault();
                         navigate(link);
                         setTimeout(() => {
                           isMobile && toggleNavbar();
                         }, 150);
                       }}
+                      href={link}
                     >
-                      <Anchor>
+                      <Button variant="subtle" justify="start">
                         <Flex align="stretch">
                           {isTabActive(link) && <IconChevronRight />}
                           <Text size="lg">{text}</Text>
                         </Flex>
-                      </Anchor>
-                    </Button>
+                      </Button>
+                    </Anchor>
                   ))}
               </Flex>
             ))}

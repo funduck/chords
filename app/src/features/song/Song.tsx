@@ -1,6 +1,6 @@
 import { Anchor, Box, Divider, ScrollArea } from "@mantine/core";
 import { useEffect, useRef } from "react";
-import { useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 
 import { RoutesEnum } from "@src/Router";
 import ChordDisplayManager from "@src/components/ChordDisplayManager";
@@ -31,17 +31,33 @@ function Song() {
 
   const songViewportRef = useRef<HTMLDivElement>(null);
 
+  const navigate = useNavigate();
+
   useScrollPosition();
 
   const artistRefs =
     song?.artists?.map((a) => (
-      <Anchor key={a.id} href={RoutesEnum.SearchArtists(a.id)}>
+      <Anchor
+        key={a.id}
+        onClick={(e) => {
+          e.preventDefault();
+          navigate(RoutesEnum.SearchArtists(a.id));
+        }}
+        href={RoutesEnum.SearchArtists(a.id)}
+      >
         {a.name}
       </Anchor>
     )) || [];
   const composerRefs =
     song?.composers?.map((a) => (
-      <Anchor key={a.id} href={RoutesEnum.SearchArtists(a.id)}>
+      <Anchor
+        key={a.id}
+        onClick={(e) => {
+          e.preventDefault();
+          navigate(RoutesEnum.SearchArtists(a.id));
+        }}
+        href={RoutesEnum.SearchArtists(a.id)}
+      >
         {a.name}
       </Anchor>
     )) || [];
