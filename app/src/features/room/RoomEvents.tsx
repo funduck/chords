@@ -95,7 +95,7 @@ export function RoomEventsPublisher() {
   const userId = useSignal(Signals.userId);
 
   const { songState } = useSongContext();
-  const { roomState, publishState, applyState, publish } = useRoomContext();
+  const { roomState, updateRoomState, publishState, applyState, publish } = useRoomContext();
   const room = roomState.room;
 
   // Instead of useEffect for every field I track changes in "publishState"
@@ -227,13 +227,16 @@ export function RoomEventsPublisher() {
       stateDto.new_sheet = publishedNewSheet?.value || stateDto.new_sheet;
 
       if (!isEqual(stateDto, room.state)) {
-        console.debug("Updating room state:", stateDto);
+        console.debug("Updating room state:", stateDto, "from", room.state);
         roomsApi
           ?.updateRoom({
             id: room.id!,
             request: {
               state: stateDto,
             },
+          })
+          .then((res) => {
+            updateRoomState({ room: res });
           })
           .catch((error) => {
             console.error("Failed to update room state:", error);

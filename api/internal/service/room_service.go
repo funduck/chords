@@ -322,7 +322,7 @@ func (s *RoomService) UpdateRoom(ctx context.Context, accessToken *auth.AccessTo
 
 	// Find the room by ID
 	room := entity.Room{}
-	if err := tx.First(&room, roomID).Error; err != nil {
+	if err := tx.Preload("Users").First(&room, roomID).Error; err != nil {
 		return nil, tx.Error
 	}
 

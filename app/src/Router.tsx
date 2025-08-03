@@ -206,7 +206,7 @@ function Router() {
                       }}
                       href={link}
                     >
-                      <Button variant="subtle" justify="start">
+                      <Button variant="subtle" justify="start" w={"100%"}>
                         <Flex align="stretch">
                           {isTabActive(link) && <IconChevronRight />}
                           <Text size="lg">{text}</Text>
