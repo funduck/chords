@@ -1,24 +1,13 @@
 import ChordSheetJS from "chordsheetjs";
 import { Song } from "chordsheetjs";
 
-// Weird importing is needed to allow testing
-const {
-  Chord,
-  ChordProFormatter,
-  ChordProParser,
-  ChordsOverWordsFormatter,
-  ChordsOverWordsParser,
-  UltimateGuitarParser,
-} = ChordSheetJS;
+import { ChordsService } from "../chords/chords";
 
-const simpleChordRegex = "[A-G][b#]?[a-z2479]*";
-const chordRegex = `${simpleChordRegex}(?:\/${simpleChordRegex})?`;
+// Weird importing is needed to allow testing
+const { Chord, ChordProFormatter, ChordProParser, ChordsOverWordsParser, UltimateGuitarParser } = ChordSheetJS;
 
 export class ChordProService {
-  static adjustLineLength(song: Song, maxLineLength: number): Song {
-    const formater = new ChordProFormatter();
-    let sheet = formater.format(song);
-
+  static adjustLineLength(sheet: string, maxLineLength: number): string {
     const resLines: string[] = [];
     const lines = sheet.split("\n");
     let isTab = false;
@@ -47,75 +36,108 @@ export class ChordProService {
       }
     }
 
-    const parser = new ChordProParser();
-    const newSong = parser.parse(resLines.join("\n"));
-    return newSong;
+    return resLines.join("\n");
   }
 
-  static fixForFormatting(song: Song): Song {
-    const formater = new ChordProFormatter();
-    let sheet = formater.format(song);
-
-    const resLines: string[] = [];
-    const lines = sheet.split("\n");
-
-    for (const line of lines) {
-      if (line.match(/^\{(sot|start_of_tab|soc|start_of_chorus|sov|start_of_verse)/)) {
-        if (resLines.at(-1) != "") {
-          resLines.push(""); // Add an empty line before the start of tab/chorus
-        }
-      }
-      resLines.push(line);
-    }
-
-    const parser = new ChordProParser();
-    const newSong = parser.parse(resLines.join("\n"));
-    return newSong;
-  }
-
-  static songToSheet(
-    song: Song,
-    options: { format?: "chordsoverwords" | "chordpro"; maxLineLength?: number } = {},
-  ): string {
-    if (!song) return "";
-
-    song = this.fixForFormatting(song);
-
-    if (options.maxLineLength) {
-      song = this.adjustLineLength(song, options.maxLineLength);
-    }
-
-    const formater = options.format == "chordsoverwords" ? new ChordsOverWordsFormatter() : new ChordProFormatter();
-    let sheet = formater.format(song);
-
-    if (options.format != "chordsoverwords") {
-      // Later we want to recognize sheet as ChordPro, so we need to ensure it has a title
-      if (!song.title && !sheet.match(/{title/)) {
-        sheet = `{title}\n${sheet}`;
-      }
-    }
-
-    // Replace empty sections [  ]
-    sheet = sheet.replace(/\[\s*\]/g, "");
-
-    return sheet;
-  }
-
-  static preparseSheet(sheet: string): string {
+  static beforeParse(sheet: string): string {
     // TODO add tests for this file
 
     // Change chord H to B
     sheet = sheet.replace(/(\[|^|\s)(H)(|m)(|7|aj|7maj|dim)(\]|$|\s)/g, "$1B$3$4$5");
 
-    // Split sequences of chords like: (E/F#-E/G#-E/A)
-    sheet = sheet.replace(new RegExp(`\\((${chordRegex}[\\- ])+(${chordRegex})\\)`, "g"), (match) => {
-      return match
-        .slice(1, -1) // Remove parentheses
-        .split(/[\- ]/)
-        .map((chord) => chord.trim())
-        .filter((chord) => chord) // Remove empty strings
-        .join(" ");
-    });
+    // // Split sequences of chords like: (E/F#-E/G#-E/A)
+    // sheet = sheet.replace(new RegExp(`\\(\\s*(${chordRegex}[\\-\\s]+)+(${chordRegex})\\s*\\)`, "g"), (match) => {
+    //   return match
+    //     .slice(1, -1) // Remove parentheses
+    //     .split(/[\- ]/)
+    //     .map((chord) => chord.trim())
+    //     .filter((chord) => chord) // Remove empty strings
+    //     .join(" ");
+    // });
+
+    return sheet;
+  }
+
+  static beforeFormat(sheet: string): string {
+    const resLines: string[] = [];
+    const lines = sheet.split("\n");
+
+    for (const line of lines) {
+      const re = line.match(/^(.+)(\{(?:sot|start_of_tab|soc|start_of_chorus|sov|start_of_verse).+)$/);
+      if (re) {
+        if (re[1]) {
+          resLines.push(re[1]); // Add the part before the directive
+        }
+        resLines.push(""); // Add an empty line before the start of tab/chorus
+        resLines.push(re[2]); // Add the directive line
+        continue;
+      }
+      resLines.push(line);
+    }
+
+    return resLines.join("\n");
+  }
+
+  static afterFormat(sheet: string): string {
+    // Later we want to recognize sheet as ChordPro, so we need to ensure it has a title
+    if (!sheet.match(/{title/)) {
+      sheet = `{title}\n${sheet}`;
+    }
+
+    // Replace empty sections [  ]
+    sheet = sheet.replace(/\[\s*\]/g, "");
+
+    // Recognize all chords in the sheet without brackets
+    sheet = sheet
+      .split("\n")
+      .map((line) => {
+        if (!line.trim()) {
+          return line; // Skip empty lines
+        }
+
+        let inBracket = false;
+        return line
+          .split(/(\s|\(|\)|-)/)
+          .map((part) => {
+            if (part.startsWith("[")) {
+              inBracket = true;
+              return part;
+            }
+            if (part.endsWith("]")) {
+              inBracket = false;
+              return part;
+            }
+            if (inBracket) {
+              return part; // Inside brackets, do not change
+            }
+            // Outside brackets, recognize chords
+            const isChord = ChordsService.isChord(part);
+            console.debug("Recognizing chord:", part, "->", isChord);
+            if (isChord) {
+              return `[${part}]`; // Add brackets around recognized chords
+            }
+            return part; // Leave other parts unchanged
+          })
+          .join("");
+      })
+      .join("\n");
+
+    return sheet;
+  }
+
+  static songToSheet(song: Song, options: { format?: "chordpro"; maxLineLength?: number } = {}): string {
+    if (!song) return "";
+
+    let formater = new ChordProFormatter();
+    let sheet = formater.format(song);
+
+    sheet = this.beforeFormat(sheet);
+
+    if (options.maxLineLength) {
+      sheet = this.adjustLineLength(sheet, options.maxLineLength);
+    }
+
+    sheet = this.afterFormat(sheet);
 
     return sheet;
   }
@@ -124,7 +146,7 @@ export class ChordProService {
     sheet: string,
     options: { parse?: "chordsoverwords" | "chordpro" | "ultimateguitar"; maxLineLength?: number } = {},
   ): Song | null {
-    sheet = this.preparseSheet(sheet);
+    sheet = this.beforeParse(sheet);
 
     try {
       let parser: { parse: (sheet: string) => Song } = new ChordProParser();
@@ -196,19 +218,21 @@ export class ChordProService {
   }
 
   static extractLyrics(sheet: string): string {
-    const song = this.sheetToSong(sheet, { parse: "chordpro" });
+    const song = this.sheetToSong(sheet);
     if (!song) {
       console.warn("Failed to parse song from sheet for lyrics extraction");
       return "";
     }
     const chordproSheet = this.songToSheet(song, { format: "chordpro" });
     return chordproSheet
-      .replace(/\{.*?\}/g, "") // Remove all directives
-      .replace(/\[.*?\]/g, "") // Remove all sections and chords
       .split("\n")
-      .map((line) => line.trim())
+      .map((line) =>
+        line
+          .replace(/\{[^\}]*\}/g, "") // Remove all directives
+          .replace(/\[[^\]]*\]/g, "") // Remove all sections and chords
+          .trim(),
+      )
       .filter((line) => line) // Remove empty lines
-      .join("\n")
-      .trim(); // Trim the final result
+      .join("\n");
   }
 }

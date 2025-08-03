@@ -1,4 +1,4 @@
-import { Anchor, Box, Button, Group, Menu, Text } from "@mantine/core";
+import { Anchor, Box, Button, Group, Text } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { useSignal } from "@telegram-apps/sdk-react";
 import { okaidia } from "@uiw/codemirror-theme-okaidia";
@@ -145,7 +145,7 @@ function SongEditor({ currentSong }: { currentSong?: boolean }) {
   }, [songContext, songState.loadedSong, setSavedSheet, getEditorValue]);
 
   const formatSheet = useCallback(
-    (format: "chordpro" | "chordsoverwords") => {
+    (format: "chordpro") => {
       const song = ChordProService.sheetToSong(getEditorValue(), {});
       if (!song) {
         notifications.show({

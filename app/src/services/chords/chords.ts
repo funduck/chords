@@ -117,4 +117,12 @@ export class ChordsService {
       chord,
     };
   }
+
+  static isChord(name: string): boolean {
+    const chord = this.getChord(name);
+    if (chord.chord) {
+      return true;
+    }
+    return false;
+  }
 }
