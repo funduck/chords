@@ -1,12 +1,18 @@
-import {
+import ChordSheetJS from "chordsheetjs";
+import { Song } from "chordsheetjs";
+
+// Weird importing is needed to allow testing
+const {
   Chord,
   ChordProFormatter,
   ChordProParser,
   ChordsOverWordsFormatter,
   ChordsOverWordsParser,
-  Song,
   UltimateGuitarParser,
-} from "chordsheetjs";
+} = ChordSheetJS;
+
+const simpleChordRegex = "[A-G][b#]?[a-z2479]*";
+const chordRegex = `${simpleChordRegex}(?:\/${simpleChordRegex})?`;
 
 export class ChordProService {
   static adjustLineLength(song: Song, maxLineLength: number): Song {
@@ -95,12 +101,30 @@ export class ChordProService {
     return sheet;
   }
 
+  static preparseSheet(sheet: string): string {
+    // TODO add tests for this file
+
+    // Change chord H to B
+    sheet = sheet.replace(/(\[|^|\s)(H)(|m)(|7|aj|7maj|dim)(\]|$|\s)/g, "$1B$3$4$5");
+
+    // Split sequences of chords like: (E/F#-E/G#-E/A)
+    sheet = sheet.replace(new RegExp(`\\((${chordRegex}[\\- ])+(${chordRegex})\\)`, "g"), (match) => {
+      return match
+        .slice(1, -1) // Remove parentheses
+        .split(/[\- ]/)
+        .map((chord) => chord.trim())
+        .filter((chord) => chord) // Remove empty strings
+        .join(" ");
+    });
+
+    return sheet;
+  }
+
   static sheetToSong(
     sheet: string,
     options: { parse?: "chordsoverwords" | "chordpro" | "ultimateguitar"; maxLineLength?: number } = {},
   ): Song | null {
-    // Change Hm to Bm
-    sheet = sheet.replace(/(\s|^)(Hm)(|7|aj|7maj|dim)(\s|$)/g, "$1Bm$3$4");
+    sheet = this.preparseSheet(sheet);
 
     try {
       let parser: { parse: (sheet: string) => Song } = new ChordProParser();
@@ -180,6 +204,11 @@ export class ChordProService {
     const chordproSheet = this.songToSheet(song, { format: "chordpro" });
     return chordproSheet
       .replace(/\{.*?\}/g, "") // Remove all directives
-      .replace(/\[.*?\]/g, ""); // Remove all sections and chords
+      .replace(/\[.*?\]/g, "") // Remove all sections and chords
+      .split("\n")
+      .map((line) => line.trim())
+      .filter((line) => line) // Remove empty lines
+      .join("\n")
+      .trim(); // Trim the final result
   }
 }

@@ -9,7 +9,7 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0 && yarn run stylelint",
     "stylelint": "stylelint '**/*.css' --cache",
     "preview": "vite preview --host --port 8080",
-    "test": "node --test"
+    "test": "npx tsx --test src/**/*.test.ts"
   },
   "dependencies": {
     "@mantine/core": "^8.1.3",
