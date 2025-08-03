@@ -86,12 +86,18 @@ export class ChordsService {
       case "min":
         suffix = "minor";
         break;
+      case "2":
+        suffix = "sus2";
+        break;
       case "add":
       case "(9)":
         suffix = "add9";
         break;
       case "(11)":
         suffix = "add11";
+        break;
+      case "7(#9)":
+        suffix = "7#9";
         break;
       default:
         break;
