@@ -100,7 +100,7 @@ function Router() {
         },
         {
           id: "editor",
-          text: "Editor",
+          text: "New song editor",
           link: RoutesEnum.Editor,
         },
         {

@@ -200,7 +200,11 @@ export function SongContextProvider({ children }: { children: ReactNode }) {
         songId: createdSong.id,
         loadedSong: createdSong,
         songSheet: createdSong.sheet,
+        newSheet: "", // Clear editor sheet
       });
+      // Clear editor sheet in localStorage
+      localStorage.setItem("editor-sheet", "");
+
       navigate(RoutesEnum.Songs(createdSong.id));
       return createdSong;
     });
