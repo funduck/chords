@@ -1,9 +1,10 @@
-import { Button, Fieldset, Group, Modal, Space, Text, TextInput } from "@mantine/core";
+import { Button, Fieldset, Flex, Group, Modal, Space, Text, TextInput, Title } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useSignal } from "@telegram-apps/sdk-react";
 
 import { Signals } from "@src/services/signals-registry";
 
+import About, { TitleAbout } from "../about/About";
 import { useAccountContext } from "./AccountContext";
 
 function Login() {
@@ -26,7 +27,12 @@ function Login() {
   }
 
   return (
-    <Modal opened={true} onClose={() => {}} title="Login" withCloseButton={false}>
+    <Modal opened={true} onClose={() => {}} withCloseButton={false}>
+      <Flex direction="column" ta="center">
+        <TitleAbout />
+      </Flex>
+      <Space h="md" />
+
       <Fieldset legend="Anonymous">
         <Group justify="flex-end">
           <Text>You will have full functionality, but only in this browser</Text>

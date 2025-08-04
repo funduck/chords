@@ -8,6 +8,7 @@ import { Route, Routes, useLocation, useNavigate } from "react-router";
 import Stack from "@components/Stack";
 
 import ThemeSwitch from "./components/ThemeSwitch";
+import About from "./features/about/About";
 import Account from "./features/account/Account";
 import Confirm from "./features/account/Confirm";
 import Artist from "./features/artist/Artist";
@@ -41,6 +42,7 @@ class RoutesEnum {
   static Confirm = function (code: string): string {
     return "/confirm/" + code;
   };
+  static About = "/about";
 }
 
 export { RoutesEnum };
@@ -135,6 +137,16 @@ function Router() {
           id: "account",
           text: "Account",
           link: RoutesEnum.Account,
+        },
+      ],
+    },
+    {
+      group: "Other",
+      tabs: [
+        {
+          id: "about",
+          text: "About",
+          link: RoutesEnum.About,
         },
       ],
     },
@@ -236,6 +248,7 @@ function Router() {
           <Route path="search/artists" element={<Artist />} />
           <Route path="search/songs" element={<Search />} />
           <Route path="songs/:songId" element={<Song />} />
+          <Route path="about" element={<About />} />
         </Routes>
       </AppShell.Main>
 
