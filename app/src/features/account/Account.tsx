@@ -1,6 +1,7 @@
 import { Box, Button, Flex, Group, Space, Stack, Text, Title } from "@mantine/core";
 import { useEffect } from "react";
 
+import ClearBrowser from "@src/components/ClearBrowser";
 import { useAccountContext } from "@src/features/account/AccountContext";
 import { useUserApi } from "@src/hooks/Api";
 
@@ -22,7 +23,7 @@ function Account() {
 
   return (
     <Flex direction={"column"} gap={"md"}>
-      <Title order={2}>Account</Title>
+      <Title order={3}>Account</Title>
       <Group>
         <Text fw={700}>User</Text>
         <Text>#{userId}</Text>
@@ -50,6 +51,13 @@ function Account() {
           <Text fw={700}>Anonymous</Text>
         </Group>
       )}
+      <Space h="md" />
+
+      <Title order={3}>Misc</Title>
+      <Box>
+        <ClearBrowser />
+      </Box>
+      <Space h="md" />
     </Flex>
   );
 }
