@@ -77,7 +77,7 @@ function SongDisplaySettings() {
 function SongKeySettings() {
   const { songState, updateDisplayOptions } = useSongContext();
   const transpose = songState.displayOptions?.transpose || 0;
-  const fontSize = songState.displayOptions?.fontSize || 10;
+  const fontSize = songState.displayOptions?.fontSize || 16;
 
   return (
     <Box>
