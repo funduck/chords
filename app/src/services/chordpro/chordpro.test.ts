@@ -165,34 +165,6 @@ describe("ChordProService.songToSheet", () => {
   });
 });
 
-describe("ChordProService.sheetToChordProSheet", () => {
-  it("should convert chords over words to ChordPro format", () => {
-    const input = `
- C       G
-Hello world`;
-    const result = ChordProService.sheetToChordProSheet(input);
-
-    assert.equal(result, "{title}\n\nH[C]ello wor[G]ld", "Should preserve lyrics");
-  });
-
-  it("should handle empty input", () => {
-    const result = ChordProService.sheetToChordProSheet("");
-    assert.strictEqual(result, "", "Should return empty string for empty input");
-  });
-
-  it("should handle whitespace-only input", () => {
-    const result = ChordProService.sheetToChordProSheet("   \n  \n  ");
-    assert.strictEqual(result, "", "Should return empty string for whitespace-only input");
-  });
-
-  it("should apply parsing options", () => {
-    const input = "[Verse]\n[C]Hello world";
-    const result = ChordProService.sheetToChordProSheet(input, { parse: "ultimateguitar" });
-
-    assert.ok(result.length > 0, "Should return non-empty result");
-  });
-});
-
 describe("ChordProService.transposeSong", () => {
   it("should transpose song up by semitones", () => {
     const inputSheet = "{title: Test}\n{key: C}\n[C]Hello [G]world";

@@ -193,28 +193,6 @@ export class ChordProService {
     }
   }
 
-  static sheetToChordProSheet(
-    sheet: string,
-    options: {
-      parse?: "chordsoverwords" | "chordpro" | "ultimateguitar";
-      maxLineLength?: number;
-      throw?: boolean;
-    } = {},
-  ): string {
-    if (!sheet || !sheet.trim()) {
-      return "";
-    }
-    const song = this.sheetToSong(sheet, options);
-    if (!song) {
-      console.warn("Failed to parse song from sheet");
-      return "";
-    }
-
-    return this.songToSheet(song, {
-      maxLineLength: options.maxLineLength,
-    });
-  }
-
   static transposeSong(song: Song, transpose: number): Song {
     let key = song.key;
     if (!key) {
@@ -232,12 +210,14 @@ export class ChordProService {
   }
 
   static extractLyrics(sheet: string): string {
-    const song = this.sheetToSong(sheet);
+    const song = this.sheetToSong(sheet, {
+      throw: true,
+    });
     if (!song) {
       console.warn("Failed to parse song from sheet for lyrics extraction");
       return "";
     }
-    const chordproSheet = this.songToSheet(song, { format: "chordpro" });
+    const chordproSheet = this.songToSheet(song, { format: "chordpro", throw: true });
     return chordproSheet
       .split("\n")
       .map((line) =>
