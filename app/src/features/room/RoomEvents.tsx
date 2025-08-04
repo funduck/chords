@@ -216,6 +216,11 @@ export function RoomEventsPublisher() {
         console.debug("Published:", event);
       }
 
+      // Only owner can update the room state in the database
+      if (room.owner_id != userId) {
+        return;
+      }
+
       // Some changes should be stored in RoomEntity in database, so
 
       // Clone the room state to avoid mutating the original object
