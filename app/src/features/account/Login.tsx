@@ -1,10 +1,10 @@
-import { Button, Fieldset, Flex, Group, Modal, Space, Text, TextInput, Title } from "@mantine/core";
+import { Button, Fieldset, Flex, Group, Modal, Space, Text, TextInput } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useSignal } from "@telegram-apps/sdk-react";
 
 import { Signals } from "@src/services/signals-registry";
 
-import About, { TitleAbout } from "../about/About";
+import { TitleAbout } from "../about/About";
 import { useAccountContext } from "./AccountContext";
 
 function Login() {
