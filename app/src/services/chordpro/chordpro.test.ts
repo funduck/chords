@@ -306,6 +306,17 @@ Regular long line that should be split when it exceeds the maximum length specif
     assert.ok(outputSheet.includes("{end_of_tab}"), "Should preserve tab end directive");
     assert.ok(outputSheet.includes("Tab content that is very long"), "Should preserve tab content without splitting");
   });
+
+  it("should not break inside brackets", () => {
+    const inputSheet = "{title: No Break}\n[C] This is a long chord [G Am D] that should not break inside brackets";
+
+    const outputSheet = ChordProService.adjustLineLength(inputSheet!, 30);
+    assert.equal(
+      outputSheet,
+      "{title: No Break}\n[C] This is a long chord\n[G Am D] that should not break\ninside brackets",
+      "Should not break inside brackets",
+    );
+  });
 });
 
 describe("ChordProService.beforeFormat", () => {

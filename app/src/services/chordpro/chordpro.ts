@@ -8,6 +8,11 @@ const { Chord, ChordProFormatter, ChordProParser, ChordsOverWordsParser, Ultimat
 
 export class ChordProService {
   static adjustLineLength(sheet: string, maxLineLength: number): string {
+    if (maxLineLength < 20) {
+      console.warn("Max line length is too short, skipping adjustment");
+      return sheet;
+    }
+
     const resLines: string[] = [];
     const lines = sheet.split("\n");
     let isTab = false;
@@ -21,9 +26,34 @@ export class ChordProService {
         isTab = false;
       }
       if (!isDirective && !isTab && line.length > maxLineLength) {
+        // We have to track brackets to avoid breaking inside them
+        const brackets = { "[": 0, "]": 0 };
+
         const rest = line.split(" ").reduce((acc, word) => {
+          // Check if we are inside brackets before the word
+          const inBrackets = brackets["["] > brackets["]"];
+          // Count brackets in the word
+          for (const char of word) {
+            if (char == "[") {
+              brackets["["]++;
+            } else if (char == "]") {
+              brackets["]"]++;
+            }
+          }
+
           if (acc.length + word.length + 1 > maxLineLength) {
-            resLines.push(acc);
+            if (inBrackets) {
+              // We cannot break inside brackets, we need to break before the last bracket
+              const idx = acc.lastIndexOf("[");
+              if (idx > 0) {
+                resLines.push(acc.slice(0, idx).trim());
+                return `${acc.slice(idx)} ${word}`; // Start new line with the brackets part and current word
+              }
+
+              console.error("isBracket is true, but no brackets found in the line:", line);
+            }
+
+            resLines.push(acc.trim());
             return word; // Start new line with the current word
           }
           return acc ? `${acc} ${word}` : word; // Add space if acc is not empty
@@ -112,7 +142,6 @@ export class ChordProService {
             }
             // Outside brackets, recognize chords
             const isChord = ChordsService.isChord(part);
-            console.debug("Recognizing chord:", part, "->", isChord);
             if (isChord) {
               return `[${part}]`; // Add brackets around recognized chords
             }
@@ -166,7 +195,6 @@ export class ChordProService {
       if (!options.parse) {
         options.parse = "chordsoverwords";
       }
-      console.log("Parsing sheet with options:", options);
       switch (options.parse) {
         case "chordsoverwords":
           parser = new ChordsOverWordsParser();
@@ -180,7 +208,7 @@ export class ChordProService {
       }
       let song = parser.parse(sheet);
       if (options.maxLineLength) {
-        sheet = this.songToSheet(song, { maxLineLength: options.maxLineLength });
+        sheet = this.songToSheet(song, { maxLineLength: options.maxLineLength, throw: true });
         song = parser.parse(sheet);
       }
       return song;
