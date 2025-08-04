@@ -153,7 +153,7 @@ export class ChordProService {
       if (!options.parse && sheet.match(/{(title|artist|composer)/)) {
         options.parse = "chordpro";
       }
-      if (!options.parse && sheet.match(/\[(Chorus|Verse)\]/)) {
+      if (!options.parse && sheet.match(/\[(Chorus|Verse)/)) {
         options.parse = "ultimateguitar";
       }
       if (!options.parse) {
