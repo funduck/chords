@@ -1,4 +1,4 @@
-import { Button, Flex, Text } from "@mantine/core";
+import { Box, Button, Flex, Text } from "@mantine/core";
 import { IconEdit, IconEye, IconMinus, IconPlayerPlayFilled, IconPlayerStop, IconPlus } from "@tabler/icons-react";
 import { useEffect } from "react";
 
@@ -76,21 +76,36 @@ function SongDisplaySettings() {
 
 function SongKeySettings() {
   const { songState, updateDisplayOptions } = useSongContext();
-  const transposeSong = songState.displayOptions?.transpose || 0;
+  const transpose = songState.displayOptions?.transpose || 0;
+  const fontSize = songState.displayOptions?.fontSize || 10;
 
   return (
-    <Flex direction="row" m={"xs"} ta={"center"} align="center">
-      <Text>Transpose</Text>
-      <Button variant="subtle" onClick={() => updateDisplayOptions({ transpose: transposeSong - 1 })}>
-        <IconMinus />
-      </Button>
-      <Text>
-        <b>{transposeSong}</b>
-      </Text>
-      <Button variant="subtle" onClick={() => updateDisplayOptions({ transpose: transposeSong + 1 })}>
-        <IconPlus />
-      </Button>
-    </Flex>
+    <Box>
+      <Flex direction="row" m={"xs"} ta={"center"} align="center">
+        <Text>Transpose</Text>
+        <Button variant="subtle" onClick={() => updateDisplayOptions({ transpose: transpose - 1 })}>
+          <IconMinus />
+        </Button>
+        <Text>
+          <b>{transpose}</b>
+        </Text>
+        <Button variant="subtle" onClick={() => updateDisplayOptions({ transpose: transpose + 1 })}>
+          <IconPlus />
+        </Button>
+      </Flex>
+      <Flex direction="row" m={"xs"} ta={"center"} align="center">
+        <Text>Font size</Text>
+        <Button variant="subtle" onClick={() => updateDisplayOptions({ fontSize: fontSize - 1 })}>
+          <IconMinus />
+        </Button>
+        <Text>
+          <b>{fontSize}</b>
+        </Text>
+        <Button variant="subtle" onClick={() => updateDisplayOptions({ fontSize: fontSize + 1 })}>
+          <IconPlus />
+        </Button>
+      </Flex>
+    </Box>
   );
 }
 

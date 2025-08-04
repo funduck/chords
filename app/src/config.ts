@@ -7,6 +7,7 @@ const AutoScrollSpeed = parseInt(import.meta.env.VITE_AUTO_SCROLL_SPEED || "50",
 const AutoScrollInterval = parseInt(import.meta.env.VITE_AUTO_SCROLL_INTERVAL || "2000", 10);
 const AutoScrollEnabled = import.meta.env.VITE_AUTO_SCROLL_ENABLED == "true";
 const SearchPageSize = parseInt(import.meta.env.VITE_SEARCH_PAGE_SIZE || "30", 10);
+const SongFontSize = parseInt(import.meta.env.VITE_SONG_FONT_SIZE || "15", 10);
 const StrictMode = import.meta.env.VITE_STRICT_MODE == "true";
 
 export const Config = {
@@ -19,5 +20,6 @@ export const Config = {
   AutoScrollInterval,
   AutoScrollEnabled,
   SearchPageSize,
+  SongFontSize,
   StrictMode,
 };

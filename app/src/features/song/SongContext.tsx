@@ -17,6 +17,7 @@ export interface AutoScrollOptions {
 interface DisplayOptions {
   mode?: "render" | "editor";
   transpose?: number; // Transpose value in semitones
+  fontSize?: number; // Font size in pixels
 }
 
 interface SongState {
@@ -63,6 +64,7 @@ export function SongContextProvider({ children }: { children: ReactNode }) {
     displayOptions: {
       mode: "render",
       transpose: 0,
+      fontSize: Config.SongFontSize,
     },
   });
 

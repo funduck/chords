@@ -1,14 +1,23 @@
 import { Box, Divider, Text } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { HtmlDivFormatter } from "chordsheetjs";
-// import { HtmlTableFormatter } from "chordsheetjs";
 import { memo, useEffect, useRef, useState } from "react";
 
 import { ChordProService } from "@src/services/chordpro/chordpro";
 import { Logger } from "@src/services/logger.service";
 import { estimateFontSize } from "@src/utils/font";
 
-function ChordProViewer({ sheet, transpose, active }: { sheet: string; transpose?: number; active?: boolean }) {
+function ChordProViewer({
+  sheet,
+  transpose,
+  fontSize,
+  active,
+}: {
+  sheet: string;
+  transpose?: number;
+  fontSize?: number;
+  active?: boolean;
+}) {
   console.debug("Rendering ChordProViewer", { active });
   const ref = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(window.innerWidth);
@@ -47,10 +56,14 @@ function ChordProViewer({ sheet, transpose, active }: { sheet: string; transpose
       }
 
       const formater = new HtmlDivFormatter();
-      // const formater = new HtmlTableFormatter();
       const html = formater.format(song);
 
       ref.current.innerHTML = html;
+
+      // Apply fontSize to the rendered content
+      if (ref.current) {
+        ref.current.style.fontSize = `${fontSize}px`;
+      }
     } catch (e) {
       notifications.show({
         title: "Error",
@@ -60,7 +73,7 @@ function ChordProViewer({ sheet, transpose, active }: { sheet: string; transpose
       });
       Logger.error("Failed to render ChordPro sheet:", (e as Error).message);
     }
-  }, [ref, sheet, width, transpose, active]);
+  }, [ref, sheet, width, transpose, active, fontSize]);
 
   return (
     <>
@@ -77,6 +90,7 @@ export default memo(ChordProViewer, (prevProps, nextProps) => {
   return (
     prevProps.sheet === nextProps.sheet &&
     prevProps.transpose === nextProps.transpose &&
+    prevProps.fontSize === nextProps.fontSize &&
     prevProps.active === nextProps.active
   );
 });

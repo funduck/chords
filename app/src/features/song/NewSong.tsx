@@ -2,7 +2,7 @@ import { Box, Divider, ScrollArea } from "@mantine/core";
 import { useEffect, useRef } from "react";
 
 import ChordDisplayManager from "@src/components/ChordDisplayManager";
-import ChordProViewer from "@src/components/ChordproViewer";
+import ChordProViewer from "@src/components/ChordProViewer";
 
 import AutoScrollManager from "./AutoScroll";
 import { useSongContext } from "./SongContext";
@@ -13,7 +13,8 @@ function NewSong() {
   const { songState, updateDisplayOptions } = useSongContext();
   const sheet = songState.newSheet || "";
   const displayMode = songState.displayOptions?.mode || "render";
-  const transposeSong = songState.displayOptions?.transpose || 0;
+  const transpose = songState.displayOptions?.transpose || 0;
+  const fontSize = songState.displayOptions?.fontSize || 16;
 
   const songViewportRef = useRef<HTMLDivElement>(null);
 
@@ -44,7 +45,7 @@ function NewSong() {
             <SongEditor currentSong={false} />
           </Box>
           <Box key="render" hidden={displayMode != "render"}>
-            <ChordProViewer sheet={sheet} transpose={transposeSong} active={displayMode == "render"} />
+            <ChordProViewer sheet={sheet} transpose={transpose} fontSize={fontSize} active={displayMode == "render"} />
           </Box>
         </ScrollArea>
       </Box>
