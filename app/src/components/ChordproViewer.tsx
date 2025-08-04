@@ -5,6 +5,7 @@ import { HtmlDivFormatter } from "chordsheetjs";
 import { memo, useEffect, useRef, useState } from "react";
 
 import { ChordProService } from "@src/services/chordpro/chordpro";
+import { Logger } from "@src/services/logger.service";
 import { estimateFontSize } from "@src/utils/font";
 
 function ChordProViewer({ sheet, transpose, active }: { sheet: string; transpose?: number; active?: boolean }) {
@@ -36,6 +37,7 @@ function ChordProViewer({ sheet, transpose, active }: { sheet: string; transpose
 
       let song = ChordProService.sheetToSong(sheet, {
         maxLineLength,
+        throw: true,
       });
       if (!song) {
         throw new Error("Failed to parse song from sheet");
@@ -56,6 +58,7 @@ function ChordProViewer({ sheet, transpose, active }: { sheet: string; transpose
         color: "red",
         position: "top-right",
       });
+      Logger.error("Failed to render ChordPro sheet:", (e as Error).message);
     }
   }, [ref, sheet, width, transpose, active]);
 

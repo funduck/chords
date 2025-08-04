@@ -125,7 +125,10 @@ export class ChordProService {
     return sheet;
   }
 
-  static songToSheet(song: Song, options: { format?: "chordpro"; maxLineLength?: number } = {}): string {
+  static songToSheet(
+    song: Song,
+    options: { format?: "chordpro"; maxLineLength?: number; throw?: boolean } = {},
+  ): string {
     if (!song) return "";
 
     let formater = new ChordProFormatter();
@@ -144,7 +147,11 @@ export class ChordProService {
 
   static sheetToSong(
     sheet: string,
-    options: { parse?: "chordsoverwords" | "chordpro" | "ultimateguitar"; maxLineLength?: number } = {},
+    options: {
+      parse?: "chordsoverwords" | "chordpro" | "ultimateguitar";
+      maxLineLength?: number;
+      throw?: boolean;
+    } = {},
   ): Song | null {
     sheet = this.beforeParse(sheet);
 
@@ -179,13 +186,20 @@ export class ChordProService {
       return song;
     } catch (error) {
       console.debug("Failed to parse sheet to Song:", error);
+      if (options.throw) {
+        throw error;
+      }
       return null;
     }
   }
 
   static sheetToChordProSheet(
     sheet: string,
-    options: { parse?: "chordsoverwords" | "chordpro" | "ultimateguitar"; maxLineLength?: number } = {},
+    options: {
+      parse?: "chordsoverwords" | "chordpro" | "ultimateguitar";
+      maxLineLength?: number;
+      throw?: boolean;
+    } = {},
   ): string {
     if (!sheet || !sheet.trim()) {
       return "";
