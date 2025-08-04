@@ -115,14 +115,22 @@ export function AccountProvider({ children }: { children: ReactNode }) {
       //   position: "top-right",
       // });
       // TODO: remove this when email confirmation is implemented
-      if (res.link) {
+      if (res.link && res.code) {
         notifications.show({
           title: "Email Confirmation",
           message: (
             <Box>
               Lets pretend that we sent you an email to {email} with a link to confirm your account. So, if you want to
               continue,{" "}
-              <Anchor href={res.link} target="_blank" rel="noopener noreferrer">
+              <Anchor
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigate(RoutesEnum.Confirm(res.code!));
+                }}
+                href={res.link}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 click here
               </Anchor>
             </Box>

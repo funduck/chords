@@ -38,6 +38,9 @@ class RoutesEnum {
   };
   static Editor = "/editor";
   static Account = "/account";
+  static Confirm = function (code: string): string {
+    return "/confirm/" + code;
+  };
 }
 
 export { RoutesEnum };

@@ -127,6 +127,7 @@ type EmailAuthRequest struct {
 
 type AuthResponse struct {
 	Link string `json:"link,omitempty"` // TODO remove when email confirmation is implemented
+	Code string `json:"code,omitempty"` // TODO remove when email confirmation is implemented
 }
 
 // EmailAuth godoc
@@ -156,6 +157,7 @@ func (a *App) EmailAuth(w http.ResponseWriter, r *http.Request) {
 	// TODO: Send email with confirmation link
 
 	response := AuthResponse{
+		Code: result.Code,
 		Link: result.Link,
 	}
 	a.respondJSON(w, http.StatusOK, response)

@@ -23,6 +23,7 @@ type EmailAuthRequest struct {
 }
 
 type EmailAuthResult struct {
+	Code string
 	Link string
 	User *entity.User
 }
@@ -75,6 +76,7 @@ func (uc *EmailAuthUseCase) Execute(ctx context.Context, req EmailAuthRequest) (
 	}
 
 	return &EmailAuthResult{
+		Code: authEntity.ActionCode,
 		Link: link,
 		User: authEntity.User,
 	}, nil
