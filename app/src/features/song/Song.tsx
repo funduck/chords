@@ -46,7 +46,7 @@ function Song() {
           style={{
             display: "flex",
             flexGrow: 1,
-            paddingTop: "20px",
+            paddingTop: "5px",
           }}
         >
           <Box key="song">Song #{song?.id || songId}</Box>
