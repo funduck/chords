@@ -9,6 +9,10 @@ This is my pet project that should allow me to keep all my favorite songs with c
 ![Pick song](demo-enter-song.gif)
 #### View song
 ![Song view](demo-song-view.gif)
+#### Paste Song
+Example for Ultimate Guitar  
+You can see that I have to edit sheet a little for correct display
+![Paste song](demo-paste-song.gif)
 
 
 ## Motivation
