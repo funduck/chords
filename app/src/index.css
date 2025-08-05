@@ -96,3 +96,7 @@
 .chordpro .paragraph {
     margin-bottom: 1em;
 }
+
+.chordpro .comment {
+    font-weight: 800;
+}
