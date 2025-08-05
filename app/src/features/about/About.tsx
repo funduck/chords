@@ -34,7 +34,7 @@ function About() {
 
       <Title order={5}>Limitations & Notes</Title>
       <Text>
-        ⚠️ This is a pet project by a backend developer - most frontend may be laggy or rough around the edges!
+        ⚠️ This is a pet project by a backend developer - the frontend may be laggy or rough around the edges!
       </Text>
       <Space h="sm" />
 
