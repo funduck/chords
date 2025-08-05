@@ -3,8 +3,12 @@ This is my pet project that should allow me to keep all my favorite songs with c
 
 *I kept in mind that I would be referencing this project when applying for a new job. And ironically this project is 80% frontend while I'am a backend developer ;)*
 
-![Song view](image.png)
-![Editor](image-1.png)
+#### Enter room
+![Enter room](demo-enter-room.gif)
+#### Pick song
+![Pick song](demo-enter-song.gif)
+#### View song
+![Song view](demo-song-view.gif)
 
 
 ## Motivation
@@ -14,7 +18,7 @@ This is my pet project that should allow me to keep all my favorite songs with c
 * other websites have their own limitations, like not allowing to search by lyrics, or not having a mobile-friendly interface
 * and (important) I wanted to make sharing songs with friends easy, so they can play along with me
 
-## Core features and current state
+## Features and current state
 * Create and edit song with chords and lyrics [Works]
 * Search by title or lyrics (full text search) [Works]
 * View songs with chords and lyrics [Works]
