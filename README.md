@@ -1,18 +1,21 @@
 # Chords
 This is my pet project that should allow me to keep all my favorite songs with chords and lyrics in one place and play them with my friends on phone or any other device.
 
+App uses [ChordPro](https://chordpro.org/) syntax for chords and lyrics.  
+You can check some [samples](./docs/sample_library)
+
 *I kept in mind that I would be referencing this project when applying for a new job. And ironically this project is 80% frontend while I'm a backend developer ;)*
 
 #### Enter room
-![Enter room](demo-enter-room.gif)
+![Enter room](docs/demo-enter-room.gif)
 #### Pick song
-![Pick song](demo-enter-song.gif)
+![Pick song](docs/demo-enter-song.gif)
 #### View song
-![Song view](demo-song-view.gif)
+![Song view](docs/demo-song-view.gif)
 #### Paste Song
 Example for Ultimate Guitar  
 You can see that I have to edit sheet a little for correct display  
-![Paste song](demo-paste-song.gif)
+![Paste song](docs/demo-paste-song.gif)
 
 ## Motivation
 * I wanted to start a pet project I really care about
