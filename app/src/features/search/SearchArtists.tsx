@@ -27,7 +27,10 @@ function SearchArtists() {
     });
   }, [artistsApi]);
 
-  const [inPrivateLibs, setInPrivateLibs] = useState(true);
+  const [inPrivateLibs, setInPrivateLibs] = useState(() => {
+    const saved = localStorage.getItem("search-artists-preferences-inPrivateLibs");
+    return saved !== null ? JSON.parse(saved) : true;
+  });
 
   if (!artistsApi) {
     return <div>Loading...</div>;
@@ -40,7 +43,9 @@ function SearchArtists() {
         label="In my library"
         checked={inPrivateLibs}
         onChange={(e) => {
-          setInPrivateLibs(e.currentTarget.checked);
+          const newValue = e.currentTarget.checked;
+          setInPrivateLibs(newValue);
+          localStorage.setItem("search-artists-preferences-inPrivateLibs", JSON.stringify(newValue));
         }}
       />
       <SearchEntities

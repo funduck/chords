@@ -28,8 +28,14 @@ function SearchSongs({ artistId }: { artistId?: number }) {
     });
   }, [songsApi]);
 
-  const [inPrivateLibs, setInPrivateLibs] = useState(true);
-  const [byLyrics, setByLyrics] = useState(true);
+  const [inPrivateLibs, setInPrivateLibs] = useState(() => {
+    const saved = localStorage.getItem("search-songs-preferences-inPrivateLibs");
+    return saved !== null ? JSON.parse(saved) : true;
+  });
+  const [byLyrics, setByLyrics] = useState(() => {
+    const saved = localStorage.getItem("search-songs-preferences-byLyrics");
+    return saved !== null ? JSON.parse(saved) : true;
+  });
 
   if (!songsApi) {
     return <div>Loading...</div>;
@@ -44,7 +50,9 @@ function SearchSongs({ artistId }: { artistId?: number }) {
           mb="md"
           checked={inPrivateLibs}
           onChange={(e) => {
-            setInPrivateLibs(e.currentTarget.checked);
+            const newValue = e.currentTarget.checked;
+            setInPrivateLibs(newValue);
+            localStorage.setItem("search-songs-preferences-inPrivateLibs", JSON.stringify(newValue));
           }}
         />
         <Switch
@@ -52,7 +60,9 @@ function SearchSongs({ artistId }: { artistId?: number }) {
           mb="md"
           checked={byLyrics}
           onChange={(e) => {
-            setByLyrics(e.currentTarget.checked);
+            const newValue = e.currentTarget.checked;
+            setByLyrics(newValue);
+            localStorage.setItem("search-songs-preferences-byLyrics", JSON.stringify(newValue));
           }}
         />
       </Group>
