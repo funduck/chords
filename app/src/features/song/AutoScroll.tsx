@@ -7,7 +7,7 @@ import { estimateFontSize } from "@src/utils/font";
 import { useSongContext } from "./SongContext";
 
 function AutoScrollManager({ viewportRef }: { viewportRef: React.RefObject<HTMLDivElement> }) {
-  const { songState, updateSongState } = useSongContext();
+  const { songState, updateSongState, updateAutoScrollOptions } = useSongContext();
 
   const enabled = songState?.autoScrollOptions?.enabled ?? Config.AutoScrollEnabled;
   const speed = songState?.autoScrollOptions?.speed ?? Config.AutoScrollSpeed;
@@ -24,6 +24,43 @@ function AutoScrollManager({ viewportRef }: { viewportRef: React.RefObject<HTMLD
 
   // Track touch state to temporarily disable auto-scroll on mobile
   const [isTouching, setIsTouching] = useState(false);
+
+  // Keyboard event listener for Space key to toggle auto-scroll
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      // Check if Space key is pressed
+      if (event.code === "Space" || event.key === " ") {
+        // Check if any input field is focused
+        const activeElement = document.activeElement;
+        const isInputFocused =
+          activeElement &&
+          (activeElement.tagName === "INPUT" ||
+            activeElement.tagName === "TEXTAREA" ||
+            activeElement.tagName === "SELECT" ||
+            (activeElement as HTMLElement).contentEditable === "true" ||
+            activeElement.classList.contains("cm-editor")); // CodeMirror editor
+
+        if (!isInputFocused) {
+          event.preventDefault(); // Prevent default space behavior (page scroll)
+
+          // Toggle auto-scroll
+          updateAutoScrollOptions({
+            enabled: !enabled,
+          });
+
+          console.debug("Auto-scroll toggled via Space key:", !enabled);
+        }
+      }
+    };
+
+    // Add global keyboard event listener
+    document.addEventListener("keydown", handleKeyDown);
+
+    // Cleanup
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [enabled, updateAutoScrollOptions]);
 
   // Auto scrolling
   useEffect(() => {
