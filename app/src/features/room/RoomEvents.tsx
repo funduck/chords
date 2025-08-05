@@ -218,6 +218,7 @@ export function RoomEventsPublisher() {
 
       // Only owner can update the room state in the database
       if (room.owner_id != userId) {
+        console.warn("Not owner: ", room.owner_id, userId);
         return;
       }
 
@@ -226,10 +227,14 @@ export function RoomEventsPublisher() {
       // Clone the room state to avoid mutating the original object
       const stateDto = cloneDeep((room.state as RoomStateDto) || {});
 
-      // roomState.song_settings = publishSongSettings || roomState.song_settings;
-      stateDto.song_id = publishedSongId?.value || stateDto.song_id;
-      stateDto.song_sheet = publishedSheet?.value || stateDto.song_sheet;
-      stateDto.new_sheet = publishedNewSheet?.value || stateDto.new_sheet;
+      stateDto.song_id = songState.songId || stateDto.song_id;
+      stateDto.song_sheet = songState.songSheet || stateDto.song_sheet;
+      stateDto.new_sheet = songState.newSheet || stateDto.new_sheet;
+
+      stateDto.song_settings = stateDto.song_settings || {};
+      stateDto.song_settings.auto_scroll = songState.autoScrollOptions?.enabled == true;
+      stateDto.song_settings.auto_scroll_interval = songState.autoScrollOptions?.interval || 100;
+      stateDto.song_settings.auto_scroll_speed = songState.autoScrollOptions?.speed || 0.1;
 
       if (!isEqual(stateDto, room.state)) {
         console.debug("Updating room state:", stateDto, "from", room.state);

@@ -12,20 +12,23 @@ function SearchResetArtist({}: {}) {
   return (
     <>
       {artist && (
-        <Flex direction="row" ta={"center"} align="center" gap="xs" m={"xs"}>
-          <Text>Selected artist:</Text>
-          <Button
-            color={"primary"}
-            variant="outline"
-            onClick={() => {
-              navigate(RoutesEnum.SearchArtists());
-            }}
-          >
-            <Text>{artist?.name}</Text>
-            <Space w="xs" />
-            <IconX />
-          </Button>
-        </Flex>
+        <>
+          <Flex direction="row" ta={"center"} align="center" gap="xs" m={"xs"}>
+            <Text>Selected artist:</Text>
+            <Button
+              color={"primary"}
+              variant="outline"
+              onClick={() => {
+                navigate(RoutesEnum.SearchArtists());
+              }}
+            >
+              <Text>{artist?.name}</Text>
+              <Space w="xs" />
+              <IconX />
+            </Button>
+          </Flex>
+          <Space h="md" />
+        </>
       )}
     </>
   );

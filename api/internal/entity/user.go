@@ -11,8 +11,8 @@ const (
 type User struct {
 	BaseEntity
 	Status      UserStatus `gorm:"not null" json:"status,omitempty"`
-	MyRooms     []*Room    `gorm:"foreignKey:OwnerID"`
-	Rooms       []*Room    `gorm:"many2many:room_users;"`
-	MyLibraries []*Library `gorm:"foreignKey:OwnerID"`
-	MySongs     []*Song    `gorm:"foreignKey:OwnerID"`
+	MyRooms     []*Room    `gorm:"foreignKey:OwnerID" json:"-"`
+	Rooms       []*Room    `gorm:"many2many:room_users;" json:"-"`
+	MyLibraries []*Library `gorm:"foreignKey:OwnerID" json:"-"`
+	MySongs     []*Song    `gorm:"foreignKey:OwnerID" json:"-"`
 }

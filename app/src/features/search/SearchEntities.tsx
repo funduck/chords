@@ -200,9 +200,9 @@ function SearchEntities<T extends { id?: number; cursor?: string }, SP extends S
             })
           ) : (
             <Stack>
-              {searchState.entities.map((entity: T) => (
+              {searchState.entities.map((entity: T, index: number) => (
                 <>
-                  <ListItemComponent key={entity.id} {...listItemProps(entity)} />
+                  <ListItemComponent key={entity.id || index} {...listItemProps(entity)} />
                   <Divider />
                 </>
               ))}

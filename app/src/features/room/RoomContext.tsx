@@ -4,6 +4,7 @@ import { ReactNode, createContext, useContext, useEffect, useState } from "react
 import { RoomEntity, useRoomsApi } from "@src/hooks/Api";
 import { useWebSocket } from "@src/hooks/WebSocket";
 
+import { useSongContext } from "../song/SongContext";
 import { SongSettingsDto } from "../song/settings";
 
 export type RoomStateDto = {
@@ -49,6 +50,8 @@ export function RoomContextProvider({ children }: { children: ReactNode }) {
   const [publishState, setPublishState] = useState<PublishState>({});
   const [applyState, setApplyState] = useState<PublishState>({});
 
+  const songContext = useSongContext();
+
   const roomsApi = useRoomsApi();
   const ws = useWebSocket();
 
@@ -61,14 +64,32 @@ export function RoomContextProvider({ children }: { children: ReactNode }) {
       console.error("Invalid room state:", state);
       return;
     }
+
+    console.log("Applying room state:", state);
+
+    if (state.song_id) {
+      songContext.updateSongState({
+        songId: state.song_id,
+        songSheet: state.song_sheet || "",
+        newSheet: state.new_sheet || "",
+      });
+    }
+
     if (state.song_settings) {
-      console.log("Applying room state:", state);
-      // TODO: Apply the room state to the song context or wherever needed
+      songContext.updateAutoScrollOptions({
+        enabled: state.song_settings.auto_scroll,
+        interval: state.song_settings.auto_scroll_interval,
+        speed: state.song_settings.auto_scroll_speed,
+      });
     }
   };
 
   const handle = (room?: RoomEntity) => {
+    setPublishState({});
+    setApplyState({});
+
     if (room) {
+      room.state = room.state || {};
       console.log("Joined room:", room);
 
       setRoomState({ room });

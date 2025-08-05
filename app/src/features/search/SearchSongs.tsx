@@ -38,7 +38,6 @@ function SearchSongs({ artistId }: { artistId?: number }) {
   return (
     <>
       <SearchResetArtist />
-      <Space h="md" />
       <Group>
         <Switch
           label="in my library"
