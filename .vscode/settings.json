@@ -39,6 +39,12 @@
       "driver": "SQLite",
       "name": "dev",
       "database": "${workspaceFolder:chords}/data/dev.sqlite"
+    },
+    {
+      "previewLimit": 50,
+      "driver": "SQLite",
+      "name": "prod",
+      "database": "${workspaceFolder:chords}/data/prod.sqlite"
     }
   ]
 }
