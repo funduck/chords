@@ -25,7 +25,7 @@ class RoutesEnum {
     if (!roomCode) return "/room";
     return "/room/join/" + roomCode;
   };
-  static SearchArtists = function (artistId?: number): string {
+  static Artists = function (artistId?: number): string {
     if (artistId == null) {
       return "/search/artists";
     }
@@ -126,7 +126,7 @@ function Router() {
         {
           id: "artists",
           text: "Artists",
-          link: RoutesEnum.SearchArtists(artist?.id),
+          link: RoutesEnum.Artists(artist?.id),
         },
       ],
     },

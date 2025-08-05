@@ -19,7 +19,7 @@ function SearchResetArtist({}: {}) {
               color={"primary"}
               variant="outline"
               onClick={() => {
-                navigate(RoutesEnum.SearchArtists());
+                navigate(RoutesEnum.Artists());
               }}
             >
               <Text>{artist?.name}</Text>

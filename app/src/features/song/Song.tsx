@@ -1,10 +1,10 @@
-import { Anchor, Box, Divider, ScrollArea } from "@mantine/core";
+import { Box, Divider, ScrollArea } from "@mantine/core";
 import { useEffect, useRef } from "react";
-import { useNavigate, useParams } from "react-router";
+import { useParams } from "react-router";
 
-import { RoutesEnum } from "@src/Router";
 import ChordDisplayManager from "@src/components/ChordDisplayManager";
 import ChordProViewer from "@src/components/ChordProViewer";
+import SongCreators from "@src/components/SongCreators";
 import { useSongsApi } from "@src/hooks/Api";
 import { useScrollPosition } from "@src/hooks/useScrollPosition";
 
@@ -32,36 +32,7 @@ function Song() {
 
   const songViewportRef = useRef<HTMLDivElement>(null);
 
-  const navigate = useNavigate();
-
   useScrollPosition();
-
-  const artistRefs =
-    song?.artists?.map((a) => (
-      <Anchor
-        key={a.id}
-        onClick={(e) => {
-          e.preventDefault();
-          navigate(RoutesEnum.SearchArtists(a.id));
-        }}
-        href={RoutesEnum.SearchArtists(a.id)}
-      >
-        {a.name}
-      </Anchor>
-    )) || [];
-  const composerRefs =
-    song?.composers?.map((a) => (
-      <Anchor
-        key={a.id}
-        onClick={(e) => {
-          e.preventDefault();
-          navigate(RoutesEnum.SearchArtists(a.id));
-        }}
-        href={RoutesEnum.SearchArtists(a.id)}
-      >
-        {a.name}
-      </Anchor>
-    )) || [];
 
   return (
     <>
@@ -79,8 +50,7 @@ function Song() {
           }}
         >
           <Box key="song">Song #{song?.id || songId}</Box>
-          {artistRefs.length > 0 && <Box key="artists">Artists: {artistRefs}</Box>}
-          {composerRefs.length > 0 && <Box key="composers">Composers: {composerRefs}</Box>}
+          {song && <SongCreators song={song} />}
           <Divider my="md" />
           <Box key="song_editor" hidden={displayMode != "editor"}>
             <SongEditor currentSong={true} />

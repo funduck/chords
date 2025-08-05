@@ -13,9 +13,9 @@ function SearchArtistListItem({ entity }: { entity: ArtistInfoEntity }) {
       onClick={(e) => {
         e.preventDefault();
         Signals.artist.set(entity!);
-        navigate(RoutesEnum.SearchArtists(entity.id));
+        navigate(RoutesEnum.Artists(entity.id));
       }}
-      href={RoutesEnum.SearchArtists(entity.id)}
+      href={RoutesEnum.Artists(entity.id)}
     >
       <Flex direction={"row"} align={"center"} gap={"sm"}>
         <Text size="lg">{entity.name}</Text>
