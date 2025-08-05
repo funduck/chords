@@ -1,4 +1,4 @@
-import { Anchor, AppShell, Burger, Button, Flex, Group, Menu, Text, em } from "@mantine/core";
+import { Anchor, AppShell, Burger, Button, Divider, Flex, Group, Menu, Space, Text, em } from "@mantine/core";
 import { useDisclosure, useMediaQuery } from "@mantine/hooks";
 import { IconChevronRight, IconSettings, IconSettingsFilled } from "@tabler/icons-react";
 import { useSignal } from "@telegram-apps/sdk-react";
@@ -95,7 +95,7 @@ function Router() {
 
   const tabs = [
     {
-      group: "Current",
+      group: "",
       tabs: [
         {
           id: "song",
@@ -116,7 +116,7 @@ function Router() {
       ],
     },
     {
-      group: "Search",
+      group: "",
       tabs: [
         {
           id: "songs",
@@ -131,18 +131,14 @@ function Router() {
       ],
     },
     {
-      group: "My",
+      group: "",
       tabs: [
         {
           id: "account",
           text: "Account",
           link: RoutesEnum.Account,
         },
-      ],
-    },
-    {
-      group: "Other",
-      tabs: [
+
         {
           id: "about",
           text: "About",
@@ -202,9 +198,15 @@ function Router() {
         <Stack gap="lg">
           {tabs
             .filter((g) => g.tabs.length)
-            .map((group) => (
+            .map((group, index) => (
               <Flex direction={"column"} key={group.group} gap={"lg"} m={0} p={0}>
-                {/* <Text size="xl">{group.group}</Text> */}
+                {index === 0 && <Space h="xs" />}
+                {index > 0 && <Divider my="xl" />}
+                {group.group && (
+                  <Text c="dimmed" size="md">
+                    {group.group}
+                  </Text>
+                )}
                 {group.tabs
                   .filter((t) => !t.hidden)
                   .map(({ id, link, text }) => (
@@ -223,7 +225,7 @@ function Router() {
                     >
                       <Button variant="subtle" justify="start" w={"100%"}>
                         <Flex align="stretch">
-                          {isTabActive(link) && <IconChevronRight />}
+                          {isTabActive(link) ? <IconChevronRight /> : <IconChevronRight color="grba(0,0,0,0)" />}
                           <Text size="lg">{text}</Text>
                         </Flex>
                       </Button>
