@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useSongsApi } from "@src/hooks/Api";
 import { useScrollPosition } from "@src/hooks/useScrollPosition";
 
+import PublicSearchDisclaimer from "./PublicSearchDisclaimer";
 import { useSearchSongsContext } from "./SearchContext";
 import SearchEntities from "./SearchEntities";
 import SearchResetArtist from "./SearchResetArtist";
@@ -66,6 +67,9 @@ function SearchSongs({ artistId }: { artistId?: number }) {
           }}
         />
       </Group>
+
+      {!inPrivateLibs && <PublicSearchDisclaimer />}
+
       <SearchEntities
         useSearchContext={useSearchSongsContext}
         searchMethod={(params) =>

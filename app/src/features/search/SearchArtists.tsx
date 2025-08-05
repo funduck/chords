@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useArtistsApi } from "@src/hooks/Api";
 import { useScrollPosition } from "@src/hooks/useScrollPosition";
 
+import PublicSearchDisclaimer from "./PublicSearchDisclaimer";
 import SearchArtistListItem from "./SearchArtistListItem";
 import { useSearchArtistsContext } from "./SearchContext";
 import SearchEntities from "./SearchEntities";
@@ -48,6 +49,9 @@ function SearchArtists() {
           localStorage.setItem("search-artists-preferences-inPrivateLibs", JSON.stringify(newValue));
         }}
       />
+
+      {!inPrivateLibs && <PublicSearchDisclaimer />}
+
       <SearchEntities
         useSearchContext={useSearchArtistsContext}
         searchMethod={(params) =>
