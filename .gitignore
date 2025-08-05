@@ -4,7 +4,6 @@ api.yaml
 prod.env
 prod.api.yaml
 prod.Caddyfile
-Caddyfile
 coverage
 dist
 node_modules

@@ -1,0 +1,38 @@
+{
+        debug
+        log {
+                output stdout
+                format console
+                level info
+        }
+}
+
+localhost:80 {
+        tls some@gmail.com
+        encode zstd gzip
+
+        handle /api* {
+                reverse_proxy localhost:9000 {
+                        header_up Host {http.request.host}
+                        header_up X-Real-IP {http.request.remote}
+                        header_up X-Forwarded-For {http.request.remote}
+                }
+        }
+
+        handle /log {
+			reverse_proxy localhost:9000 {
+				header_up Host {http.request.host}
+				header_up X-Real-IP {http.request.remote}
+				header_up X-Forwarded-For {http.request.remote}
+			}
+		}
+
+        # Serve static files and handle React Router
+        handle /* {
+			reverse_proxy localhost:8080 {
+				header_up Host {http.request.host}
+				header_up X-Real-IP {http.request.remote}
+				header_up X-Forwarded-For {http.request.remote}
+			}
+        }
+}
