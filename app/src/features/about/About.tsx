@@ -1,4 +1,4 @@
-import { Anchor, Box, Group, Space, Text, Title } from "@mantine/core";
+import { Anchor, Box, Divider, Group, Space, Text, Title } from "@mantine/core";
 
 export function TitleAbout() {
   return (
@@ -36,15 +36,17 @@ function About() {
       <Text>
         ⚠️ This is a pet project by a backend developer - the frontend may be laggy or rough around the edges!
       </Text>
-      <Space h="sm" />
+      <Space h="xl" />
+      <Divider />
+      <Space h="xl" />
 
-      <Title order={5}>Interested?</Title>
-      <Text>If you'd like to contribute, report bugs, or just chat about the project:</Text>
       <Text>
-        📧 Email <Anchor href="mailto:qlfunduck@gmail.com">qlfunduck@gmail.com</Anchor>
+        Better documentation is available in the <Anchor href="https://github.com/funduck/chords">repository</Anchor>
       </Text>
+      <Space h="xl" />
+
       <Text>
-        🔗 Github <Anchor href="https://github.com/funduck/chords">repository</Anchor>
+        My email <Anchor href="mailto:qlfunduck@gmail.com">qlfunduck@gmail.com</Anchor>
       </Text>
       <Space h="sm" />
     </Box>
