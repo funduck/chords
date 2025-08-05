@@ -10,6 +10,7 @@ export default function SongCreators({ song }: { song: SongEntity }) {
   const artistRefs =
     song?.artists?.map((a) => (
       <Anchor
+        c="dimmed"
         key={a.id}
         onClick={(e) => {
           e.preventDefault();
@@ -24,6 +25,7 @@ export default function SongCreators({ song }: { song: SongEntity }) {
   const composerRefs =
     song?.composers?.map((a) => (
       <Anchor
+        c="dimmed"
         key={a.id}
         onClick={(e) => {
           e.preventDefault();

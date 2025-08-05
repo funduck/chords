@@ -25,9 +25,6 @@ function SearchSongListItem({ entity }: { entity: SongInfoEntity }) {
         <Text size="lg">{title}</Text>
       </Anchor>
       <SongCreators song={entity} />
-      <Text c="dimmed" size="xs">
-        #{entity.id}
-      </Text>
     </Flex>
   );
 }
