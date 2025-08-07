@@ -1,4 +1,4 @@
-import { Box, Button, CopyButton, Fieldset, Flex, Space, Stack, Text, TextInput, Title } from "@mantine/core";
+import { Button, CopyButton, Fieldset, Flex, Space, Stack, Text, TextInput } from "@mantine/core";
 import { IconCopy, IconDoorExit, IconShare3 } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";

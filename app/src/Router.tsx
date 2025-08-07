@@ -1,7 +1,6 @@
 import { Anchor, AppShell, Box, Burger, Button, Divider, Flex, Group, Menu, Space, Text, em } from "@mantine/core";
 import { useDisclosure, useMediaQuery } from "@mantine/hooks";
 import {
-  IconCircleFilled,
   IconMusic,
   IconMusicPlus,
   IconMusicSearch,
