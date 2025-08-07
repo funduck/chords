@@ -55,7 +55,7 @@ function Song() {
           <Box key="song_editor" hidden={displayMode != "editor"}>
             <SongEditor currentSong={true} />
           </Box>
-          <Box key="song_viewer" hidden={displayMode != "render"}>
+          <Box key="song_viewer" pl="xl" hidden={displayMode != "render"}>
             <ChordProViewer sheet={sheet} transpose={transpose} fontSize={fontSize} active={displayMode == "render"} />
           </Box>
         </ScrollArea>
