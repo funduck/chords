@@ -1,7 +1,7 @@
-import { Anchor, AppShell, Burger, Button, Divider, Flex, Group, Menu, Space, Text, em } from "@mantine/core";
+import { Anchor, AppShell, Box, Burger, Button, Divider, Flex, Group, Menu, Space, Text, em } from "@mantine/core";
 import { useDisclosure, useMediaQuery } from "@mantine/hooks";
 import {
-  IconChevronRight,
+  IconCircleFilled,
   IconMusic,
   IconMusicPlus,
   IconMusicSearch,
@@ -194,13 +194,13 @@ function Router() {
   return (
     <AppShell
       header={{ height: 60 }}
-      navbar={{ width: 300, breakpoint: "sm", collapsed: { mobile: !navbarOpened, desktop: !navbarOpened } }}
+      navbar={{ width: 280, breakpoint: "sm", collapsed: { mobile: !navbarOpened, desktop: !navbarOpened } }}
       transitionDuration={150}
       transitionTimingFunction="ease-in-out"
       padding="md"
       style={{ display: "flex", flexDirection: "column", height: "100vh" }}
     >
-      <AppShell.Header>
+      <AppShell.Header bg="header-bg">
         <Group justify="space-between" ta={"center"} align="center" style={{ height: "100%" }}>
           {/* Burger on the left */}
           <Group>
@@ -217,14 +217,14 @@ function Router() {
         </Group>
       </AppShell.Header>
 
-      <AppShell.Navbar p="lg">
+      <AppShell.Navbar p="sm" bg="navbar-bg">
         <Stack gap="lg">
           {tabs
             .filter((g) => g.tabs.length)
             .map((group, index) => (
-              <Flex direction={"column"} key={group.groupText} gap={"lg"} m={0} p={0}>
+              <Flex pl={0} ml={0} direction={"column"} key={group.groupText} gap={"lg"} m={0} p={0}>
                 {index === 0 && <Space h="xs" />}
-                {index > 0 && <Divider my="xl" />}
+                {index > 0 && <Divider my="xs" />}
                 {group.groupText && (
                   <Text c="dimmed" size="md">
                     {group.groupText}
@@ -235,6 +235,8 @@ function Router() {
                   .map(({ id, link, text, icon }) => (
                     <Anchor
                       variant="subtle"
+                      pl={0}
+                      ml={0}
                       key={id}
                       id={id}
                       onClick={(e) => {
@@ -245,17 +247,14 @@ function Router() {
                         }, 150);
                       }}
                       href={link}
+                      w={"100%"}
                     >
-                      <Button variant={isTabActive(link) ? "light" : "subtle"} justify="start" w={"100%"} c="primary">
-                        <Flex align="stretch" gap="xs">
-                          {isTabActive(link) ? (
-                            <IconChevronRight size={"24px"} />
-                          ) : (
-                            <IconChevronRight color="grba(0,0,0,0)" />
-                          )}
-                          {icon}
+                      <Button variant={isTabActive(link) ? "light" : "subtle"} pl={0} ml={0} w={"100%"} c="primary">
+                        <Group gap="sm" align="center">
+                          <Box w={20}>{isTabActive(link) && icon}</Box>
                           <Text size="lg">{text}</Text>
-                        </Flex>
+                          <Box w={20}></Box>
+                        </Group>
                       </Button>
                     </Anchor>
                   ))}

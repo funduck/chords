@@ -110,17 +110,7 @@ export function RoomContextProvider({ children }: { children: ReactNode }) {
     if (!roomsApi) {
       throw new Error("Rooms API is not available");
     }
-    return roomsApi
-      .createRoom()
-      .then((r) => handle(r))
-      .then(() => {
-        notifications.show({
-          title: "Room Created",
-          message: "You have successfully created a new room",
-          color: "green",
-          position: "top-right",
-        });
-      });
+    return roomsApi.createRoom().then((r) => handle(r));
   };
 
   const joinRoom = async (roomCode: string) => {
@@ -131,17 +121,7 @@ export function RoomContextProvider({ children }: { children: ReactNode }) {
     // Remove stored code
     localStorage.removeItem("roomCode");
 
-    return roomsApi
-      .joinRoom({ request: { room_code: roomCode } })
-      .then((r) => handle(r))
-      .then(() => {
-        notifications.show({
-          title: "Room Joined",
-          message: `You have successfully joined the room with code ${roomCode}`,
-          color: "green",
-          position: "top-right",
-        });
-      });
+    return roomsApi.joinRoom({ request: { room_code: roomCode } }).then((r) => handle(r));
   };
 
   const leaveRoom = async () => {

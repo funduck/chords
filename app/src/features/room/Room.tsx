@@ -1,4 +1,4 @@
-import { Button, CopyButton, Fieldset, Flex, Space, Stack, Text, TextInput } from "@mantine/core";
+import { Box, Button, CopyButton, Fieldset, Flex, Space, Stack, Text, TextInput, Title } from "@mantine/core";
 import { IconCopy, IconDoorExit, IconShare3 } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
@@ -78,6 +78,7 @@ function Room() {
 
   return (
     <>
+      <RoomDescription />
       <Stack>
         <CopyButton value={joinLink}>
           {({ copied, copy }) => (
