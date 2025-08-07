@@ -151,12 +151,12 @@ export function AccountProvider({ children }: { children: ReactNode }) {
       .then(handleTokens)
       .then(() => {
         console.log("Account confirmed successfully");
-        notifications.show({
-          title: "Account Confirmed",
-          message: "Your account has been confirmed successfully",
-          color: "green",
-          position: "top-right",
-        });
+        // notifications.show({
+        //   title: "Account Confirmed",
+        //   message: "Your account has been confirmed successfully",
+        //   color: "green",
+        //   position: "top-right",
+        // });
         navigate(RoutesEnum.Account);
       });
   };

@@ -8,6 +8,7 @@ import { useHeader } from "@src/hooks/Header";
 import { useScrollPosition } from "@src/hooks/useScrollPosition";
 
 import { useRoomContext } from "./RoomContext";
+import RoomDescription from "./RoomDescription";
 
 function Room() {
   // Initialize scroll position management
@@ -44,6 +45,7 @@ function Room() {
   if (!room) {
     return (
       <>
+        <RoomDescription />
         <Stack>
           <Fieldset legend="Create Room" style={{ borderColor: "rgba(0,0,0,0)" }}>
             <Button variant="outline" fullWidth onClick={() => createRoom()}>

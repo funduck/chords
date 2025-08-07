@@ -1,5 +1,4 @@
-import { Box, Divider, Group, ScrollArea, Text, Tooltip } from "@mantine/core";
-import { IconInfoCircle } from "@tabler/icons-react";
+import { Box, Divider, ScrollArea } from "@mantine/core";
 import { useEffect, useRef } from "react";
 
 import ChordDisplayManager from "@src/components/ChordDisplayManager";
@@ -8,6 +7,7 @@ import ChordProViewer from "@src/components/ChordProViewer";
 import AutoScrollManager from "./AutoScroll";
 import { useSongContext } from "./SongContext";
 import SongEditor from "./SongEditor";
+import SongEditorDescription from "./SongEditorDescription";
 import SongSettings from "./SongSettings";
 
 function NewSong() {
@@ -37,18 +37,9 @@ function NewSong() {
           style={{
             display: "flex",
             flexGrow: 1,
-            paddingTop: "5px",
           }}
         >
-          <Group key="title">
-            <Text>New song editor</Text>
-            <Tooltip
-              label="Paste sheet, format to ChordPro. This screen also syncs in room so you can use it to play anything beyond your library."
-              position="bottom-start"
-            >
-              <IconInfoCircle />
-            </Tooltip>
-          </Group>
+          <SongEditorDescription />
           <Divider my="md" />
           <Box key="editor" hidden={displayMode != "editor"}>
             <SongEditor currentSong={false} />

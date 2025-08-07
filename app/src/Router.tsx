@@ -1,6 +1,15 @@
 import { Anchor, AppShell, Burger, Button, Divider, Flex, Group, Menu, Space, Text, em } from "@mantine/core";
 import { useDisclosure, useMediaQuery } from "@mantine/hooks";
-import { IconChevronRight, IconSettings, IconSettingsFilled } from "@tabler/icons-react";
+import {
+  IconChevronRight,
+  IconMusic,
+  IconMusicPlus,
+  IconMusicSearch,
+  IconSettings,
+  IconSettingsFilled,
+  IconUserSearch,
+  IconUsersGroup,
+} from "@tabler/icons-react";
 import { useSignal } from "@telegram-apps/sdk-react";
 import { useEffect } from "react";
 import { Route, Routes, useLocation, useNavigate } from "react-router";
@@ -93,45 +102,59 @@ function Router() {
 
   const artist = useSignal(Signals.artist);
 
-  const tabs = [
+  const tabs: {
+    groupText: string;
+    tabs: {
+      id: string;
+      text: string;
+      icon?: React.ReactNode;
+      link: string;
+      hidden?: boolean;
+    }[];
+  }[] = [
     {
-      group: "",
+      groupText: "",
       tabs: [
         {
           id: "song",
           text: "Play song",
+          icon: <IconMusic />,
           link: RoutesEnum.Songs(songId),
           hidden: !songId,
         },
         {
           id: "editor",
-          text: "New song editor",
+          text: "Create song",
+          icon: <IconMusicPlus />,
           link: RoutesEnum.Editor,
         },
         {
           id: "room",
           text: "Room",
+          icon: <IconUsersGroup />,
           link: RoutesEnum.Room(),
         },
       ],
     },
     {
-      group: "",
+      groupText: "",
       tabs: [
         {
           id: "songs",
           text: "Songs",
+          icon: <IconMusicSearch />,
           link: RoutesEnum.Songs(),
         },
         {
           id: "artists",
           text: "Artists",
+          icon: <IconUserSearch />,
           link: RoutesEnum.Artists(artist?.id),
         },
       ],
     },
     {
-      group: "",
+      groupText: "",
       tabs: [
         {
           id: "account",
@@ -199,17 +222,17 @@ function Router() {
           {tabs
             .filter((g) => g.tabs.length)
             .map((group, index) => (
-              <Flex direction={"column"} key={group.group} gap={"lg"} m={0} p={0}>
+              <Flex direction={"column"} key={group.groupText} gap={"lg"} m={0} p={0}>
                 {index === 0 && <Space h="xs" />}
                 {index > 0 && <Divider my="xl" />}
-                {group.group && (
+                {group.groupText && (
                   <Text c="dimmed" size="md">
-                    {group.group}
+                    {group.groupText}
                   </Text>
                 )}
                 {group.tabs
                   .filter((t) => !t.hidden)
-                  .map(({ id, link, text }) => (
+                  .map(({ id, link, text, icon }) => (
                     <Anchor
                       variant="subtle"
                       key={id}
@@ -223,9 +246,14 @@ function Router() {
                       }}
                       href={link}
                     >
-                      <Button variant="subtle" justify="start" w={"100%"}>
-                        <Flex align="stretch">
-                          {isTabActive(link) ? <IconChevronRight /> : <IconChevronRight color="grba(0,0,0,0)" />}
+                      <Button variant={isTabActive(link) ? "light" : "subtle"} justify="start" w={"100%"} c="primary">
+                        <Flex align="stretch" gap="xs">
+                          {isTabActive(link) ? (
+                            <IconChevronRight size={"24px"} />
+                          ) : (
+                            <IconChevronRight color="grba(0,0,0,0)" />
+                          )}
+                          {icon}
                           <Text size="lg">{text}</Text>
                         </Flex>
                       </Button>
@@ -240,7 +268,7 @@ function Router() {
 
       <AppShell.Main id="appshellmain" style={{ display: "flex", flex: 1, flexDirection: "column" }}>
         <Routes>
-          <Route index element={<Search />} />
+          <Route index element={<About />} />
           <Route path="account" element={<Account />} />
           <Route path="artists/:artistId" element={<Artist />} />
           <Route path="confirm/:code" element={<Confirm />} />

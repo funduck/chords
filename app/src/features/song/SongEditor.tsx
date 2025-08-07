@@ -1,4 +1,4 @@
-import { Anchor, Box, Button, Group, Text } from "@mantine/core";
+import { Button, Group } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { useSignal } from "@telegram-apps/sdk-react";
 import { okaidia } from "@uiw/codemirror-theme-okaidia";
@@ -215,13 +215,6 @@ function SongEditor({ currentSong }: { currentSong?: boolean }) {
       </Group>
 
       <CodeMirror ref={ref} onChange={onEditorChange} theme={okaidia} />
-
-      <Box mt="md">
-        <Text>
-          For songs we use <Anchor href="https://www.chordpro.org/chordpro/chordpro-introduction/">chordpro</Anchor>{" "}
-          format.
-        </Text>
-      </Box>
     </>
   );
 }

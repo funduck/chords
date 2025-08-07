@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import ClearBrowser from "@src/components/ClearBrowser";
 import { useAccountContext } from "@src/features/account/AccountContext";
 import { useUserApi } from "@src/hooks/Api";
+import { useHeader } from "@src/hooks/Header";
 
 import Login from "./Login";
 
@@ -16,6 +17,11 @@ function Account() {
       getAuths();
     }
   }, [accessToken, userApi]);
+
+  const { setCenterContent } = useHeader();
+  useEffect(() => {
+    setCenterContent("Account");
+  }, []);
 
   if (!accessToken) {
     return <Login />;

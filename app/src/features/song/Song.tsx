@@ -49,8 +49,8 @@ function Song() {
             paddingTop: "5px",
           }}
         >
-          <Box key="song">Song #{song?.id || songId}</Box>
-          {song && <SongCreators song={song} />}
+          {/* <Box key="song">Song #{song?.id || songId}</Box> */}
+          {song && <SongCreators song={song} withIcon={true} />}
           <Divider my="md" />
           <Box key="song_editor" hidden={displayMode != "editor"}>
             <SongEditor currentSong={true} />
