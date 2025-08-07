@@ -52,10 +52,10 @@ function Song() {
           {/* <Box key="song">Song #{song?.id || songId}</Box> */}
           {song && <SongCreators song={song} withIcon={true} />}
           <Divider my="md" />
-          <Box key="song_editor" hidden={displayMode != "editor"}>
+          <Box key="song_editor" ml="sm" hidden={displayMode != "editor"}>
             <SongEditor currentSong={true} />
           </Box>
-          <Box key="song_viewer" pl="xl" hidden={displayMode != "render"}>
+          <Box key="song_viewer" ml="sm" hidden={displayMode != "render"}>
             <ChordProViewer sheet={sheet} transpose={transpose} fontSize={fontSize} active={displayMode == "render"} />
           </Box>
         </ScrollArea>

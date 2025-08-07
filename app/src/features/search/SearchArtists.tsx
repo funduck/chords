@@ -40,6 +40,7 @@ function SearchArtists() {
   return (
     <>
       <Switch
+        ml="sm"
         mb="md"
         label="In my library"
         checked={inPrivateLibs}

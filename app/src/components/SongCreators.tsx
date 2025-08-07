@@ -39,7 +39,7 @@ export default function SongCreators({ song, withIcon }: { song: SongEntity; wit
     )) || [];
 
   return (
-    <Group gap="xs" c="dimmed">
+    <Group gap="xs" c="dimmed" ml="sm">
       {withIcon && <IconUsers size="24px" />}
       {artistRefs.length > 0 && artistRefs}
       {composerRefs.length > 0 && composerRefs}

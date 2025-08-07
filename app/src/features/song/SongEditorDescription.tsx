@@ -4,7 +4,7 @@ import { IconEdit, IconEye } from "@tabler/icons-react";
 export default function SongEditorDescription() {
   return (
     <>
-      <Text c="dimmed" mb="md">
+      <Text c="dimmed" mb="md" ml="md">
         Song editor allows you to create and edit chord sheets using{" "}
         <Anchor href="https://www.chordpro.org/chordpro/chordpro-introduction/">ChordPro</Anchor> format.
         <Group gap="xs">

@@ -45,10 +45,9 @@ function SearchSongs({ artistId }: { artistId?: number }) {
   return (
     <>
       <SearchResetArtist />
-      <Group>
+      <Group ml="sm" mb="md">
         <Switch
           label="in my library"
-          mb="md"
           checked={inPrivateLibs}
           onChange={(e) => {
             const newValue = e.currentTarget.checked;
@@ -58,7 +57,6 @@ function SearchSongs({ artistId }: { artistId?: number }) {
         />
         <Switch
           label="by lyrics"
-          mb="md"
           checked={byLyrics}
           onChange={(e) => {
             const newValue = e.currentTarget.checked;

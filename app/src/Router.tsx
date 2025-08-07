@@ -196,7 +196,7 @@ function Router() {
       navbar={{ width: 280, breakpoint: "sm", collapsed: { mobile: !navbarOpened, desktop: !navbarOpened } }}
       transitionDuration={150}
       transitionTimingFunction="ease-in-out"
-      padding="md"
+      p={isMobile ? "sm" : "md"}
       style={{ display: "flex", flexDirection: "column", height: "100vh" }}
     >
       <AppShell.Header bg="header-bg">

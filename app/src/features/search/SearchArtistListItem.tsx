@@ -17,7 +17,7 @@ function SearchArtistListItem({ entity }: { entity: ArtistInfoEntity }) {
       }}
       href={RoutesEnum.Artists(entity.id)}
     >
-      <Flex direction={"row"} align={"center"} gap={"sm"}>
+      <Flex direction={"row"} align={"center"} gap={"sm"} pl="md">
         <Text size="lg">{entity.name}</Text>
         <Text c="dimmed" size="xs">
           #{entity.id}
