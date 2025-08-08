@@ -1,96 +1,185 @@
-import { Accordion, Anchor, Box, Button, Divider, Group, List, Space, Text, Title } from "@mantine/core";
-import { IconMusic, IconMusicPlus, IconMusicSearch, IconUsersGroup } from "@tabler/icons-react";
+import {
+  Accordion,
+  Anchor,
+  Box,
+  Button,
+  Card,
+  Divider,
+  Grid,
+  Group,
+  List,
+  Space,
+  Text,
+  ThemeIcon,
+  Title,
+} from "@mantine/core";
+import {
+  IconDeviceMobile,
+  IconEdit,
+  IconHelpCircle,
+  IconMusic,
+  IconMusicPlus,
+  IconPlayerPlayFilled,
+  IconSearch,
+  IconUsersGroup,
+} from "@tabler/icons-react";
 import { useEffect } from "react";
 import { useNavigate } from "react-router";
 
-import { useSongContext } from "@src/features/song/SongContext";
+import { RoutesEnum } from "@src/Router";
 import { useHeader } from "@src/hooks/Header";
 
 export function TitleAbout() {
   return (
-    <Box>
-      <Title order={2}>MyChords</Title>
-      <Space h="xs" />
-      <Title order={3}>Minimal, real‑time songbook</Title>
-      <Space h="md" />
-      <Text c="dimmed">Share lyrics and chords live. Keep hands free and stay in sync.</Text>
-      <Space h="sm" />
-      <Text c="dimmed">
-        Open source on <Anchor href="https://github.com/funduck/chords">GitHub</Anchor>
+    <Box ta="center" mb="xl">
+      <Title order={1} c="primary" mb="xs">
+        🎵 MyChords
+      </Title>
+      <Title order={3} c="dimmed" fw={400} mb="lg">
+        Collaborative songbook for jam sessions
+      </Title>
+      <Text size="lg" maw={600} mx="auto">
+        Share chord sheets and lyrics in real-time with your band members. Keep everyone in sync and your hands free to
+        play music.
       </Text>
-      <Space h="lg" />
     </Box>
   );
 }
 
-function QuickActions() {
-  const navigate = useNavigate();
-  const { songState } = useSongContext();
-  const hasSong = Boolean(songState.songId);
-
+function FeatureCard({ icon, title, description }: { icon: React.ReactNode; title: string; description: string }) {
   return (
-    <Group wrap="wrap" gap="sm">
-      <Button leftSection={<IconUsersGroup size={18} />} variant="light" onClick={() => navigate("/room")}>
-        Start a Room
-      </Button>
-      <Button leftSection={<IconMusicPlus size={18} />} variant="light" onClick={() => navigate("/editor")}>
-        Create song
-      </Button>
-      <Button leftSection={<IconMusicSearch size={18} />} variant="light" onClick={() => navigate("/search/songs")}>
-        Browse songs
-      </Button>
-      {hasSong && (
-        <Button
-          leftSection={<IconMusic size={18} />}
-          variant="subtle"
-          onClick={() => navigate(`/songs/${songState.songId}`)}
-        >
-          Play current
-        </Button>
-      )}
-    </Group>
+    <Card shadow="sm" padding="lg" radius="md" withBorder>
+      <Group mb="md" align="flex-start">
+        <ThemeIcon size={40} radius="md" color="primary">
+          {icon}
+        </ThemeIcon>
+        <Title order={4}>{title}</Title>
+      </Group>
+      <Text size="sm" c="dimmed">
+        {description}
+      </Text>
+    </Card>
   );
 }
 
-function ShortGuide() {
-  const navigate = useNavigate();
+function Features() {
   return (
-    <Box>
-      <Title order={4}>How to use</Title>
-      <Space h="sm" />
-      <List spacing="xs" size="sm" withPadding>
-        <List.Item>
-          Create or paste a song{" "}
-          <Button
-            size="xs"
-            variant="subtle"
-            leftSection={<IconMusicPlus size={16} />}
-            onClick={() => navigate("/editor")}
-          >
-            Open editor
-          </Button>
-        </List.Item>
-        <List.Item>
-          Start a room and share the link{" "}
-          <Button
-            size="xs"
-            variant="subtle"
-            leftSection={<IconUsersGroup size={16} />}
-            onClick={() => navigate("/room")}
-          >
-            Start room
-          </Button>
-        </List.Item>
-        <List.Item>Everyone in the room sees the same page and scrolls together</List.Item>
-      </List>
+    <Grid mb="xl" mt="xl">
+      <Grid.Col span={{ base: 12, sm: 6, lg: 4 }}>
+        <FeatureCard
+          icon={<IconUsersGroup size={24} />}
+          title="Real-time Sync"
+          description="Share your screen with bandmates. Everyone sees the same song and scroll position automatically."
+        />
+      </Grid.Col>
+      <Grid.Col span={{ base: 12, sm: 6, lg: 4 }}>
+        <FeatureCard
+          icon={<IconPlayerPlayFilled size={24} />}
+          title="Auto-scroll"
+          description="Hands-free playing with adjustable auto-scroll speed. Perfect for performances and practice."
+        />
+      </Grid.Col>
+      <Grid.Col span={{ base: 12, sm: 6, lg: 4 }}>
+        <FeatureCard
+          icon={<IconEdit size={24} />}
+          title="Smart Editor"
+          description="Paste songs from Ultimate Guitar or any source. Auto-format to ChordPro with intelligent parsing."
+        />
+      </Grid.Col>
+      <Grid.Col span={{ base: 12, sm: 6, lg: 4 }}>
+        <FeatureCard
+          icon={<IconSearch size={24} />}
+          title="Full-text Search"
+          description="Find songs by title, artist, or even lyrics. Lightning-fast search through your entire library."
+        />
+      </Grid.Col>
+      <Grid.Col span={{ base: 12, sm: 6, lg: 4 }}>
+        <FeatureCard
+          icon={<IconMusic size={24} />}
+          title="Chord Diagrams"
+          description="Interactive chord diagrams with multiple fingering positions. Perfect for learning new songs."
+        />
+      </Grid.Col>
+      <Grid.Col span={{ base: 12, sm: 6, lg: 4 }}>
+        <FeatureCard
+          icon={<IconDeviceMobile size={24} />}
+          title="Mobile Ready"
+          description="Works perfectly on phones and tablets. Take your songbook anywhere, no app installation needed."
+        />
+      </Grid.Col>
+    </Grid>
+  );
+}
+
+function QuickStartGuide() {
+  const navigate = useNavigate();
+
+  return (
+    <Box mt="xl" mb="xl">
+      <Title order={2} mb="md" ta="center">
+        🚀 Quick Start Guide
+      </Title>
+
+      <Space h="md" />
+
+      <Grid mb="xl">
+        <Grid.Col span={{ base: 12, md: 6 }}>
+          <Card shadow="sm" padding="lg" radius="md" withBorder h="100%">
+            <Title order={4} mb="md" c="primary">
+              <IconMusicPlus size={20} style={{ marginRight: "8px" }} />
+              Start Playing Now
+            </Title>
+            <List spacing="sm" size="sm" mb="md">
+              <List.Item>Create a new song with the editor</List.Item>
+              <List.Item>Paste lyrics with chords from any source</List.Item>
+              <List.Item>Use auto-format to convert to ChordPro</List.Item>
+              <List.Item>Preview and adjust as needed</List.Item>
+            </List>
+            <Button
+              fullWidth
+              variant="filled"
+              leftSection={<IconMusicPlus size={16} />}
+              onClick={() => navigate(RoutesEnum.Editor)}
+            >
+              Create Your First Song
+            </Button>
+          </Card>
+        </Grid.Col>
+
+        <Grid.Col span={{ base: 12, md: 6 }}>
+          <Card shadow="sm" padding="lg" radius="md" withBorder h="100%">
+            <Title order={4} mb="md" c="primary">
+              <IconUsersGroup size={20} style={{ marginRight: "8px" }} />
+              Jam with Friends
+            </Title>
+            <List spacing="sm" size="sm" mb="md">
+              <List.Item>Create or join a room</List.Item>
+              <List.Item>Share the room code or link</List.Item>
+              <List.Item>Pick a song from your library</List.Item>
+              <List.Item>Everyone sees the same content in sync</List.Item>
+            </List>
+            <Button
+              fullWidth
+              variant="outline"
+              leftSection={<IconUsersGroup size={16} />}
+              onClick={() => navigate(RoutesEnum.Room())}
+            >
+              Start a Jam Session
+            </Button>
+          </Card>
+        </Grid.Col>
+      </Grid>
     </Box>
   );
 }
 
 function FAQ() {
   return (
-    <Box>
-      <Title order={4}>FAQ</Title>
+    <Box mt="xl" mb="xl">
+      <Title order={2} mb="md" ta="center">
+        <IconHelpCircle size={22} style={{ marginRight: 8, verticalAlign: "middle" }} /> FAQ
+      </Title>
+
       <Space h="sm" />
       <Accordion variant="separated" radius="md">
         <Accordion.Item value="sync">
@@ -128,24 +217,25 @@ function About() {
     <Box m="md">
       <TitleAbout />
 
-      <QuickActions />
+      <Features />
 
-      <Space h="xl" />
-      <Divider />
-      <Space h="xl" />
+      <Space h="xs" />
+      <QuickStartGuide />
 
-      <ShortGuide />
-
-      <Space h="xl" />
-      <Divider />
-      <Space h="xl" />
-
+      <Space h="xs" />
       <FAQ />
 
-      <Space h="xl" />
+      <Space h="xs" />
+      <Divider my="xl" />
+
       <Text c="dimmed">
-        Questions or ideas? Feel free to write me <Anchor href="mailto:qlfunduck@gmail.com">qlfunduck@gmail.com</Anchor>
+        Open source on <Anchor href="https://github.com/funduck/chords">GitHub</Anchor>
       </Text>
+      <Text c="dimmed">
+        Feel free to write me <Anchor href="mailto:qlfunduck@gmail.com">qlfunduck@gmail.com</Anchor>
+      </Text>
+
+      <Space h="xl" />
     </Box>
   );
 }
