@@ -1,4 +1,5 @@
-import { Box, Button, Flex, Group, Space, Stack, Text, Title } from "@mantine/core";
+import { Box, Button, Card, Grid, Group, Space, Stack, Text, ThemeIcon, Title } from "@mantine/core";
+import { IconKey, IconLogout, IconTrash, IconUserCircle } from "@tabler/icons-react";
 import { useEffect } from "react";
 
 import ClearBrowser from "@src/components/ClearBrowser";
@@ -28,43 +29,89 @@ function Account() {
   }
 
   return (
-    <Flex direction={"column"} gap={"md"}>
-      <Title order={3}>Account</Title>
-      <Group>
-        <Text fw={700}>User</Text>
-        <Text>#{userId}</Text>
-      </Group>
-      <Box>
-        <Button onClick={logout} color="orange" variant="outline">
-          Logout
-        </Button>
+    <Box m="md">
+      {/* Header */}
+      <Box ta="center" mb="xl">
+        <Title order={1} c="primary" mb="xs">
+          Account
+        </Title>
+        <Text c="dimmed">Manage your profile, sign-ins, and device data</Text>
       </Box>
-      <Space h="md" />
 
-      <Title order={3}>Auth</Title>
-      {auths && auths.length > 0 && (
-        <Stack>
-          {auths.map((a) => (
-            <Group key={a.type}>
-              <Text fw={700}>{a.type}</Text>
-              <Text>{a.identity}</Text>
+      {/* Content */}
+      <Grid>
+        {/* Profile */}
+        <Grid.Col span={{ base: 12, md: 6, lg: 4 }}>
+          <Card withBorder radius="md" padding="lg" shadow="sm">
+            <Group mb="md" align="flex-start">
+              <ThemeIcon size={40} radius="md" color="primary">
+                <IconUserCircle size={24} />
+              </ThemeIcon>
+              <Title order={4}>Profile</Title>
             </Group>
-          ))}
-        </Stack>
-      )}
-      {!auths?.length && (
-        <Group>
-          <Text fw={700}>Anonymous</Text>
-        </Group>
-      )}
-      <Space h="md" />
 
-      <Title order={3}>Misc</Title>
-      <Box>
-        <ClearBrowser />
-      </Box>
-      <Space h="md" />
-    </Flex>
+            <Group>
+              <Text fw={700}>User</Text>
+              <Text>#{userId}</Text>
+            </Group>
+
+            <Space h="md" />
+            <Button fullWidth variant="outline" color="orange" leftSection={<IconLogout size={16} />} onClick={logout}>
+              Logout
+            </Button>
+          </Card>
+        </Grid.Col>
+
+        {/* Authentication */}
+        <Grid.Col span={{ base: 12, md: 6, lg: 4 }}>
+          <Card withBorder radius="md" padding="lg" shadow="sm">
+            <Group mb="md" align="flex-start">
+              <ThemeIcon size={40} radius="md" color="primary">
+                <IconKey size={24} />
+              </ThemeIcon>
+              <Title order={4}>Authentication</Title>
+            </Group>
+
+            {auths && auths.length > 0 ? (
+              <Stack gap="xs">
+                {auths.map((a) => (
+                  <Group key={a.type} gap="sm">
+                    <Text fw={700}>{a.type}</Text>
+                    <Text>{a.identity}</Text>
+                  </Group>
+                ))}
+              </Stack>
+            ) : (
+              <Stack gap={4}>
+                <Text fw={700}>Anonymous</Text>
+                <Text size="sm" c="dimmed">
+                  Sign in later to sync your library across devices.
+                </Text>
+              </Stack>
+            )}
+          </Card>
+        </Grid.Col>
+
+        {/* Device / Misc */}
+        <Grid.Col span={{ base: 12, md: 12, lg: 4 }}>
+          <Card withBorder radius="md" padding="lg" shadow="sm">
+            <Group mb="md" align="flex-start">
+              <ThemeIcon size={40} radius="md" color="primary">
+                <IconTrash size={24} />
+              </ThemeIcon>
+              <Title order={4}>Device</Title>
+            </Group>
+
+            <Text size="sm" c="dimmed" mb="sm">
+              Clear cached app data on this device.
+            </Text>
+            <ClearBrowser />
+          </Card>
+        </Grid.Col>
+      </Grid>
+
+      <Space h="xl" />
+    </Box>
   );
 }
 
