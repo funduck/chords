@@ -28,7 +28,7 @@ function Login() {
 
   return (
     <Modal opened={true} onClose={() => {}} withCloseButton={false}>
-      <Flex direction="column" ta="center">
+      <Flex direction="column" ta="center" mt="lg">
         <TitleAbout />
       </Flex>
       <Space h="md" />

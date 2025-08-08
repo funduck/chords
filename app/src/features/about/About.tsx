@@ -1,6 +1,7 @@
 import {
   Accordion,
   Anchor,
+  Badge,
   Box,
   Button,
   Card,
@@ -12,6 +13,7 @@ import {
   Text,
   ThemeIcon,
   Title,
+  Tooltip,
 } from "@mantine/core";
 import {
   IconDeviceMobile,
@@ -32,15 +34,26 @@ import { useHeader } from "@src/hooks/Header";
 export function TitleAbout() {
   return (
     <Box ta="center" mb="xl">
-      <Title order={1} c="primary" mb="xs">
-        🎵 MyChords
-      </Title>
+      <Group justify="center" gap="xs" mb="xs">
+        <Title order={1} c="primary" m={0}>
+          🎵 MyChords
+        </Title>
+        <Tooltip
+          withArrow
+          multiline
+          w={320}
+          label="Beta — a personal pet project focused on a lightweight, neat, clean experience. It may become commercial later, but most core features will remain free."
+        >
+          <Badge variant="light" color="gray" size="sm" radius="sm">
+            Beta
+          </Badge>
+        </Tooltip>
+      </Group>
       <Title order={3} c="dimmed" fw={400} mb="lg">
         Collaborative songbook for jam sessions
       </Title>
       <Text size="lg" maw={600} mx="auto">
-        Share chord sheets and lyrics in real-time with your band members. Keep everyone in sync and your hands free to
-        play music.
+        Share chord sheets and lyrics in real-time. Keep everyone in sync and hands free to play music.
       </Text>
     </Box>
   );
