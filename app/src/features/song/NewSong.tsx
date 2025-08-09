@@ -1,4 +1,5 @@
-import { Box, Divider, ScrollArea } from "@mantine/core";
+import { Box, Divider, ScrollArea, Text, Title } from "@mantine/core";
+import { IconMusicPlus } from "@tabler/icons-react";
 import { useEffect, useRef } from "react";
 
 import ChordDisplayManager from "@src/components/ChordDisplayManager";
@@ -39,6 +40,14 @@ function NewSong() {
             flexGrow: 1,
           }}
         >
+          <Box ta="center" mt="sm" mb="md">
+            <Title order={2} c="primary" mb={4}>
+              <IconMusicPlus size={24} style={{ marginRight: 8, verticalAlign: "text-bottom" }} /> New Song
+            </Title>
+            <Text c="dimmed" size="sm">
+              Create or paste a chord sheet. Toggle preview with the eye icon in header.
+            </Text>
+          </Box>
           <SongEditorDescription />
           <Divider my="md" />
           <Box key="editor" hidden={displayMode != "editor"}>

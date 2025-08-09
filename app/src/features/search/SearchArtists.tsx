@@ -1,4 +1,5 @@
-import { Switch } from "@mantine/core";
+import { Box, Group, Switch, Text, Title } from "@mantine/core";
+import { IconUserSearch } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 
 import { useArtistsApi } from "@src/hooks/Api";
@@ -39,19 +40,14 @@ function SearchArtists() {
 
   return (
     <>
-      <Switch
-        ml="sm"
-        mb="md"
-        label="In my library"
-        checked={inPrivateLibs}
-        onChange={(e) => {
-          const newValue = e.currentTarget.checked;
-          setInPrivateLibs(newValue);
-          localStorage.setItem("search-artists-preferences-inPrivateLibs", JSON.stringify(newValue));
-        }}
-      />
-
-      {!inPrivateLibs && <PublicSearchDisclaimer />}
+      <Box ta="center" mb="lg">
+        <Title order={2} c="primary">
+          <IconUserSearch size={22} style={{ marginRight: 8, verticalAlign: "text-bottom" }} /> Search Artists
+        </Title>
+        <Text c="dimmed" size="sm">
+          Find artists quickly. Toggle to search your library or public catalog.
+        </Text>
+      </Box>
 
       <SearchEntities
         useSearchContext={useSearchArtistsContext}
@@ -64,6 +60,22 @@ function SearchArtists() {
         listItemProps={(entity) => ({ entity })}
         placeholder="Search Artist by Name"
         entityName="artists"
+        beforeQueryInput={
+          <Group>
+            <Switch
+              ml="sm"
+              label="In my library"
+              checked={inPrivateLibs}
+              onChange={(e) => {
+                const newValue = e.currentTarget.checked;
+                setInPrivateLibs(newValue);
+                localStorage.setItem("search-artists-preferences-inPrivateLibs", JSON.stringify(newValue));
+              }}
+            />
+
+            {!inPrivateLibs && <PublicSearchDisclaimer />}
+          </Group>
+        }
       />
     </>
   );

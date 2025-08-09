@@ -1,5 +1,5 @@
-import { Button, CopyButton, Fieldset, Flex, Space, Stack, Text, TextInput } from "@mantine/core";
-import { IconCopy, IconDoorExit, IconShare3 } from "@tabler/icons-react";
+import { Box, Button, Card, CopyButton, Flex, Group, Stack, Text, TextInput, ThemeIcon, Title } from "@mantine/core";
+import { IconCopy, IconDoorExit, IconLogin2, IconPlus, IconShare3, IconUsersGroup } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 
@@ -8,7 +8,6 @@ import { useHeader } from "@src/hooks/Header";
 import { useScrollPosition } from "@src/hooks/useScrollPosition";
 
 import { useRoomContext } from "./RoomContext";
-import RoomDescription from "./RoomDescription";
 
 function Room() {
   // Initialize scroll position management
@@ -44,83 +43,112 @@ function Room() {
 
   if (!room) {
     return (
-      <>
-        <RoomDescription />
-        <Stack>
-          <Fieldset legend="Create Room" style={{ borderColor: "rgba(0,0,0,0)" }}>
-            <Button variant="outline" fullWidth onClick={() => createRoom()}>
+      <Box>
+        <Box ta="center" mb="xl">
+          <Title order={2} c="primary" mb={4}>
+            <IconUsersGroup size={24} style={{ marginRight: 8, verticalAlign: "text-bottom" }} /> Jam Room
+          </Title>
+          <Text size="sm" c="dimmed">
+            Create a room to sync scrolling & song changes with others, or join one with a 6‑char code.
+          </Text>
+        </Box>
+
+        <Flex direction={{ base: "column", sm: "row" }} gap="md" align="stretch">
+          <Card withBorder radius="md" padding="lg" style={{ flex: 1 }}>
+            <Group mb="sm">
+              <ThemeIcon size={40} radius="md" color="primary">
+                <IconPlus size={22} />
+              </ThemeIcon>
+              <Title order={4}>Create Room</Title>
+            </Group>
+            <Text size="sm" c="dimmed" mb="md">
+              Instantly start a synced session. Share the link or code that appears after creation.
+            </Text>
+            <Button variant="filled" fullWidth onClick={() => createRoom()} leftSection={<IconPlus size={16} />}>
               Create
             </Button>
-          </Fieldset>
-
-          <Fieldset legend="Join Room" style={{ borderColor: "rgba(0,0,0,0)" }}>
-            <Flex direction={"row"} gap="md">
+          </Card>
+          <Card withBorder radius="md" padding="lg" style={{ flex: 1 }}>
+            <Group mb="sm">
+              <ThemeIcon size={40} radius="md" color="primary">
+                <IconLogin2 size={22} />
+              </ThemeIcon>
+              <Title order={4}>Join Room</Title>
+            </Group>
+            <Text size="sm" c="dimmed" mb="md">
+              Enter a 6‑character room code you received.
+            </Text>
+            <Flex gap="sm" align="flex-start">
               <TextInput
+                placeholder="ABC123"
                 name="roomCode"
-                onChange={(event) => setRoomCode(event.target.value)}
-                error={
-                  roomCode?.length && roomCode.length != 6
-                    ? `Need ${6 - (roomCode?.length || 0)} more characters`
-                    : undefined
-                }
+                onChange={(event) => setRoomCode(event.target.value.trim().toUpperCase())}
+                value={roomCode ?? ""}
+                error={roomCode?.length && roomCode.length != 6 ? `${6 - (roomCode?.length || 0)} more` : undefined}
+                style={{ flex: 1 }}
+                maxLength={6}
               />
               <Button variant="outline" onClick={() => joinRoom(roomCode!)} disabled={(roomCode?.length || 0) != 6}>
                 Join
               </Button>
             </Flex>
-          </Fieldset>
-        </Stack>
-      </>
+          </Card>
+        </Flex>
+      </Box>
     );
   }
 
   const joinLink = room.code ? `${currentURL.replace(/\/room.+/, "/room")}/join/${room.code}` : "";
 
   return (
-    <>
-      <RoomDescription />
-      <Stack>
+    <Box>
+      <Box ta="center" mb="xl">
+        <Title order={2} c="primary" mb={4}>
+          <IconUsersGroup size={24} style={{ marginRight: 8, verticalAlign: "text-bottom" }} /> Room Active
+        </Title>
+        <Text size="sm" c="dimmed">
+          Share the link or code below. Anyone joining stays in sync with scroll & song changes.
+        </Text>
+      </Box>
+
+      <Flex direction={{ base: "column", sm: "row" }} gap="md" align="stretch">
         <CopyButton value={joinLink}>
           {({ copied, copy }) => (
-            <Button variant="outline" disabled={room?.code == null} onClick={copy}>
-              {copied ? (
-                "Copied"
-              ) : (
-                <>
-                  <IconShare3 />
-                  <Space w="xs" />
-                  Copy join link
-                </>
-              )}
+            <Button
+              variant={copied ? "light" : "outline"}
+              disabled={room?.code == null}
+              onClick={copy}
+              fullWidth
+              leftSection={<IconShare3 size={16} />}
+            >
+              {copied ? "Link Copied" : "Copy Join Link"}
             </Button>
           )}
         </CopyButton>
         <CopyButton value={room?.code ?? ""}>
           {({ copied, copy }) => (
-            <Button variant="outline" disabled={room?.code == null} onClick={copy}>
-              {copied ? (
-                "Copied"
-              ) : (
-                <>
-                  <IconCopy />
-                  <Space w="xs" />
-                  Copy code {room?.code}
-                </>
-              )}
+            <Button
+              variant={copied ? "light" : "outline"}
+              disabled={room?.code == null}
+              onClick={copy}
+              fullWidth
+              leftSection={<IconCopy size={16} />}
+            >
+              {copied ? "Code Copied" : `Copy Code ${room?.code || ""}`}
             </Button>
           )}
         </CopyButton>
-        <Button variant="outline" onClick={() => leaveRoom()}>
-          <IconDoorExit />
-          <Space w="xs" />
+        <Button
+          variant="outline"
+          color="red"
+          fullWidth
+          onClick={() => leaveRoom()}
+          leftSection={<IconDoorExit size={16} />}
+        >
           Leave Room
         </Button>
-      </Stack>
-      <Space h="md" />
-      {/* {Config.IsDev && room.id && <Text>Room ID: {room.id}</Text>}
-      {Config.IsDev && room.users && <Text>Users: {room.users?.map((u) => u.id).join(", ")}</Text>}
-      {Config.IsDev && room.state && <Text>State: {JSON.stringify(room.state)}</Text>} */}
-    </>
+      </Flex>
+    </Box>
   );
 }
 

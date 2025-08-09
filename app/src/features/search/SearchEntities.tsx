@@ -42,6 +42,8 @@ interface SearchEntitiesProps<T, SP extends SearchParams> {
   // Search functionality
   searchMethod: (params: SearchMethodParams<SP>) => Promise<{ entities?: T[]; total?: number }>;
 
+  beforeQueryInput?: React.ReactNode;
+
   // UI components
   ListItemComponent: React.ComponentType<any>;
   listItemProps: (entity: T) => any;
@@ -72,6 +74,7 @@ interface ResultsProps<T> {
 function SearchEntities<T extends { id?: number; cursor?: string }, SP extends SearchParams>({
   useSearchContext,
   searchMethod,
+  beforeQueryInput,
   ListItemComponent,
   listItemProps,
   placeholder,
@@ -134,6 +137,7 @@ function SearchEntities<T extends { id?: number; cursor?: string }, SP extends S
         } as SP,
       };
 
+      // TODO: move this to context
       searchMethod(searchParams)
         .then((res) => {
           const newEntities = res.entities || [];
@@ -170,6 +174,8 @@ function SearchEntities<T extends { id?: number; cursor?: string }, SP extends S
   return (
     <>
       <Flex direction={"column"} gap="md">
+        {beforeQueryInput}
+
         <QueryInput
           name={"search-query-input"}
           query={searchState.query}

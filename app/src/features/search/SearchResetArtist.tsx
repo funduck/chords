@@ -13,8 +13,10 @@ function SearchResetArtist({}: {}) {
     <>
       {artist && (
         <>
-          <Flex direction="row" ta={"center"} align="center" gap="xs" m={"xs"}>
-            <Text>Selected artist:</Text>
+          <Flex direction="row" ta={"center"} align="center" gap="sm" mt="xs" mb="xl">
+            <Text fw={500} fz={"1.2em"}>
+              Selected artist:
+            </Text>
             <Button
               color={"primary"}
               variant="outline"
@@ -27,7 +29,6 @@ function SearchResetArtist({}: {}) {
               <IconX />
             </Button>
           </Flex>
-          <Space h="md" />
         </>
       )}
     </>

@@ -1,5 +1,8 @@
-import { Group, Switch } from "@mantine/core";
-import { useEffect, useState } from "react";
+import { Box, Group, Space, Switch, Text, Title } from "@mantine/core";
+import { IconMusicSearch } from "@tabler/icons-react";
+import { useCallback, useEffect, useState } from "react";
+
+import { SearchSongsRequest } from "@generated/api";
 
 import { useSongsApi } from "@src/hooks/Api";
 import { useScrollPosition } from "@src/hooks/useScrollPosition";
@@ -38,52 +41,73 @@ function SearchSongs({ artistId }: { artistId?: number }) {
     return saved !== null ? JSON.parse(saved) : true;
   });
 
+  const searchMethod = useCallback(
+    (params: SearchSongsRequest) =>
+      songsApi!.searchSongs({
+        request: {
+          ...params.request,
+          artist_id: artistId || undefined,
+          library_type: inPrivateLibs ? "private" : undefined,
+          by_lyrics: byLyrics,
+        },
+      }),
+    [songsApi, artistId, inPrivateLibs, byLyrics],
+  );
+
   if (!songsApi) {
     return <div>Loading...</div>;
   }
 
   return (
     <>
-      <SearchResetArtist />
-      <Group ml="sm" mb="md">
-        <Switch
-          label="in my library"
-          checked={inPrivateLibs}
-          onChange={(e) => {
-            const newValue = e.currentTarget.checked;
-            setInPrivateLibs(newValue);
-            localStorage.setItem("search-songs-preferences-inPrivateLibs", JSON.stringify(newValue));
-          }}
-        />
-        <Switch
-          label="by lyrics"
-          checked={byLyrics}
-          onChange={(e) => {
-            const newValue = e.currentTarget.checked;
-            setByLyrics(newValue);
-            localStorage.setItem("search-songs-preferences-byLyrics", JSON.stringify(newValue));
-          }}
-        />
-      </Group>
+      <Box ta="center" mb="lg">
+        <Title order={2} c="primary">
+          <IconMusicSearch size={22} style={{ marginRight: 8, verticalAlign: "text-bottom" }} /> Search Songs
+        </Title>
+        <Space h="xs" />
+        <Text c="dimmed" size="sm">
+          Find songs by title or lyrics, in your library or public catalog.
+        </Text>
+      </Box>
 
-      {!inPrivateLibs && <PublicSearchDisclaimer />}
+      <SearchResetArtist />
 
       <SearchEntities
         useSearchContext={useSearchSongsContext}
-        searchMethod={(params) =>
-          songsApi!.searchSongs({
-            request: {
-              ...params.request,
-              artist_id: artistId || undefined,
-              library_type: inPrivateLibs ? "private" : undefined,
-              by_lyrics: byLyrics,
-            },
-          })
-        }
+        searchMethod={searchMethod}
         ListItemComponent={SearchSongListItem}
         listItemProps={(entity) => ({ entity })}
         placeholder="Search Song by Title or Lyrics"
         entityName="songs"
+        beforeQueryInput={
+          <Box>
+            {/* <Card padding="sm" radius="md" mb="md"> */}
+            <Group gap="lg">
+              <Switch
+                label="By lyrics"
+                checked={byLyrics}
+                onChange={(e) => {
+                  const newValue = e.currentTarget.checked;
+                  setByLyrics(newValue);
+                  localStorage.setItem("search-songs-preferences-byLyrics", JSON.stringify(newValue));
+                }}
+              />
+              <Group>
+                <Switch
+                  label="In my library"
+                  checked={inPrivateLibs}
+                  onChange={(e) => {
+                    const newValue = e.currentTarget.checked;
+                    setInPrivateLibs(newValue);
+                    localStorage.setItem("search-songs-preferences-inPrivateLibs", JSON.stringify(newValue));
+                  }}
+                />
+                {!inPrivateLibs && <PublicSearchDisclaimer />}
+              </Group>
+            </Group>
+            {/* </Card> */}
+          </Box>
+        }
       />
     </>
   );
