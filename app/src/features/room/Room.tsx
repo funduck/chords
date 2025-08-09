@@ -1,4 +1,4 @@
-import { Box, Button, Card, CopyButton, Flex, Group, Stack, Text, TextInput, ThemeIcon, Title } from "@mantine/core";
+import { Box, Button, Card, CopyButton, Flex, Group, Text, TextInput, ThemeIcon, Title } from "@mantine/core";
 import { IconCopy, IconDoorExit, IconLogin2, IconPlus, IconShare3, IconUsersGroup } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
@@ -10,7 +10,6 @@ import { useScrollPosition } from "@src/hooks/useScrollPosition";
 import { useRoomContext } from "./RoomContext";
 
 function Room() {
-  // Initialize scroll position management
   useScrollPosition();
 
   const { roomState, createRoom, joinRoom, leaveRoom } = useRoomContext();
@@ -20,7 +19,7 @@ function Room() {
 
   const { setCenterContent } = useHeader();
   useEffect(() => {
-    setCenterContent(<Text>Room</Text>);
+    setCenterContent();
   }, []);
 
   const [roomCode, setRoomCode] = useState<string | null>(null);
@@ -43,7 +42,7 @@ function Room() {
 
   if (!room) {
     return (
-      <Box>
+      <Box m="md">
         <Box ta="center" mb="xl">
           <Title order={2} c="primary" mb={4}>
             <IconUsersGroup size={24} style={{ marginRight: 8, verticalAlign: "text-bottom" }} /> Jam Room
@@ -101,10 +100,10 @@ function Room() {
   const joinLink = room.code ? `${currentURL.replace(/\/room.+/, "/room")}/join/${room.code}` : "";
 
   return (
-    <Box>
+    <Box m="md">
       <Box ta="center" mb="xl">
         <Title order={2} c="primary" mb={4}>
-          <IconUsersGroup size={24} style={{ marginRight: 8, verticalAlign: "text-bottom" }} /> Room Active
+          <IconUsersGroup size={24} style={{ marginRight: 8, verticalAlign: "text-bottom" }} /> Jam Room
         </Title>
         <Text size="sm" c="dimmed">
           Share the link or code below. Anyone joining stays in sync with scroll & song changes.
@@ -112,6 +111,15 @@ function Room() {
       </Box>
 
       <Flex direction={{ base: "column", sm: "row" }} gap="md" align="stretch">
+        <Button
+          variant="outline"
+          color="red"
+          fullWidth
+          onClick={() => leaveRoom()}
+          leftSection={<IconDoorExit size={16} />}
+        >
+          Leave Room
+        </Button>
         <CopyButton value={joinLink}>
           {({ copied, copy }) => (
             <Button
@@ -138,15 +146,6 @@ function Room() {
             </Button>
           )}
         </CopyButton>
-        <Button
-          variant="outline"
-          color="red"
-          fullWidth
-          onClick={() => leaveRoom()}
-          leftSection={<IconDoorExit size={16} />}
-        >
-          Leave Room
-        </Button>
       </Flex>
     </Box>
   );

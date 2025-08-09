@@ -1,4 +1,5 @@
-import { Box, Divider, ScrollArea } from "@mantine/core";
+import { Box, Divider, ScrollArea, Text, Title } from "@mantine/core";
+import { IconMusic } from "@tabler/icons-react";
 import { useEffect, useRef } from "react";
 import { useParams } from "react-router";
 
@@ -39,7 +40,7 @@ function Song() {
       <AutoScrollManager viewportRef={songViewportRef} />
       <ChordDisplayManager />
       <SongSettings />
-      <Box id="songbox" style={{ display: "flex", flex: 1, flexDirection: "column", height: "100%" }}>
+      <Box id="songbox" style={{ display: "flex", flex: 1, flexDirection: "column", height: "100%" }} mt="md">
         <ScrollArea
           viewportRef={songViewportRef}
           type="always"
@@ -49,8 +50,19 @@ function Song() {
             paddingTop: "5px",
           }}
         >
-          {/* <Box key="song">Song #{song?.id || songId}</Box> */}
-          {song && <SongCreators song={song} withIcon={true} />}
+          <Box ta="center" mb="xl">
+            <Title order={2} c="primary" mb={4}>
+              <IconMusic size={24} style={{ marginRight: 8, verticalAlign: "text-bottom" }} /> Play Song
+            </Title>
+            {song && (
+              <>
+                <Text c="dimmed">
+                  "{song.title}" by
+                  <SongCreators song={song} inGroup={false} />
+                </Text>
+              </>
+            )}
+          </Box>
           <Divider my="md" />
           <Box key="song_editor" ml="sm" hidden={displayMode != "editor"}>
             <SongEditor currentSong={true} />

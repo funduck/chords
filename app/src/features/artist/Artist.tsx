@@ -13,12 +13,11 @@ import { useSearchSongsContext } from "../search/SearchContext";
 import SearchSongs from "../search/SearchSongs";
 
 function Artist() {
-  // Initialize scroll position management
   useScrollPosition();
 
   const { setCenterContent } = useHeader();
   useEffect(() => {
-    setCenterContent("Artist");
+    setCenterContent();
   }, []);
 
   const { artistId } = useParams<{ artistId: string }>();

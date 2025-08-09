@@ -6,12 +6,11 @@ import { useScrollPosition } from "@src/hooks/useScrollPosition";
 import SearchSongs from "./SearchSongs";
 
 function Search() {
-  // Initialize scroll position management
   useScrollPosition();
 
   const { setCenterContent } = useHeader();
   useEffect(() => {
-    setCenterContent("Songs");
+    setCenterContent();
   }, []);
 
   return <SearchSongs />;

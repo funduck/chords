@@ -1,4 +1,4 @@
-import { Box, Group, Space, Switch, Text, Title } from "@mantine/core";
+import { Box, Group, Switch, Text, Title } from "@mantine/core";
 import { IconMusicSearch } from "@tabler/icons-react";
 import { useCallback, useEffect, useState } from "react";
 
@@ -59,12 +59,11 @@ function SearchSongs({ artistId }: { artistId?: number }) {
   }
 
   return (
-    <>
+    <Box m="md">
       <Box ta="center" mb="lg">
-        <Title order={2} c="primary">
+        <Title order={2} c="primary" mb="xs">
           <IconMusicSearch size={22} style={{ marginRight: 8, verticalAlign: "text-bottom" }} /> Search Songs
         </Title>
-        <Space h="xs" />
         <Text c="dimmed" size="sm">
           Find songs by title or lyrics, in your library or public catalog.
         </Text>
@@ -83,15 +82,6 @@ function SearchSongs({ artistId }: { artistId?: number }) {
           <Box>
             {/* <Card padding="sm" radius="md" mb="md"> */}
             <Group gap="lg">
-              <Switch
-                label="By lyrics"
-                checked={byLyrics}
-                onChange={(e) => {
-                  const newValue = e.currentTarget.checked;
-                  setByLyrics(newValue);
-                  localStorage.setItem("search-songs-preferences-byLyrics", JSON.stringify(newValue));
-                }}
-              />
               <Group>
                 <Switch
                   label="In my library"
@@ -104,12 +94,21 @@ function SearchSongs({ artistId }: { artistId?: number }) {
                 />
                 {!inPrivateLibs && <PublicSearchDisclaimer />}
               </Group>
+              <Switch
+                label="By lyrics"
+                checked={byLyrics}
+                onChange={(e) => {
+                  const newValue = e.currentTarget.checked;
+                  setByLyrics(newValue);
+                  localStorage.setItem("search-songs-preferences-byLyrics", JSON.stringify(newValue));
+                }}
+              />
             </Group>
             {/* </Card> */}
           </Box>
         }
       />
-    </>
+    </Box>
   );
 }
 

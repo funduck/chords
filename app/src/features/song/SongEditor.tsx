@@ -176,13 +176,13 @@ function SongEditor({ currentSong }: { currentSong?: boolean }) {
         position: "top-right",
       });
     },
-    [ref.current?.view, setEditorValue, songContext, onSheetChanged, getEditorValue],
+    [setEditorValue, onSheetChanged, getEditorValue],
   );
 
   const clearSheet = useCallback(() => {
     setEditorValue("");
     onSheetChanged("");
-  }, [ref.current?.view, setEditorValue, onSheetChanged]);
+  }, [setEditorValue, onSheetChanged]);
 
   const onEditorChange = useCallback(
     (value) => {

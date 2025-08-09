@@ -160,7 +160,7 @@ export class ChordProService {
   ): string {
     if (!song) return "";
 
-    let formater = new ChordProFormatter();
+    const formater = new ChordProFormatter();
     let sheet = formater.format(song);
 
     sheet = this.beforeFormat(sheet);

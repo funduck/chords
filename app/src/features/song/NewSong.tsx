@@ -1,5 +1,5 @@
-import { Box, Divider, ScrollArea, Text, Title } from "@mantine/core";
-import { IconMusicPlus } from "@tabler/icons-react";
+import { Anchor, Box, Divider, Group, ScrollArea, Stack, Text, ThemeIcon, Title } from "@mantine/core";
+import { IconEdit, IconEye, IconMusicPlus } from "@tabler/icons-react";
 import { useEffect, useRef } from "react";
 
 import ChordDisplayManager from "@src/components/ChordDisplayManager";
@@ -8,7 +8,6 @@ import ChordProViewer from "@src/components/ChordProViewer";
 import AutoScrollManager from "./AutoScroll";
 import { useSongContext } from "./SongContext";
 import SongEditor from "./SongEditor";
-import SongEditorDescription from "./SongEditorDescription";
 import SongSettings from "./SongSettings";
 
 function NewSong() {
@@ -31,7 +30,7 @@ function NewSong() {
       <AutoScrollManager viewportRef={songViewportRef} />
       <ChordDisplayManager />
       <SongSettings />
-      <Box id="songbox" style={{ display: "flex", flex: 1, flexDirection: "column", height: "100%" }}>
+      <Box id="songbox" style={{ display: "flex", flex: 1, flexDirection: "column", height: "100%" }} mt="md">
         <ScrollArea
           viewportRef={songViewportRef}
           type="always"
@@ -40,15 +39,38 @@ function NewSong() {
             flexGrow: 1,
           }}
         >
-          <Box ta="center" mt="sm" mb="md">
+          <Box ta="center" mb="xl">
             <Title order={2} c="primary" mb={4}>
               <IconMusicPlus size={24} style={{ marginRight: 8, verticalAlign: "text-bottom" }} /> New Song
             </Title>
-            <Text c="dimmed" size="sm">
-              Create or paste a chord sheet. Toggle preview with the eye icon in header.
+            <Text c="dimmed">
+              Create a new chord sheet in{" "}
+              <Anchor href="https://www.chordpro.org/chordpro/chordpro-introduction/" target="_blank">
+                ChordPro
+              </Anchor>{" "}
+              format.
             </Text>
           </Box>
-          <SongEditorDescription />
+          <Stack gap={6}>
+            <Group gap="sm" wrap="nowrap"></Group>
+            <Group align="flex-start" gap={8} wrap="nowrap">
+              <ThemeIcon variant="light" size={26} radius="md" c="gray">
+                <IconEdit size={16} />
+              </ThemeIcon>
+              <Text size="sm">
+                Paste plain lyrics or foreign chord sheets, then tidy them into proper ChordPro. Some manual tweaks may
+                still be needed.
+              </Text>
+            </Group>
+            <Group align="flex-start" gap={8} wrap="nowrap">
+              <ThemeIcon variant="light" size={26} radius="md" c="gray">
+                <IconEye size={16} />
+              </ThemeIcon>
+              <Text size="sm">
+                Switch to Preview to see rendered chords above lyrics, adjust transpose & font size before saving.
+              </Text>
+            </Group>
+          </Stack>
           <Divider my="md" />
           <Box key="editor" hidden={displayMode != "editor"}>
             <SongEditor currentSong={false} />

@@ -2,7 +2,9 @@ import { ReactNode, createContext, useContext, useState } from "react";
 
 interface HeaderContextType {
   centerContent: ReactNode;
-  setCenterContent: (content: ReactNode) => void;
+  defaultCenterContent?: ReactNode;
+  setCenterContent: (content?: ReactNode) => void;
+  setDefaultCenterContent: (content?: ReactNode) => void;
   settingsContent: ReactNode[];
   setSettingsContent: (content: ReactNode[]) => void;
 }
@@ -19,13 +21,16 @@ export const useHeader = () => {
 
 export const HeaderProvider = ({ children }: { children: ReactNode }) => {
   const [centerContent, setCenterContent] = useState<ReactNode>(null);
+  const [defaultCenterContent, setDefaultCenterContent] = useState<ReactNode>(null);
   const [settingsContent, setSettingsContent] = useState<ReactNode[]>([]);
 
   return (
     <HeaderContext.Provider
       value={{
         centerContent,
+        defaultCenterContent,
         setCenterContent,
+        setDefaultCenterContent,
         settingsContent,
         setSettingsContent,
       }}

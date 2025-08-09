@@ -21,7 +21,7 @@ function Account() {
 
   const { setCenterContent } = useHeader();
   useEffect(() => {
-    setCenterContent("Account");
+    setCenterContent();
   }, []);
 
   if (!accessToken) {
@@ -32,7 +32,7 @@ function Account() {
     <Box m="md">
       {/* Header */}
       <Box ta="center" mb="xl">
-        <Title order={1} c="primary" mb="xs">
+        <Title order={2} c="primary" mb="xs">
           Account
         </Title>
         <Text c="dimmed">Manage your profile, sign-ins, and device data</Text>

@@ -1,5 +1,5 @@
 import { notifications } from "@mantine/notifications";
-import { ReactNode, createContext, useContext, useEffect, useState } from "react";
+import { ReactNode, createContext, useCallback, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 
 import { RoutesEnum } from "@src/Router";
@@ -72,16 +72,18 @@ export function SongContextProvider({ children }: { children: ReactNode }) {
 
   const navigate = useNavigate();
 
-  const loadStateFromLocalStorage = () => {
+  const loadStateFromLocalStorage = useCallback(() => {
     const savedState = localStorage.getItem("songState");
     if (savedState) {
       setSongState(JSON.parse(savedState));
     }
-  };
-  const saveStateToLocalStorage = () => {
+  }, []);
+  const saveStateToLocalStorage = useCallback(() => {
     localStorage.setItem("songState", JSON.stringify(songState));
-  };
+  }, [songState]);
+
   // Load state from localStorage if available
+  // On exit, save state to localStorage
   useEffect(() => {
     loadStateFromLocalStorage();
     return () => {

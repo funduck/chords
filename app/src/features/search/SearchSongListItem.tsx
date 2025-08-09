@@ -10,7 +10,7 @@ import { useSongContext } from "../song/SongContext";
 function SearchSongListItem({ entity }: { entity: SongInfoEntity }) {
   const { loadSong } = useSongContext();
 
-  let title = stringToTitleCase(entity.title);
+  const title = stringToTitleCase(entity.title);
 
   return (
     <Flex direction={"row"} align={"center"} gap={"sm"} pl="md">

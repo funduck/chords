@@ -95,12 +95,12 @@ export function AccountProvider({ children }: { children: ReactNode }) {
       .then(handleTokens)
       .then(() => {
         console.log("Logged in anonymously successfully");
-        notifications.show({
-          title: "Logged In",
-          message: "You have been logged in anonymously",
-          color: "green",
-          position: "top-right",
-        });
+        // notifications.show({
+        //   title: "Logged In",
+        //   message: "You have been logged in anonymously",
+        //   color: "green",
+        //   position: "top-right",
+        // });
       });
   };
 
@@ -183,12 +183,12 @@ export function AccountProvider({ children }: { children: ReactNode }) {
 
     console.log("Logged out successfully");
 
-    notifications.show({
-      title: "Logged Out",
-      message: "You have been logged out successfully",
-      color: "blue",
-      position: "top-right",
-    });
+    // notifications.show({
+    //   title: "Logged Out",
+    //   message: "You have been logged out successfully",
+    //   color: "blue",
+    //   position: "top-right",
+    // });
   };
 
   return (

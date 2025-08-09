@@ -1,10 +1,13 @@
 import { Button, Fieldset, Flex, Group, Modal, Space, Text, TextInput } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useSignal } from "@telegram-apps/sdk-react";
+import { useEffect, useState } from "react";
+import { useLocation } from "react-router";
 
+import { RoutesEnum } from "@src/Router";
 import { Signals } from "@src/services/signals-registry";
 
-import { TitleAbout } from "../about/About";
+import { BetaPanel, TitleAbout } from "../about/About";
 import { useAccountContext } from "./AccountContext";
 
 function Login() {
@@ -22,13 +25,25 @@ function Login() {
     },
   });
 
-  if (accessToken) {
+  const location = useLocation();
+  const [ignoreLogin, setPublic] = useState(true);
+
+  useEffect(() => {
+    if (location.pathname === RoutesEnum.About || location.pathname === "/") {
+      setPublic(true);
+    } else {
+      setPublic(false);
+    }
+  }, [location.pathname]);
+
+  if (accessToken || ignoreLogin) {
     return <></>;
   }
 
   return (
     <Modal opened={true} onClose={() => {}} withCloseButton={false}>
       <Flex direction="column" ta="center" mt="lg">
+        <BetaPanel />
         <TitleAbout />
       </Flex>
       <Space h="md" />

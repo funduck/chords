@@ -92,7 +92,7 @@ function AutoScrollManager({ viewportRef }: { viewportRef: React.RefObject<HTMLD
         clearInterval(_interval);
       };
     }
-  }, [viewportRef.current, enabled, interval, speed, isTouching]);
+  }, [viewportRef, enabled, interval, speed, isTouching]);
 
   // Emitting scroll events
   function onScrollPositionChange() {
@@ -143,7 +143,7 @@ function AutoScrollManager({ viewportRef }: { viewportRef: React.RefObject<HTMLD
         viewportRef.current.onscrollend = null;
       }
     };
-  }, [viewportRef.current]);
+  }, [viewportRef]);
 
   // Touch event listeners to disable auto-scroll during touch
   useEffect(() => {
@@ -177,7 +177,7 @@ function AutoScrollManager({ viewportRef }: { viewportRef: React.RefObject<HTMLD
       element.removeEventListener("touchend", handleTouchEnd);
       element.removeEventListener("touchcancel", handleTouchCancel);
     };
-  }, [viewportRef.current]);
+  }, [viewportRef]);
 
   // Applying scroll events
   useEffect(() => {
@@ -197,7 +197,7 @@ function AutoScrollManager({ viewportRef }: { viewportRef: React.RefObject<HTMLD
     allowScrollEvent.current = false;
 
     viewportRef.current.scrollTo({ top: scrollTop, behavior: "smooth" });
-  }, [viewportRef.current, songState.applyScrollPosition]);
+  }, [songState.applyScrollPosition, viewportRef]);
 
   return <></>;
 }

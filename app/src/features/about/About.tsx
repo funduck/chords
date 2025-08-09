@@ -13,7 +13,6 @@ import {
   Text,
   ThemeIcon,
   Title,
-  Tooltip,
 } from "@mantine/core";
 import {
   IconDeviceMobile,
@@ -25,34 +24,45 @@ import {
   IconSearch,
   IconUsersGroup,
 } from "@tabler/icons-react";
-import { useEffect } from "react";
 import { useNavigate } from "react-router";
 
 import { RoutesEnum } from "@src/Router";
-import { useHeader } from "@src/hooks/Header";
+
+export function Beta() {
+  return (
+    <Grid justify="center" align="center">
+      <Badge variant="light" size="md" radius="sm" mr="xs">
+        Beta
+      </Badge>
+      <Text size="sm">
+        Early build focused on simplicity & real‑time collaboration. Core features will stay free if it grows.
+      </Text>
+    </Grid>
+  );
+}
+
+export function BetaPanel() {
+  return (
+    <Group mb="md" align="center" justify="center">
+      <Card withBorder radius="md">
+        <Beta />
+      </Card>
+    </Group>
+  );
+}
 
 export function TitleAbout() {
   return (
     <Box ta="center" mb="xl">
-      <Group justify="center" gap="xs" mb="xs">
-        <Title order={1} c="primary" m={0}>
-          🎵 MyChords
-        </Title>
-        <Tooltip
-          withArrow
-          multiline
-          w={320}
-          label="Beta — a personal pet project focused on a lightweight, neat, clean experience. It may become commercial later, but most core features will remain free."
-        >
-          <Badge variant="light" color="gray" size="sm" radius="sm">
-            Beta
-          </Badge>
-        </Tooltip>
-      </Group>
-      <Title order={3} c="dimmed" fw={400} mb="lg">
-        Collaborative songbook for jam sessions
+      <Title order={1} c="primary" mb="xs">
+        🎵 MyChords
       </Title>
-      <Text size="lg" maw={600} mx="auto">
+
+      <Title order={2} c="dimmed" mb="xs">
+        Songbook for jam sessions
+      </Title>
+
+      <Text size="lg" maw={600} mx="auto" mb="xl">
         Share chord sheets and lyrics in real-time. Keep everyone in sync and hands free to play music.
       </Text>
     </Box>
@@ -78,42 +88,42 @@ function FeatureCard({ icon, title, description }: { icon: React.ReactNode; titl
 function Features() {
   return (
     <Grid mb="xl" mt="xl">
-      <Grid.Col span={{ base: 12, sm: 6, lg: 4 }}>
+      <Grid.Col key="1" span={{ base: 12, sm: 6, lg: 4 }}>
         <FeatureCard
           icon={<IconUsersGroup size={24} />}
           title="Real-time Sync"
           description="Share your screen with bandmates. Everyone sees the same song and scroll position automatically."
         />
       </Grid.Col>
-      <Grid.Col span={{ base: 12, sm: 6, lg: 4 }}>
+      <Grid.Col key="2" span={{ base: 12, sm: 6, lg: 4 }}>
         <FeatureCard
           icon={<IconPlayerPlayFilled size={24} />}
           title="Auto-scroll"
           description="Hands-free playing with adjustable auto-scroll speed. Perfect for performances and practice."
         />
       </Grid.Col>
-      <Grid.Col span={{ base: 12, sm: 6, lg: 4 }}>
+      <Grid.Col key="3" span={{ base: 12, sm: 6, lg: 4 }}>
         <FeatureCard
           icon={<IconEdit size={24} />}
           title="Smart Editor"
           description="Paste songs from Ultimate Guitar or any source. Auto-format to ChordPro with intelligent parsing."
         />
       </Grid.Col>
-      <Grid.Col span={{ base: 12, sm: 6, lg: 4 }}>
+      <Grid.Col key="4" span={{ base: 12, sm: 6, lg: 4 }}>
         <FeatureCard
           icon={<IconSearch size={24} />}
           title="Full-text Search"
           description="Find songs by title, artist, or even lyrics. Lightning-fast search through your entire library."
         />
       </Grid.Col>
-      <Grid.Col span={{ base: 12, sm: 6, lg: 4 }}>
+      <Grid.Col key="5" span={{ base: 12, sm: 6, lg: 4 }}>
         <FeatureCard
           icon={<IconMusic size={24} />}
           title="Chord Diagrams"
           description="Interactive chord diagrams with multiple fingering positions. Perfect for learning new songs."
         />
       </Grid.Col>
-      <Grid.Col span={{ base: 12, sm: 6, lg: 4 }}>
+      <Grid.Col key="6" span={{ base: 12, sm: 6, lg: 4 }}>
         <FeatureCard
           icon={<IconDeviceMobile size={24} />}
           title="Mobile Ready"
@@ -143,10 +153,10 @@ function QuickStartGuide() {
               Start Playing Now
             </Title>
             <List spacing="sm" size="sm" mb="md">
-              <List.Item>Create a new song with the editor</List.Item>
-              <List.Item>Paste lyrics with chords from any source</List.Item>
-              <List.Item>Use auto-format to convert to ChordPro</List.Item>
-              <List.Item>Preview and adjust as needed</List.Item>
+              <List.Item key="1">Create a new song with the editor</List.Item>
+              <List.Item key="2">Paste lyrics with chords from any source</List.Item>
+              <List.Item key="3">Use auto-format to convert to ChordPro</List.Item>
+              <List.Item key="4">Preview and adjust as needed</List.Item>
             </List>
             <Button
               fullWidth
@@ -166,10 +176,10 @@ function QuickStartGuide() {
               Jam with Friends
             </Title>
             <List spacing="sm" size="sm" mb="md">
-              <List.Item>Create or join a room</List.Item>
-              <List.Item>Share the room code or link</List.Item>
-              <List.Item>Pick a song from your library</List.Item>
-              <List.Item>Everyone sees the same content in sync</List.Item>
+              <List.Item key="1">Create or join a room</List.Item>
+              <List.Item key="2">Share the room code or link</List.Item>
+              <List.Item key="3">Pick a song from your library</List.Item>
+              <List.Item key="4">Everyone sees the same content in sync</List.Item>
             </List>
             <Button
               fullWidth
@@ -195,19 +205,19 @@ function FAQ() {
 
       <Space h="sm" />
       <Accordion variant="separated" radius="md">
-        <Accordion.Item value="sync">
+        <Accordion.Item value="sync" key="sync">
           <Accordion.Control>How do we sync our screens?</Accordion.Control>
           <Accordion.Panel>
             Create a room and share its link or code. Anyone who joins sees the same song and scroll position.
           </Accordion.Panel>
         </Accordion.Item>
-        <Accordion.Item value="paste">
+        <Accordion.Item value="paste" key="paste">
           <Accordion.Control>How do I add my song quickly?</Accordion.Control>
           <Accordion.Panel>
             Open the editor and paste text (plain or ChordPro). You can play right away—no need to save first.
           </Accordion.Panel>
         </Accordion.Item>
-        <Accordion.Item value="account">
+        <Accordion.Item value="account" key="account">
           <Accordion.Control>Do I need an account?</Accordion.Control>
           <Accordion.Panel>
             No. You can use anonymous login but on another device or browser you won't be able to access your songs.
@@ -221,33 +231,22 @@ function FAQ() {
 }
 
 function About() {
-  const { setCenterContent } = useHeader();
-  useEffect(() => {
-    setCenterContent("About");
-  }, []);
-
   return (
     <Box m="md">
       <TitleAbout />
-
       <Features />
-
       <Space h="xs" />
       <QuickStartGuide />
-
       <Space h="xs" />
       <FAQ />
-
       <Space h="xs" />
       <Divider my="xl" />
-
       <Text c="dimmed">
         Open source on <Anchor href="https://github.com/funduck/chords">GitHub</Anchor>
       </Text>
       <Text c="dimmed">
         Feel free to write me <Anchor href="mailto:qlfunduck@gmail.com">qlfunduck@gmail.com</Anchor>
       </Text>
-
       <Space h="xl" />
     </Box>
   );

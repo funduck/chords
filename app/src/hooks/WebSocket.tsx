@@ -6,12 +6,13 @@ import { Signals } from "@src/services/signals-registry";
 
 export const WebSocketContext = createContext<WebSocket | null>(null);
 
+const maxReconnectAttempts = 5;
+const reconnectInterval = 1000; // Start with 1 second
+
 export function WebSocketProvider({ children }: { children: ReactNode }) {
   const [ws, setWs] = useState<WebSocket | null>(null);
   const accessToken = useSignal(Signals.accessToken);
   const [reconnectAttempt, setReconnectAttempt] = useState(0);
-  const maxReconnectAttempts = 5;
-  const reconnectInterval = 1000; // Start with 1 second
 
   useEffect(() => {
     if (!accessToken) {

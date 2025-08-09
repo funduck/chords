@@ -39,9 +39,9 @@ function SearchArtists() {
   }
 
   return (
-    <>
+    <Box m="md">
       <Box ta="center" mb="lg">
-        <Title order={2} c="primary">
+        <Title order={2} c="primary" mb="xs">
           <IconUserSearch size={22} style={{ marginRight: 8, verticalAlign: "text-bottom" }} /> Search Artists
         </Title>
         <Text c="dimmed" size="sm">
@@ -77,7 +77,7 @@ function SearchArtists() {
           </Group>
         }
       />
-    </>
+    </Box>
   );
 }
 

@@ -24,7 +24,7 @@ const ChordsDB: {
 
 // Populate the chords map from the raw chords database
 // Map will be mush faster for lookups
-for (const [_, chords] of Object.entries(RawChordsDB.chords)) {
+for (const chords of Object.values(RawChordsDB.chords)) {
   for (const chord of chords) {
     if (!ChordsDB.chords.has(chord.key)) {
       ChordsDB.chords.set(chord.key, new Map());

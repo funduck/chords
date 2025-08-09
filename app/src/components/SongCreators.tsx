@@ -1,11 +1,19 @@
-import { Anchor, Group } from "@mantine/core";
+import { Anchor, Box, Group } from "@mantine/core";
 import { IconUsers } from "@tabler/icons-react";
 import { useNavigate } from "react-router";
 
 import { RoutesEnum } from "@src/Router";
 import { SongEntity } from "@src/hooks/Api";
 
-export default function SongCreators({ song, withIcon }: { song: SongEntity; withIcon?: boolean }) {
+export default function SongCreators({
+  song,
+  withIcon,
+  inGroup = true,
+}: {
+  song: SongEntity;
+  withIcon?: boolean;
+  inGroup?: boolean;
+}) {
   const navigate = useNavigate();
 
   const artistRefs =
@@ -37,6 +45,16 @@ export default function SongCreators({ song, withIcon }: { song: SongEntity; wit
         {a.name}
       </Anchor>
     )) || [];
+
+  if (!inGroup) {
+    return (
+      <Box>
+        {withIcon && <IconUsers size="24px" />}
+        {artistRefs.length > 0 && artistRefs}
+        {composerRefs.length > 0 && composerRefs}
+      </Box>
+    );
+  }
 
   return (
     <Group gap="xs" c="dimmed" ml="sm">

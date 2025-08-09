@@ -16,7 +16,7 @@ import { Route, Routes, useLocation, useNavigate } from "react-router";
 import Stack from "@components/Stack";
 
 import ThemeSwitch from "./components/ThemeSwitch";
-import About from "./features/about/About";
+import About, { Beta } from "./features/about/About";
 import Account from "./features/account/Account";
 import Confirm from "./features/account/Confirm";
 import Artist from "./features/artist/Artist";
@@ -90,8 +90,16 @@ function SettingsMenu() {
   );
 }
 
+function Index() {
+  const navigate = useNavigate();
+  useEffect(() => {
+    navigate(RoutesEnum.About);
+  }, [navigate]);
+  return <></>; // Empty component, just for redirect
+}
+
 function Router() {
-  const { centerContent } = useHeader();
+  const { centerContent, defaultCenterContent } = useHeader();
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -190,6 +198,12 @@ function Router() {
     }
   }, [isMobile]);
 
+  // Set default center content to Beta
+  const { setDefaultCenterContent } = useHeader();
+  useEffect(() => {
+    setDefaultCenterContent(<Beta />);
+  }, []);
+
   return (
     <AppShell
       header={{ height: 60 }}
@@ -207,7 +221,7 @@ function Router() {
           </Group>
 
           {/* Center content is optional */}
-          {centerContent && <Group>{centerContent}</Group>}
+          {(centerContent || defaultCenterContent) && <Group>{centerContent || defaultCenterContent}</Group>}
 
           {/* Settings menu on the right with also optional content, except theme switch */}
           <Group>
@@ -266,7 +280,7 @@ function Router() {
 
       <AppShell.Main id="appshellmain" style={{ display: "flex", flex: 1, flexDirection: "column" }}>
         <Routes>
-          <Route index element={<About />} />
+          <Route index element={<Index />} />
           <Route path="account" element={<Account />} />
           <Route path="artists/:artistId" element={<Artist />} />
           <Route path="confirm/:code" element={<Confirm />} />
