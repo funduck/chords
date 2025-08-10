@@ -1,4 +1,4 @@
-import { Button, Divider, Flex, Space, Text } from "@mantine/core";
+import { Box, Button, Divider, Flex, Space, Text } from "@mantine/core";
 import { useScrollIntoView } from "@mantine/hooks";
 import { ReactNode, useEffect } from "react";
 
@@ -43,6 +43,7 @@ interface SearchEntitiesProps<T, SP extends SearchParams> {
   searchMethod: (params: SearchMethodParams<SP>) => Promise<{ entities?: T[]; total?: number }>;
 
   beforeQueryInput?: React.ReactNode;
+  afterQueryInput?: React.ReactNode;
 
   // UI components
   ListItemComponent: React.ComponentType<any>;
@@ -75,6 +76,7 @@ function SearchEntities<T extends { id?: number; cursor?: string }, SP extends S
   useSearchContext,
   searchMethod,
   beforeQueryInput,
+  afterQueryInput,
   ListItemComponent,
   listItemProps,
   placeholder,
@@ -184,6 +186,8 @@ function SearchEntities<T extends { id?: number; cursor?: string }, SP extends S
           placeholder={placeholder}
         />
 
+        {afterQueryInput}
+
         <Button
           variant="outline"
           onClick={handleSearch}
@@ -207,10 +211,11 @@ function SearchEntities<T extends { id?: number; cursor?: string }, SP extends S
           ) : (
             <Stack>
               {searchState.entities.map((entity: T, index: number) => (
-                <>
-                  <ListItemComponent key={entity.id || index} {...listItemProps(entity)} />
+                <Box key={entity.id || `search-item-${index}`} w="100%">
+                  {/* Render each entity using the provided ListItemComponent */}
+                  <ListItemComponent {...listItemProps(entity)} />
                   <Divider />
-                </>
+                </Box>
               ))}
 
               {renderPagination ? (

@@ -1,4 +1,4 @@
-import { Box, Group, Switch, Text, Title } from "@mantine/core";
+import { Box, Group, Switch, Title } from "@mantine/core";
 import { IconMusicSearch } from "@tabler/icons-react";
 import { useCallback, useEffect, useState } from "react";
 
@@ -64,9 +64,6 @@ function SearchSongs({ artistId }: { artistId?: number }) {
         <Title order={2} c="primary" mb="xs">
           <IconMusicSearch size={22} style={{ marginRight: 8, verticalAlign: "text-bottom" }} /> Search Songs
         </Title>
-        <Text c="dimmed" size="sm">
-          Find songs by title or lyrics, in your library or public catalog.
-        </Text>
       </Box>
 
       <SearchResetArtist />
@@ -78,7 +75,7 @@ function SearchSongs({ artistId }: { artistId?: number }) {
         listItemProps={(entity) => ({ entity })}
         placeholder="Search Song by Title or Lyrics"
         entityName="songs"
-        beforeQueryInput={
+        afterQueryInput={
           <Box>
             {/* <Card padding="sm" radius="md" mb="md"> */}
             <Group gap="lg">

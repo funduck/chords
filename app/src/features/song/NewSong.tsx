@@ -58,17 +58,15 @@ function NewSong() {
                 <IconEdit size={16} />
               </ThemeIcon>
               <Text size="sm">
-                Paste plain lyrics or foreign chord sheets, then tidy them into proper ChordPro. Some manual tweaks may
-                still be needed.
+                Editor. Paste chordpro or foreign chord sheets, then format into ChordPro. Some manual tweaks may still
+                be needed.
               </Text>
             </Group>
             <Group align="flex-start" gap={8} wrap="nowrap">
               <ThemeIcon variant="light" size={26} radius="md" c="gray">
                 <IconEye size={16} />
               </ThemeIcon>
-              <Text size="sm">
-                Switch to Preview to see rendered chords above lyrics, adjust transpose & font size before saving.
-              </Text>
+              <Text size="sm">Switch to Preview.</Text>
             </Group>
           </Stack>
           <Divider my="md" />

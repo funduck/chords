@@ -1,4 +1,4 @@
-import { Box, Group, Switch, Text, Title } from "@mantine/core";
+import { Box, Group, Switch, Title } from "@mantine/core";
 import { IconUserSearch } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 
@@ -44,9 +44,6 @@ function SearchArtists() {
         <Title order={2} c="primary" mb="xs">
           <IconUserSearch size={22} style={{ marginRight: 8, verticalAlign: "text-bottom" }} /> Search Artists
         </Title>
-        <Text c="dimmed" size="sm">
-          Find artists quickly. Toggle to search your library or public catalog.
-        </Text>
       </Box>
 
       <SearchEntities
@@ -60,7 +57,7 @@ function SearchArtists() {
         listItemProps={(entity) => ({ entity })}
         placeholder="Search Artist by Name"
         entityName="artists"
-        beforeQueryInput={
+        afterQueryInput={
           <Group>
             <Switch
               ml="sm"

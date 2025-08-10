@@ -235,7 +235,7 @@ function Router() {
           {tabs
             .filter((g) => g.tabs.length)
             .map((group, index) => (
-              <Flex pl={0} ml={0} direction={"column"} key={group.groupText} gap={"lg"} m={0} p={0}>
+              <Flex pl={0} ml={0} direction={"column"} key={group.groupText || `group-${index}`} gap={"lg"} m={0} p={0}>
                 {index === 0 && <Space h="xs" />}
                 {index > 0 && <Divider my="xs" />}
                 {group.groupText && (

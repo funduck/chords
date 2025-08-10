@@ -1,5 +1,5 @@
-import { Box, Button, Card, CopyButton, Flex, Group, Text, TextInput, ThemeIcon, Title } from "@mantine/core";
-import { IconCopy, IconDoorExit, IconLogin2, IconPlus, IconShare3, IconUsersGroup } from "@tabler/icons-react";
+import { Box, Button, Card, CopyButton, Flex, Group, Text, TextInput, Title } from "@mantine/core";
+import { IconCopy, IconDoorExit, IconPlus, IconShare3, IconUsersGroup } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 
@@ -55,23 +55,14 @@ function Room() {
         <Flex direction={{ base: "column", sm: "row" }} gap="md" align="stretch">
           <Card withBorder radius="md" padding="lg" style={{ flex: 1 }}>
             <Group mb="sm">
-              <ThemeIcon size={40} radius="md" color="primary">
-                <IconPlus size={22} />
-              </ThemeIcon>
               <Title order={4}>Create Room</Title>
             </Group>
-            <Text size="sm" c="dimmed" mb="md">
-              Instantly start a synced session. Share the link or code that appears after creation.
-            </Text>
             <Button variant="filled" fullWidth onClick={() => createRoom()} leftSection={<IconPlus size={16} />}>
               Create
             </Button>
           </Card>
           <Card withBorder radius="md" padding="lg" style={{ flex: 1 }}>
             <Group mb="sm">
-              <ThemeIcon size={40} radius="md" color="primary">
-                <IconLogin2 size={22} />
-              </ThemeIcon>
               <Title order={4}>Join Room</Title>
             </Group>
             <Text size="sm" c="dimmed" mb="md">

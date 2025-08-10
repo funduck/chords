@@ -9,6 +9,7 @@ import {
   Grid,
   Group,
   List,
+  Modal, // added
   Space,
   Text,
   ThemeIcon,
@@ -24,20 +25,42 @@ import {
   IconSearch,
   IconUsersGroup,
 } from "@tabler/icons-react";
+import { useState } from "react";
 import { useNavigate } from "react-router";
 
 import { RoutesEnum } from "@src/Router";
 
 export function Beta() {
+  const [opened, setOpened] = useState(false);
   return (
-    <Grid justify="center" align="center">
-      <Badge variant="light" size="md" radius="sm" mr="xs">
+    <>
+      <Badge
+        variant="light"
+        size="md"
+        radius="sm"
+        mr="xs"
+        onClick={() => setOpened(true)}
+        style={{ cursor: "pointer" }}
+        role="button"
+        title="About this beta"
+      >
         Beta
       </Badge>
-      <Text size="sm">
-        Early build focused on simplicity & real‑time collaboration. Core features will stay free if it grows.
-      </Text>
-    </Grid>
+      <Modal opened={opened} onClose={() => setOpened(false)} title="Beta notice" centered size="lg">
+        <Text size="sm" mb="sm">
+          This is an early build focused on simplicity and real‑time collaboration.
+        </Text>
+        <Text size="sm" mb="sm">
+          Public library is not yet available, so you can only create and share songs with friends in a room.
+        </Text>
+        <Text size="sm" mb="sm">
+          Things may change quickly; features can shift or be refined. Feedback is very welcome—reach out any time.
+        </Text>
+        <Text size="xs" c="dimmed">
+          Core features will stay free if the project grows. Thanks for trying it out!
+        </Text>
+      </Modal>
+    </>
   );
 }
 
