@@ -3,6 +3,7 @@ import { IconKey, IconLogout, IconTrash, IconUserCircle } from "@tabler/icons-re
 import { useEffect } from "react";
 
 import ClearBrowser from "@src/components/ClearBrowser";
+import PageTop from "@src/components/PageTop";
 import { useAccountContext } from "@src/features/account/AccountContext";
 import { useUserApi } from "@src/hooks/Api";
 import { useHeader } from "@src/hooks/Header";
@@ -31,12 +32,7 @@ function Account() {
   return (
     <Box m="md">
       {/* Header */}
-      <Box ta="center" mb="xl">
-        <Title order={2} c="primary" mb="xs">
-          Account
-        </Title>
-        <Text c="dimmed">Manage your profile, sign-ins, and device data</Text>
-      </Box>
+      <PageTop title="Account" description="Manage your profile, sign-ins, and device data" titleMb="xs" />
 
       {/* Content */}
       <Grid>

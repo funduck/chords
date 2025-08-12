@@ -1,9 +1,10 @@
-import { Anchor, Box, Divider, Group, ScrollArea, Stack, Text, ThemeIcon, Title } from "@mantine/core";
-import { IconEdit, IconEye, IconMusicPlus } from "@tabler/icons-react";
+import { Anchor, Box, Divider, Group, ScrollArea, Stack, Text, ThemeIcon } from "@mantine/core";
+import { IconEdit, IconEye } from "@tabler/icons-react";
 import { useEffect, useRef } from "react";
 
 import ChordDisplayManager from "@src/components/ChordDisplayManager";
 import ChordProViewer from "@src/components/ChordProViewer";
+import PageTop from "@src/components/PageTop";
 
 import AutoScrollManager from "./AutoScroll";
 import { useSongContext } from "./SongContext";
@@ -39,18 +40,18 @@ function NewSong() {
             flexGrow: 1,
           }}
         >
-          <Box ta="center" mb="xl">
-            <Title order={2} c="primary" mb={4}>
-              <IconMusicPlus size={24} style={{ marginRight: 8, verticalAlign: "text-bottom" }} /> New Song
-            </Title>
-            <Text c="dimmed">
-              Create a new chord sheet in{" "}
-              <Anchor href="https://www.chordpro.org/chordpro/chordpro-introduction/" target="_blank">
-                ChordPro
-              </Anchor>{" "}
-              format.
-            </Text>
-          </Box>
+          <PageTop
+            title="New Song"
+            description={
+              <Text c="dimmed">
+                Create a new chord sheet in{" "}
+                <Anchor href="https://www.chordpro.org/chordpro/chordpro-introduction/" target="_blank">
+                  ChordPro
+                </Anchor>{" "}
+                format.
+              </Text>
+            }
+          />
           <Stack gap={6}>
             <Group gap="sm" wrap="nowrap"></Group>
             <Group align="flex-start" gap={8} wrap="nowrap">

@@ -1,10 +1,10 @@
-import { Box, Divider, ScrollArea, Text, Title } from "@mantine/core";
-import { IconMusic } from "@tabler/icons-react";
+import { Box, Divider, ScrollArea, Text } from "@mantine/core";
 import { useEffect, useRef } from "react";
 import { useParams } from "react-router";
 
 import ChordDisplayManager from "@src/components/ChordDisplayManager";
 import ChordProViewer from "@src/components/ChordProViewer";
+import PageTop from "@src/components/PageTop";
 import SongCreators from "@src/components/SongCreators";
 import { useSongsApi } from "@src/hooks/Api";
 import { useScrollPosition } from "@src/hooks/useScrollPosition";
@@ -50,19 +50,17 @@ function Song() {
             paddingTop: "5px",
           }}
         >
-          <Box ta="center" mb="xl">
-            <Title order={2} c="primary" mb={4}>
-              <IconMusic size={24} style={{ marginRight: 8, verticalAlign: "text-bottom" }} /> Play Song
-            </Title>
-            {song && (
-              <>
+          <PageTop
+            title="Play Song"
+            description={
+              song && (
                 <Text c="dimmed">
                   "{song.title}" by
                   <SongCreators song={song} inGroup={false} />
                 </Text>
-              </>
-            )}
-          </Box>
+              )
+            }
+          />
           <Divider my="md" />
           <Box key="song_editor" ml="sm" hidden={displayMode != "editor"}>
             <SongEditor currentSong={true} />

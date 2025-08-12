@@ -1,8 +1,9 @@
 import { Box, Button, Card, CopyButton, Flex, Group, Text, TextInput, Title } from "@mantine/core";
-import { IconCopy, IconDoorExit, IconPlus, IconShare3, IconUsersGroup } from "@tabler/icons-react";
+import { IconCopy, IconDoorExit, IconPlus, IconShare3 } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 
+import PageTop from "@src/components/PageTop";
 import { useRoomsApi } from "@src/hooks/Api";
 import { useHeader } from "@src/hooks/Header";
 import { useScrollPosition } from "@src/hooks/useScrollPosition";
@@ -43,14 +44,10 @@ function Room() {
   if (!room) {
     return (
       <Box m="md">
-        <Box ta="center" mb="xl">
-          <Title order={2} c="primary" mb={4}>
-            <IconUsersGroup size={24} style={{ marginRight: 8, verticalAlign: "text-bottom" }} /> Jam Room
-          </Title>
-          <Text size="sm" c="dimmed">
-            Create a room to sync scrolling & song changes with others, or join one with a 6‑char code.
-          </Text>
-        </Box>
+        <PageTop
+          title="Jam Room"
+          description="Create a room to sync scrolling & song changes with others, or join one with a 6‑char code."
+        />
 
         <Flex direction={{ base: "column", sm: "row" }} gap="md" align="stretch">
           <Card withBorder radius="md" padding="lg" style={{ flex: 1 }}>
@@ -92,14 +89,10 @@ function Room() {
 
   return (
     <Box m="md">
-      <Box ta="center" mb="xl">
-        <Title order={2} c="primary" mb={4}>
-          <IconUsersGroup size={24} style={{ marginRight: 8, verticalAlign: "text-bottom" }} /> Jam Room
-        </Title>
-        <Text size="sm" c="dimmed">
-          Share the link or code below. Anyone joining stays in sync with scroll & song changes.
-        </Text>
-      </Box>
+      <PageTop
+        title="Jam Room"
+        description="Share the link or code below. Anyone joining stays in sync with scroll & song changes."
+      />
 
       <Flex direction={{ base: "column", sm: "row" }} gap="md" align="stretch">
         <Button
