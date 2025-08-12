@@ -1,11 +1,13 @@
-import { Anchor, AppShell, Box, Burger, Button, Divider, Flex, Group, Menu, Space, Text, em } from "@mantine/core";
+import { Anchor, AppShell, Box, Burger, Button, Divider, Flex, Group, Menu, Space, Text, Tooltip, em } from "@mantine/core";
 import { useDisclosure, useMediaQuery } from "@mantine/hooks";
 import {
+  IconInfoCircle,
   IconMusic,
   IconMusicPlus,
   IconMusicSearch,
   IconSettings,
   IconSettingsFilled,
+  IconUser,
   IconUserSearch,
   IconUsersGroup,
 } from "@tabler/icons-react";
@@ -166,12 +168,14 @@ function Router() {
         {
           id: "account",
           text: "Account",
+          icon: <IconUser />,
           link: RoutesEnum.Account,
         },
 
         {
           id: "about",
           text: "About",
+          icon: <IconInfoCircle />,
           link: RoutesEnum.About,
         },
       ],
@@ -185,16 +189,21 @@ function Router() {
   };
 
   // On mobile we close the navbar when navigating
-  // On desktop we open the navbar by default
+  // On desktop we show minimized/expanded navbar by default
   const isMobile = useMediaQuery(`(max-width: ${em(750)})`);
 
-  const [navbarOpened, { toggle: toggleNavbar, open: openNavbar, close: closeNavbar }] = useDisclosure();
+  const [navbarExpanded, { toggle: toggleNavbar, close: minimizeNavbar }] = useDisclosure(
+    localStorage.getItem("navbarExpanded") === "true",
+  );
+
+  useEffect(() => {
+    // Save changes to local storage
+    localStorage.setItem("navbarExpanded", JSON.stringify(navbarExpanded));
+  }, [navbarExpanded]);
 
   useEffect(() => {
     if (isMobile) {
-      closeNavbar(); // Close navbar on mobile
-    } else {
-      openNavbar(); // Open navbar on desktop
+      minimizeNavbar(); // Minimize navbar on mobile
     }
   }, [isMobile]);
 
@@ -207,7 +216,11 @@ function Router() {
   return (
     <AppShell
       header={{ height: 60 }}
-      navbar={{ width: 280, breakpoint: "sm", collapsed: { mobile: !navbarOpened, desktop: !navbarOpened } }}
+      navbar={{
+        width: navbarExpanded ? 280 : 60,
+        breakpoint: "sm",
+        collapsed: { mobile: !navbarExpanded && isMobile, desktop: false },
+      }}
       transitionDuration={150}
       transitionTimingFunction="ease-in-out"
       p={isMobile ? "sm" : "md"}
@@ -217,7 +230,7 @@ function Router() {
         <Group justify="space-between" ta={"center"} align="center" style={{ height: "100%" }}>
           {/* Burger on the left */}
           <Group>
-            <Burger opened={navbarOpened} onClick={toggleNavbar} ml="xs" />
+            <Burger opened={navbarExpanded} onClick={toggleNavbar} ml="xs" />
           </Group>
 
           {/* Center content is optional */}
@@ -230,15 +243,23 @@ function Router() {
         </Group>
       </AppShell.Header>
 
-      <AppShell.Navbar p="sm" bg="navbar-bg">
-        <Stack gap="lg">
+      <AppShell.Navbar p={navbarExpanded ? "sm" : "xs"} bg="navbar-bg">
+        <Stack gap={navbarExpanded ? "lg" : "sm"}>
           {tabs
             .filter((g) => g.tabs.length)
             .map((group, index) => (
-              <Flex pl={0} ml={0} direction={"column"} key={group.groupText || `group-${index}`} gap={"lg"} m={0} p={0}>
+              <Flex
+                pl={0}
+                ml={0}
+                direction={"column"}
+                key={group.groupText || `group-${index}`}
+                gap={navbarExpanded ? "lg" : "sm"}
+                m={0}
+                p={0}
+              >
                 {index === 0 && <Space h="xs" />}
                 {index > 0 && <Divider my="xs" />}
-                {group.groupText && (
+                {group.groupText && navbarExpanded && (
                   <Text c="dimmed" size="md">
                     {group.groupText}
                   </Text>
@@ -246,30 +267,41 @@ function Router() {
                 {group.tabs
                   .filter((t) => !t.hidden)
                   .map(({ id, link, text, icon }) => (
-                    <Anchor
-                      variant="subtle"
-                      pl={0}
-                      ml={0}
+                    <Tooltip
                       key={id}
-                      id={id}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        navigate(link);
-                        setTimeout(() => {
-                          isMobile && toggleNavbar();
-                        }, 150);
-                      }}
-                      href={link}
-                      w={"100%"}
+                      label={text}
+                      position="right"
+                      disabled={navbarExpanded}
+                      withArrow
                     >
-                      <Button variant={isTabActive(link) ? "light" : "subtle"} pl={0} ml={0} w={"100%"} c="primary">
-                        <Group gap="sm" align="center">
-                          <Box w={20}>{isTabActive(link) && icon}</Box>
-                          <Text size="lg">{text}</Text>
-                          <Box w={20}></Box>
-                        </Group>
-                      </Button>
-                    </Anchor>
+                      <Anchor
+                        variant="subtle"
+                        pl={0}
+                        ml={0}
+                        id={id}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          navigate(link);
+                          setTimeout(() => {
+                            isMobile && toggleNavbar();
+                          }, 150);
+                        }}
+                        href={link}
+                        w={"100%"}
+                      >
+                        <Button variant={isTabActive(link) ? "light" : "subtle"} p={0} m={0} w={"100%"} c="primary">
+                          {navbarExpanded ? (
+                            <Group gap="sm" align="center">
+                              <Box w={20}>{icon}</Box>
+                              <Text size="lg">{text}</Text>
+                              <Box w={20}></Box>
+                            </Group>
+                          ) : (
+                            <Box w={24}>{icon}</Box>
+                          )}
+                        </Button>
+                      </Anchor>
+                    </Tooltip>
                   ))}
               </Flex>
             ))}
