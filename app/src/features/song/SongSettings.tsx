@@ -56,21 +56,30 @@ function SongDisplaySettings() {
   const displayMode = songState.displayOptions?.mode || "render";
 
   return (
-    <Button
-      variant="subtle"
-      disabled={!songState}
-      onClick={() =>
-        updateDisplayOptions({
-          mode: displayMode == "render" ? "editor" : "render",
-        })
-      }
-    >
-      {displayMode == "editor" ? (
+    <>
+      <Button
+        variant="subtle"
+        disabled={!songState || displayMode == "render"}
+        onClick={() =>
+          updateDisplayOptions({
+            mode: displayMode == "render" ? "editor" : "render",
+          })
+        }
+      >
         <IconEye color="var(--mantine-color-text)" />
-      ) : (
+      </Button>
+      <Button
+        variant="subtle"
+        disabled={!songState || displayMode == "editor"}
+        onClick={() =>
+          updateDisplayOptions({
+            mode: displayMode == "render" ? "editor" : "render",
+          })
+        }
+      >
         <IconEdit color="var(--mantine-color-text)" />
-      )}
-    </Button>
+      </Button>
+    </>
   );
 }
 

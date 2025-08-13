@@ -51,11 +51,11 @@ function Song() {
           }}
         >
           <PageTop
-            title="Play Song"
+            title={song?.title}
             description={
               song && (
                 <Text c="dimmed">
-                  "{song.title}" by
+                  by
                   <SongCreators song={song} inGroup={false} />
                 </Text>
               )

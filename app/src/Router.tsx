@@ -1,4 +1,18 @@
-import { Anchor, AppShell, Box, Burger, Button, Divider, Flex, Group, Menu, Space, Text, Tooltip, em } from "@mantine/core";
+import {
+  Anchor,
+  AppShell,
+  Box,
+  Burger,
+  Button,
+  Divider,
+  Flex,
+  Group,
+  Menu,
+  Space,
+  Text,
+  Tooltip,
+  em,
+} from "@mantine/core";
 import { useDisclosure, useMediaQuery } from "@mantine/hooks";
 import {
   IconInfoCircle,
@@ -213,16 +227,20 @@ function Router() {
     setDefaultCenterContent(<Beta />);
   }, []);
 
+  const navbarWidth = navbarExpanded ? 280 : 60;
+  const transitionDuration = 150;
+  const transitionTimingFunction = "ease-in-out";
+
   return (
     <AppShell
       header={{ height: 60 }}
       navbar={{
-        width: navbarExpanded ? 280 : 60,
+        width: navbarWidth,
         breakpoint: "sm",
         collapsed: { mobile: !navbarExpanded && isMobile, desktop: false },
       }}
-      transitionDuration={150}
-      transitionTimingFunction="ease-in-out"
+      transitionDuration={transitionDuration}
+      transitionTimingFunction={transitionTimingFunction}
       p={isMobile ? "sm" : "md"}
       style={{ display: "flex", flexDirection: "column", height: "100vh" }}
     >
@@ -234,7 +252,19 @@ function Router() {
           </Group>
 
           {/* Center content is optional */}
-          {(centerContent || defaultCenterContent) && <Group>{centerContent || defaultCenterContent}</Group>}
+          {(centerContent || defaultCenterContent) && (
+            <Group>
+              {!isMobile && (
+                <Box
+                  w={navbarWidth}
+                  p={0}
+                  m={0}
+                  style={{ transitionDuration: String(transitionDuration), transitionTimingFunction }}
+                />
+              )}
+              {centerContent || defaultCenterContent}
+            </Group>
+          )}
 
           {/* Settings menu on the right with also optional content, except theme switch */}
           <Group>
@@ -267,13 +297,7 @@ function Router() {
                 {group.tabs
                   .filter((t) => !t.hidden)
                   .map(({ id, link, text, icon }) => (
-                    <Tooltip
-                      key={id}
-                      label={text}
-                      position="right"
-                      disabled={navbarExpanded}
-                      withArrow
-                    >
+                    <Tooltip key={id} label={text} position="right" disabled={navbarExpanded} withArrow>
                       <Anchor
                         variant="subtle"
                         pl={0}
