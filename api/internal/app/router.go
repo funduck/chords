@@ -50,9 +50,9 @@ func NewHttpRouter(a *App) *chi.Mux {
 	})
 
 	r.Group(func(r chi.Router) {
+		r.Use(middleware.Logger)
 		r.Use(middleware.RequestID)
 		r.Use(middleware.RealIP)
-		r.Use(middleware.Logger)
 		r.Use(middleware.Recoverer)
 
 		r.Route("/api", func(r chi.Router) {
