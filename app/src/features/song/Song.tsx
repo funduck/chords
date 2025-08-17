@@ -12,7 +12,7 @@ import { useScrollPosition } from "@src/hooks/useScrollPosition";
 import AutoScrollManager from "./AutoScroll";
 import { useSongContext } from "./SongContext";
 import SongEditor from "./SongEditor";
-import SongSettings from "./SongSettings";
+import SongSettings, { SongDisplaySettings } from "./SongSettings";
 
 function Song() {
   const { songState, loadSong } = useSongContext();
@@ -61,6 +61,8 @@ function Song() {
               )
             }
           />
+          <Divider my="md" />
+          <SongDisplaySettings />
           <Divider my="md" />
           <Box key="song_editor" ml="sm" hidden={displayMode != "editor"}>
             <SongEditor currentSong={true} />

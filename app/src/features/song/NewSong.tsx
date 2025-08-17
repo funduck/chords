@@ -9,7 +9,7 @@ import PageTop from "@src/components/PageTop";
 import AutoScrollManager from "./AutoScroll";
 import { useSongContext } from "./SongContext";
 import SongEditor from "./SongEditor";
-import SongSettings from "./SongSettings";
+import SongSettings, { SongDisplaySettings } from "./SongSettings";
 
 function NewSong() {
   const { songState, updateDisplayOptions } = useSongContext();
@@ -52,24 +52,8 @@ function NewSong() {
               </Text>
             }
           />
-          <Stack gap={6}>
-            <Group gap="sm" wrap="nowrap"></Group>
-            <Group align="flex-start" gap={8} wrap="nowrap">
-              <ThemeIcon variant="light" size={26} radius="md" c="gray">
-                <IconEdit size={16} />
-              </ThemeIcon>
-              <Text size="sm">
-                Editor. Paste chordpro or foreign chord sheets, then format into ChordPro. Some manual tweaks may still
-                be needed.
-              </Text>
-            </Group>
-            <Group align="flex-start" gap={8} wrap="nowrap">
-              <ThemeIcon variant="light" size={26} radius="md" c="gray">
-                <IconEye size={16} />
-              </ThemeIcon>
-              <Text size="sm">Switch to Preview.</Text>
-            </Group>
-          </Stack>
+          <Divider my="md" />
+          <SongDisplaySettings />
           <Divider my="md" />
           <Box key="editor" hidden={displayMode != "editor"}>
             <SongEditor currentSong={false} />
