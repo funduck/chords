@@ -10,7 +10,6 @@ import { Signals } from "@src/services/signals-registry";
 
 import NewSongForm from "./NewSongForm";
 import { useSongContext } from "./SongContext";
-import { SongDisplaySettings } from "./SongSettings";
 
 function SongEditor({ currentSong }: { currentSong?: boolean }) {
   const userId = useSignal(Signals.userId);

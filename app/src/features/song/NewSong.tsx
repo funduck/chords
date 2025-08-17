@@ -1,5 +1,4 @@
-import { Anchor, Box, Divider, Group, ScrollArea, Stack, Text, ThemeIcon } from "@mantine/core";
-import { IconEdit, IconEye } from "@tabler/icons-react";
+import { Anchor, Box, Divider, ScrollArea, Text } from "@mantine/core";
 import { useEffect, useRef } from "react";
 
 import ChordDisplayManager from "@src/components/ChordDisplayManager";
