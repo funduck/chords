@@ -1,9 +1,11 @@
 import { Anchor, Box, Divider, ScrollArea, Text } from "@mantine/core";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import ChordDisplayManager from "@src/components/ChordDisplayManager";
 import ChordProViewer from "@src/components/ChordProViewer";
 import PageTop from "@src/components/PageTop";
+import { ChordProService } from "@src/services/chordpro/chordpro";
+import { getSongArtist } from "@src/utils/song";
 
 import AutoScrollManager from "./AutoScroll";
 import { useSongContext } from "./SongContext";
@@ -19,10 +21,18 @@ function NewSong() {
 
   const songViewportRef = useRef<HTMLDivElement>(null);
 
+  const [songTitle, setSongTitle] = useState<{ title: string; artist: string | null } | null>(null);
   useEffect(() => {
     if (!sheet || sheet.length === 0) {
       updateDisplayOptions({ mode: "editor" });
     }
+
+    const song = ChordProService.sheetToSong(sheet, {});
+    if (!song) return;
+    setSongTitle({
+      title: song.title || "",
+      artist: (getSongArtist(song) || []).join(", ") || "",
+    });
   }, [sheet]);
 
   return (
@@ -40,14 +50,23 @@ function NewSong() {
           }}
         >
           <PageTop
-            title="New Song"
+            title={songTitle ? `Draft` : "New Song"}
             description={
-              <Text c="dimmed">
-                Create a new chord sheet in{" "}
-                <Anchor href="https://www.chordpro.org/chordpro/chordpro-introduction/" target="_blank">
-                  ChordPro
-                </Anchor>{" "}
-                format.
+              <Text c="dimmed" component="span">
+                {songTitle ? (
+                  <>
+                    {songTitle.title || <Text c="orange">no title</Text>} by{" "}
+                    {songTitle.artist || <Text c="orange">no artist</Text>}
+                  </>
+                ) : (
+                  <>
+                    Create a new chord sheet in{" "}
+                    <Anchor href="https://www.chordpro.org/chordpro/chordpro-introduction/" target="_blank">
+                      ChordPro
+                    </Anchor>{" "}
+                    format.
+                  </>
+                )}
               </Text>
             }
           />
