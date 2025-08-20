@@ -1,4 +1,4 @@
-import { Anchor, Box, Grid, ScrollArea, Space, Text } from "@mantine/core";
+import { Anchor, Box, Flex, ScrollArea, Space, Text } from "@mantine/core";
 import { useEffect, useRef, useState } from "react";
 
 import ChordDisplayManager from "@src/components/ChordDisplayManager";
@@ -40,7 +40,7 @@ function NewSong() {
       <AutoScrollManager viewportRef={songViewportRef} />
       <ChordDisplayManager />
       <SongSettings />
-      <Box id="songbox" style={{ display: "flex", flex: 1, flexDirection: "column", height: "100%" }} mt="md">
+      <Box id="songbox" style={{ display: "flex", flex: 1, flexDirection: "column", height: "100%" }}>
         <ScrollArea
           viewportRef={songViewportRef}
           type="always"
@@ -49,34 +49,30 @@ function NewSong() {
             flexGrow: 1,
           }}
         >
-          <Grid>
-            <Grid.Col span={{ base: 12, lg: 12 }}>
-              <PageTop
-                title={songTitle ? `Draft` : "New Song"}
-                description={
-                  <Text c="dimmed" component="span">
-                    {songTitle ? (
-                      <>
-                        {songTitle.title || <Text c="orange">no title</Text>}
-                        {songTitle.artist || <Text c="orange">no artist</Text>}
-                      </>
-                    ) : (
-                      <>
-                        Create a new chord sheet in{" "}
-                        <Anchor href="https://www.chordpro.org/chordpro/chordpro-introduction/" target="_blank">
-                          ChordPro
-                        </Anchor>{" "}
-                        format.
-                      </>
-                    )}
-                  </Text>
-                }
-              />
-            </Grid.Col>
-            <Grid.Col span={{ base: 12, lg: 12 }}>
-              <SongDisplaySettings />
-            </Grid.Col>
-          </Grid>
+          <Flex direction={"column"} align={"start"} justify={"space-between"} gap="xl" mt="xl">
+            <PageTop
+              title={songTitle ? `Draft` : "New Song"}
+              description={
+                <Text c="dimmed" component="span">
+                  {songTitle ? (
+                    <>
+                      {songTitle.title || <Text c="orange">no title</Text>}
+                      {songTitle.artist || <Text c="orange">no artist</Text>}
+                    </>
+                  ) : (
+                    <>
+                      Create a new chord sheet in{" "}
+                      <Anchor href="https://www.chordpro.org/chordpro/chordpro-introduction/" target="_blank">
+                        ChordPro
+                      </Anchor>{" "}
+                      format.
+                    </>
+                  )}
+                </Text>
+              }
+            />
+            <SongDisplaySettings />
+          </Flex>
           <Space h="xl" />
           <Box key="song_editor" hidden={displayMode != "editor"}>
             <SongEditor currentSong={false} />

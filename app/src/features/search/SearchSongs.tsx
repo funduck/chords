@@ -1,9 +1,9 @@
-import { Box, Group, Switch, Title } from "@mantine/core";
-import { IconMusicSearch } from "@tabler/icons-react";
+import { Box, Group, Switch } from "@mantine/core";
 import { useCallback, useEffect, useState } from "react";
 
 import { SearchSongsRequest } from "@generated/api";
 
+import PageTop from "@src/components/PageTop";
 import { useSongsApi } from "@src/hooks/Api";
 import { useScrollPosition } from "@src/hooks/useScrollPosition";
 
@@ -59,12 +59,8 @@ function SearchSongs({ artistId }: { artistId?: number }) {
   }
 
   return (
-    <Box m="md">
-      <Box ta="center" mb="lg">
-        <Title order={2} c="primary" mb="xs">
-          <IconMusicSearch size={22} style={{ marginRight: 8, verticalAlign: "text-bottom" }} /> Search Songs
-        </Title>
-      </Box>
+    <Box mt="xl">
+      <PageTop title="Search Songs" />
 
       <SearchResetArtist />
 

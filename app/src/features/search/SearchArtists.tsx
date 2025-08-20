@@ -1,7 +1,7 @@
-import { Box, Group, Switch, Title } from "@mantine/core";
-import { IconUserSearch } from "@tabler/icons-react";
+import { Box, Group, Switch } from "@mantine/core";
 import { useEffect, useState } from "react";
 
+import PageTop from "@src/components/PageTop";
 import { useArtistsApi } from "@src/hooks/Api";
 import { useScrollPosition } from "@src/hooks/useScrollPosition";
 
@@ -39,12 +39,8 @@ function SearchArtists() {
   }
 
   return (
-    <Box m="md">
-      <Box ta="center" mb="lg">
-        <Title order={2} c="primary" mb="xs">
-          <IconUserSearch size={22} style={{ marginRight: 8, verticalAlign: "text-bottom" }} /> Search Artists
-        </Title>
-      </Box>
+    <Box mt="xl">
+      <PageTop title="Search Artists" />
 
       <SearchEntities
         useSearchContext={useSearchArtistsContext}

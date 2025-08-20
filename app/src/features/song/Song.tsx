@@ -7,7 +7,6 @@ import ChordProViewer from "@src/components/ChordProViewer";
 import PageTop from "@src/components/PageTop";
 import SongCreators from "@src/components/SongCreators";
 import { useSongsApi } from "@src/hooks/Api";
-import { useIsMobile } from "@src/hooks/isMobile";
 import { useScrollPosition } from "@src/hooks/useScrollPosition";
 
 import AutoScrollManager from "./AutoScroll";
@@ -36,29 +35,21 @@ function Song() {
 
   useScrollPosition();
 
-  const isMobile = useIsMobile();
-
   return (
     <>
       <AutoScrollManager viewportRef={songViewportRef} />
       <ChordDisplayManager />
       <SongSettings />
-      <Box id="songbox" style={{ display: "flex", flex: 1, flexDirection: "column", height: "100%" }} mt="md">
+      <Box id="songbox" style={{ display: "flex", flex: 1, flexDirection: "column", height: "100%" }}>
         <ScrollArea
           viewportRef={songViewportRef}
           type="always"
           style={{
             display: "flex",
             flexGrow: 1,
-            paddingTop: "5px",
           }}
         >
-          <Flex
-            direction={isMobile ? "column" : "column"}
-            align={isMobile ? "start" : "start"}
-            justify={"space-between"}
-            gap="xl"
-          >
+          <Flex direction={"column"} align={"start"} justify={"space-between"} gap="xl" mt="xl">
             <PageTop
               title={song?.title}
               description={

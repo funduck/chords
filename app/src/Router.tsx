@@ -226,7 +226,6 @@ function Router() {
       }}
       transitionDuration={transitionDuration}
       transitionTimingFunction={transitionTimingFunction}
-      pt={isMobile ? "sm" : "md"}
       pl={isMobile ? "sm" : "xl"}
       pr={isMobile ? "sm" : "xl"}
       style={{ display: "flex", flexDirection: "column", height: "100vh" }}

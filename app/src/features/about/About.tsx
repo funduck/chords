@@ -255,7 +255,7 @@ function FAQ() {
 
 function About() {
   return (
-    <Box m="md">
+    <Box mt="xl">
       <TitleAbout />
       <Features />
       <Space h="xs" />

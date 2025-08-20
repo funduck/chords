@@ -30,9 +30,9 @@ function Account() {
   }
 
   return (
-    <Box m="md">
+    <Box mt="xl">
       {/* Header */}
-      <PageTop title="Account" description="Manage your profile, sign-ins, and device data" titleMb="xs" />
+      <PageTop title="Account" />
 
       {/* Content */}
       <Grid>

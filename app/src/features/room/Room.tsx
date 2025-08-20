@@ -43,7 +43,7 @@ function Room() {
 
   if (!room) {
     return (
-      <Box m="md">
+      <Box mt="xl">
         <PageTop
           title="Jam Room"
           description="Create a room to sync scrolling & song changes with others, or join one with a 6‑char code."
