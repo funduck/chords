@@ -96,7 +96,7 @@ function FeatureCard({ icon, title, description }: { icon: React.ReactNode; titl
   return (
     <Card shadow="sm" padding="lg" radius="md" withBorder>
       <Group mb="md" align="flex-start">
-        <ThemeIcon size={40} radius="md" color="primary">
+        <ThemeIcon size={40} radius="md" color="var(--mantine-color-dimmed)">
           {icon}
         </ThemeIcon>
         <Title order={4}>{title}</Title>

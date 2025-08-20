@@ -234,8 +234,8 @@ function Router() {
       <AppShell.Header bg="header-bg">
         <Group justify="space-between" ta={"center"} align="center" style={{ height: "100%" }}>
           {/* Burger on the left */}
-          <Group>
-            <Burger opened={navbarExpanded} onClick={toggleNavbar} ml="xs" />
+          <Group ml={2}>
+            <Burger color="dimmed" opened={navbarExpanded} onClick={toggleNavbar} ml="xs" />
           </Group>
 
           {/* Center content is optional */}
