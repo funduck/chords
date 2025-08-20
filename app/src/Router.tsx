@@ -1,19 +1,5 @@
-import {
-  Anchor,
-  AppShell,
-  Box,
-  Burger,
-  Button,
-  Divider,
-  Flex,
-  Group,
-  Menu,
-  Space,
-  Text,
-  Tooltip,
-  em,
-} from "@mantine/core";
-import { useDisclosure, useMediaQuery } from "@mantine/hooks";
+import { Anchor, AppShell, Box, Burger, Button, Flex, Group, Menu, Space, Text, Tooltip } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
 import {
   IconInfoCircle,
   IconMusic,
@@ -42,6 +28,7 @@ import NewSong from "./features/song/NewSong";
 import Song from "./features/song/Song";
 import { useSongContext } from "./features/song/SongContext";
 import { useHeader } from "./hooks/Header";
+import { useIsMobile } from "./hooks/isMobile";
 import { Signals } from "./services/signals-registry";
 
 class RoutesEnum {
@@ -89,18 +76,16 @@ function SettingsMenu() {
       <Menu.Dropdown>
         {/* Here we inject custom menu items */}
         {settingsContent.map((item, index) => (
-          <Menu.Item component="div" key={index}>
+          <Box m="md" key={index}>
             {item}
-          </Menu.Item>
+          </Box>
         ))}
 
         {settingsContent.length > 0 && <Menu.Divider />}
-        {/* Theme switch is always in menu */}
-        <Menu.Item component="div" key="theme-switch">
-          <Flex align={"center"} ta={"center"} justify={"center"}>
-            <ThemeSwitch />
-          </Flex>
-        </Menu.Item>
+
+        <Box>
+          <ThemeSwitch />
+        </Box>
       </Menu.Dropdown>
     </Menu>
   );
@@ -204,7 +189,7 @@ function Router() {
 
   // On mobile we close the navbar when navigating
   // On desktop we show minimized/expanded navbar by default
-  const isMobile = useMediaQuery(`(max-width: ${em(750)})`);
+  const isMobile = useIsMobile();
 
   const [navbarExpanded, { toggle: toggleNavbar, close: minimizeNavbar }] = useDisclosure(
     localStorage.getItem("navbarExpanded") === "true",
@@ -241,7 +226,9 @@ function Router() {
       }}
       transitionDuration={transitionDuration}
       transitionTimingFunction={transitionTimingFunction}
-      p={isMobile ? "sm" : "md"}
+      pt={isMobile ? "sm" : "md"}
+      pl={isMobile ? "sm" : "xl"}
+      pr={isMobile ? "sm" : "xl"}
       style={{ display: "flex", flexDirection: "column", height: "100vh" }}
     >
       <AppShell.Header bg="header-bg">
@@ -254,14 +241,15 @@ function Router() {
           {/* Center content is optional */}
           {(centerContent || defaultCenterContent) && (
             <Group>
-              {!isMobile && (
+              {/* Optional box to move header center when navbar opens */}
+              {/* {!isMobile && (
                 <Box
                   w={navbarWidth}
                   p={0}
                   m={0}
                   style={{ transitionDuration: String(transitionDuration), transitionTimingFunction }}
                 />
-              )}
+              )} */}
               {centerContent || defaultCenterContent}
             </Group>
           )}
@@ -273,22 +261,14 @@ function Router() {
         </Group>
       </AppShell.Header>
 
-      <AppShell.Navbar p={navbarExpanded ? "sm" : "xs"} bg="navbar-bg">
-        <Stack gap={navbarExpanded ? "lg" : "sm"}>
+      <AppShell.Navbar bg="navbar-bg">
+        <Stack gap="md">
           {tabs
             .filter((g) => g.tabs.length)
             .map((group, index) => (
-              <Flex
-                pl={0}
-                ml={0}
-                direction={"column"}
-                key={group.groupText || `group-${index}`}
-                gap={navbarExpanded ? "lg" : "sm"}
-                m={0}
-                p={0}
-              >
+              <Flex pl={0} ml={0} direction={"column"} key={group.groupText || `group-${index}`} gap="lg" m={0} p={0}>
                 {index === 0 && <Space h="xs" />}
-                {index > 0 && <Divider my="xs" />}
+                {/* {index > 0 && <Space my="xs" />} */}
                 {group.groupText && navbarExpanded && (
                   <Text c="dimmed" size="md">
                     {group.groupText}
@@ -316,12 +296,16 @@ function Router() {
                         <Button variant={isTabActive(link) ? "light" : "subtle"} p={0} m={0} w={"100%"} c="primary">
                           {navbarExpanded ? (
                             <Group gap="sm" align="center">
-                              <Box w={20}>{icon}</Box>
+                              <Box w={20} c="dimmed">
+                                {icon}
+                              </Box>
                               <Text size="lg">{text}</Text>
                               <Box w={20}></Box>
                             </Group>
                           ) : (
-                            <Box w={24}>{icon}</Box>
+                            <Box w={24} c="dimmed">
+                              {icon}
+                            </Box>
                           )}
                         </Button>
                       </Anchor>

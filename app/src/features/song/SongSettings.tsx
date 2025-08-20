@@ -1,11 +1,18 @@
-import { Box, Button, Flex, Group, Stack, Text } from "@mantine/core";
-import { IconEdit, IconEye, IconMinus, IconPlayerPlayFilled, IconPlus } from "@tabler/icons-react";
+import { Button, Flex, Group, RingProgress, Select, Text } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
+import {
+  IconEdit,
+  IconEye,
+  IconMinus,
+  IconPlayerPlayFilled,
+  IconPlayerStopFilled,
+  IconPlus,
+} from "@tabler/icons-react";
 import { useEffect } from "react";
 
 import { Config } from "@src/config";
 import { useHeader } from "@src/hooks/Header";
-
-import Slider from "@components/Slider";
+import { useIsMobile } from "@src/hooks/isMobile";
 
 import { useSongContext } from "./SongContext";
 
@@ -25,48 +32,50 @@ function AutoScrollPlayStopSettings() {
   }
 
   return (
-    <>
+    <Group>
       {enabled && (
-        <Button c="primary" variant="subtle" onClick={() => updateAutoScrollOptions({ speed: round5(speed - 5) })}>
+        <Button
+          p={0}
+          c="primary"
+          variant="subtle"
+          onClick={() => updateAutoScrollOptions({ speed: round5(speed - 10) })}
+        >
           <IconMinus />
         </Button>
       )}
-      <Button variant="subtle" disabled={!songState} onClick={() => setAutoScroll(!enabled)}>
-        {enabled ? (
-          <Box c="primary" w={30} ta="center" style={enabled ? { borderRadius: "8px", border: "3px solid" } : {}}>
-            <Text c="dimmed">{speed}</Text>
-          </Box>
-        ) : (
+      {enabled ? (
+        <RingProgress
+          size={50}
+          thickness={2}
+          sections={[
+            {
+              value: speed,
+              color: "primary",
+            },
+          ]}
+          label={
+            <Button p={0} variant="subtle" disabled={!songState} onClick={() => setAutoScroll(false)}>
+              <IconPlayerStopFilled color="var(--mantine-color-text)" />
+            </Button>
+          }
+        />
+      ) : null}
+      {!enabled && (
+        <Button variant="subtle" disabled={!songState} onClick={() => setAutoScroll(true)}>
           <IconPlayerPlayFilled color="var(--mantine-color-text)" />
-        )}
-      </Button>
+        </Button>
+      )}
       {enabled && (
-        <Button c="primary" variant="subtle" onClick={() => updateAutoScrollOptions({ speed: round5(speed + 5) })}>
+        <Button
+          p={0}
+          c="primary"
+          variant="subtle"
+          onClick={() => updateAutoScrollOptions({ speed: round5(speed + 10) })}
+        >
           <IconPlus />
         </Button>
       )}
-    </>
-  );
-}
-
-function AutoScrollSpeedSettings() {
-  const { songState, updateAutoScrollOptions } = useSongContext();
-  const speed = songState.autoScrollOptions?.speed ?? Config.AutoScrollSpeed;
-
-  return (
-    <Slider
-      label={`Auto scroll speed ${speed}`}
-      min={1}
-      disabled={!songState.autoScrollOptions}
-      onChange={(e) => {
-        const speed = e;
-        updateAutoScrollOptions({
-          speed,
-          interval: Config.AutoScrollInterval,
-        });
-      }}
-      value={speed}
-    />
+    </Group>
   );
 }
 
@@ -74,59 +83,57 @@ export function SongDisplaySettings() {
   const { songState, updateDisplayOptions } = useSongContext();
   const displayMode = songState.displayOptions?.mode || "render";
 
-  const previewActive = songState && displayMode == "render";
-  const editActive = songState && displayMode == "editor";
+  const [dropdownOpened, { toggle }] = useDisclosure();
 
-  return (
-    <Stack>
-      <Group align="center" wrap="nowrap">
-        <Box>
-          <Button
-            w={60}
-            m={0}
-            p={0}
-            variant="subtle"
-            disabled={previewActive}
-            onClick={() =>
-              updateDisplayOptions({
-                mode: displayMode == "render" ? "editor" : "render",
-              })
-            }
-          >
-            <IconEye size={24} color={previewActive ? "var(--mantine-color-text)" : "var(--mantine-color-dimmed)"} />
-          </Button>
-        </Box>
-        <Box>
-          <Text size="sm" c={previewActive ? "primary" : "dimmed"}>
-            Preview mode. Song is rendered with chords and formatting applied.
-          </Text>
-        </Box>
-      </Group>
-      <Group align="center" wrap="nowrap">
-        <Box>
-          <Button
-            w={60}
-            m={0}
-            p={0}
-            variant="subtle"
-            disabled={editActive}
-            onClick={() =>
-              updateDisplayOptions({
-                mode: displayMode == "render" ? "editor" : "render",
-              })
-            }
-          >
-            <IconEdit size={24} color={editActive ? "var(--mantine-color-text)" : "var(--mantine-color-dimmed)"} />
-          </Button>
-        </Box>
-        <Box>
-          <Text size="sm" c={editActive ? "primary" : "dimmed"}>
-            Editor mode. Paste chordpro or foreign chord sheets, then format into ChordPro. Some manual tweaks may still
-            be needed.
-          </Text>
-        </Box>
-      </Group>
-    </Stack>
+  const isMobile = useIsMobile();
+
+  const switchBtn =
+    displayMode == "editor" ? (
+      <Button p={0} variant="transparent" c="primary" onClick={() => updateDisplayOptions({ mode: "render" })}>
+        <IconEye />
+      </Button>
+    ) : (
+      <Button p={0} variant="transparent" c="primary" onClick={() => updateDisplayOptions({ mode: "editor" })}>
+        <IconEdit />
+      </Button>
+    );
+  const selectBtn = (
+    <Select
+      value={displayMode}
+      onChange={(value) => {
+        updateDisplayOptions({
+          mode: value as "render" | "editor",
+        });
+        toggle();
+      }}
+      data={[
+        {
+          value: "render",
+          label: !dropdownOpened ? "Preview" : "Preview mode.Song is rendered with chords and formatting applied",
+        },
+        {
+          value: "editor",
+          label: !dropdownOpened
+            ? "Editor"
+            : "Editor mode. Paste ChordPro or foreign chord sheets and format to ChordPro. Some manual tweaks may still be needed.",
+        },
+      ]}
+      onClick={toggle}
+      dropdownOpened={dropdownOpened}
+      withScrollArea={false}
+    />
+  );
+
+  return isMobile ? (
+    <Group>
+      {selectBtn}
+      {switchBtn}
+    </Group>
+  ) : (
+    <Group>
+      {selectBtn}
+      {switchBtn}
+    </Group>
   );
 }
 
@@ -136,32 +143,44 @@ function SongKeySettings() {
   const fontSize = songState.displayOptions?.fontSize || 16;
 
   return (
-    <Box>
-      <Flex direction="row" m={"xs"} ta={"center"} align="center">
-        <Text>Transpose</Text>
-        <Button variant="subtle" onClick={() => updateDisplayOptions({ transpose: transpose - 1 })}>
-          <IconMinus />
-        </Button>
-        <Text>
-          <b>{transpose}</b>
-        </Text>
-        <Button variant="subtle" onClick={() => updateDisplayOptions({ transpose: transpose + 1 })}>
-          <IconPlus />
-        </Button>
-      </Flex>
-      <Flex direction="row" m={"xs"} ta={"center"} align="center">
-        <Text>Font size</Text>
-        <Button variant="subtle" onClick={() => updateDisplayOptions({ fontSize: fontSize - 1 })}>
-          <IconMinus />
-        </Button>
-        <Text>
-          <b>{fontSize}</b>
-        </Text>
-        <Button variant="subtle" onClick={() => updateDisplayOptions({ fontSize: fontSize + 1 })}>
-          <IconPlus />
-        </Button>
-      </Flex>
-    </Box>
+    <table>
+      <tr>
+        <td>
+          <Text mr="sm">Transpose</Text>
+        </td>
+        <td>
+          <Group>
+            <Button p={0} variant="subtle" onClick={() => updateDisplayOptions({ transpose: transpose - 1 })}>
+              <IconMinus />
+            </Button>
+            <Text w={10}>
+              <b>{transpose}</b>
+            </Text>
+            <Button p={0} variant="subtle" onClick={() => updateDisplayOptions({ transpose: transpose + 1 })}>
+              <IconPlus />
+            </Button>
+          </Group>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <Text mr="sm">Font size</Text>
+        </td>
+        <td>
+          <Group>
+            <Button p={0} variant="subtle" onClick={() => updateDisplayOptions({ fontSize: fontSize - 1 })}>
+              <IconMinus />
+            </Button>
+            <Text w={10}>
+              <b>{fontSize}</b>
+            </Text>
+            <Button p={0} variant="subtle" onClick={() => updateDisplayOptions({ fontSize: fontSize + 1 })}>
+              <IconPlus />
+            </Button>
+          </Group>
+        </td>
+      </tr>
+    </table>
   );
 }
 
@@ -173,11 +192,10 @@ function SongSettings() {
     setCenterContent(
       <Flex direction="row" ta={"center"} align="center">
         <AutoScrollPlayStopSettings />
-        {/* <SongDisplaySettings /> */}
       </Flex>,
     );
 
-    setSettingsContent([<AutoScrollSpeedSettings />, <SongKeySettings />]);
+    setSettingsContent([<SongKeySettings />]);
 
     // Clean up when component unmounts
     return () => {

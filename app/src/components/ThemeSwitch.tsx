@@ -1,4 +1,4 @@
-import { Box, MantineColorScheme, useMantineColorScheme } from "@mantine/core";
+import { Button, MantineColorScheme, useMantineColorScheme } from "@mantine/core";
 import { IconMoon, IconSun } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 
@@ -21,13 +21,13 @@ function ThemeSwitch() {
   };
 
   return (
-    <Box ta="center" variant="subtle" w={"100%"} onClick={toggleTheme} mt="4px">
+    <Button ta="center" variant="subtle" w={"100%"} onClick={toggleTheme} mt="4px">
       {theme === "light" ? (
         <IconMoon color="var(--mantine-color-text)" />
       ) : (
         <IconSun color="var(--mantine-color-text)" />
       )}
-    </Box>
+    </Button>
   );
 }
 

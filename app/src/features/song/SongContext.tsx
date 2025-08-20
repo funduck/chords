@@ -194,12 +194,12 @@ export function SongContextProvider({ children }: { children: ReactNode }) {
       params.song.lyrics = ChordProService.extractLyrics(params.song.sheet || "");
     }
     return songsApi.createSong(params).then((createdSong) => {
-      notifications.show({
-        title: "Song Created",
-        message: `Song "${createdSong.title}" has been successfully created`,
-        color: "green",
-        position: "top-right",
-      });
+      // notifications.show({
+      //   title: "Song Created",
+      //   message: `Song "${createdSong.title}" has been successfully created`,
+      //   color: "green",
+      //   position: "top-right",
+      // });
       updateSongState({
         songId: createdSong.id,
         loadedSong: createdSong,

@@ -1,4 +1,4 @@
-import { Box, Divider, ScrollArea, Text } from "@mantine/core";
+import { Box, Flex, ScrollArea, Space, Text } from "@mantine/core";
 import { useEffect, useRef } from "react";
 import { useParams } from "react-router";
 
@@ -7,6 +7,7 @@ import ChordProViewer from "@src/components/ChordProViewer";
 import PageTop from "@src/components/PageTop";
 import SongCreators from "@src/components/SongCreators";
 import { useSongsApi } from "@src/hooks/Api";
+import { useIsMobile } from "@src/hooks/isMobile";
 import { useScrollPosition } from "@src/hooks/useScrollPosition";
 
 import AutoScrollManager from "./AutoScroll";
@@ -35,6 +36,8 @@ function Song() {
 
   useScrollPosition();
 
+  const isMobile = useIsMobile();
+
   return (
     <>
       <AutoScrollManager viewportRef={songViewportRef} />
@@ -50,21 +53,26 @@ function Song() {
             paddingTop: "5px",
           }}
         >
-          <PageTop
-            title={song?.title}
-            description={
-              song && (
-                <Text c="dimmed">
-                  by
-                  <SongCreators song={song} inGroup={false} />
-                </Text>
-              )
-            }
-          />
-          <Divider my="md" />
-          <SongDisplaySettings />
-          <Divider my="md" />
-          <Box key="song_editor" ml="sm" hidden={displayMode != "editor"}>
+          <Flex
+            direction={isMobile ? "column" : "column"}
+            align={isMobile ? "start" : "start"}
+            justify={"space-between"}
+            gap="xl"
+          >
+            <PageTop
+              title={song?.title}
+              description={
+                song && (
+                  <Text c="dimmed" component="span">
+                    <SongCreators song={song} inGroup={false} />
+                  </Text>
+                )
+              }
+            />
+            <SongDisplaySettings />
+          </Flex>
+          <Space h="xl" />
+          <Box key="song_editor" hidden={displayMode != "editor"}>
             <SongEditor currentSong={true} />
           </Box>
           <Box key="song_viewer" ml="sm" hidden={displayMode != "render"}>

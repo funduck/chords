@@ -1,4 +1,4 @@
-import { Box, Text, Title } from "@mantine/core";
+import { Stack, Text, Title } from "@mantine/core";
 import React from "react";
 
 interface PageTopProps {
@@ -12,9 +12,9 @@ interface PageTopProps {
 /**
  * A reusable page header component with centered title and description
  */
-export default function PageTop({ title, description, order = 2, titleMb = 4, children }: PageTopProps) {
+export default function PageTop({ title, description, order = 2, titleMb = 0, children }: PageTopProps) {
   return (
-    <Box ta="center" mb="xl">
+    <Stack ta="start" ml="md" mb="md">
       <Title order={order} c="primary" mb={titleMb}>
         {title}
       </Title>
@@ -27,6 +27,6 @@ export default function PageTop({ title, description, order = 2, titleMb = 4, ch
           description
         ))}
       {children}
-    </Box>
+    </Stack>
   );
 }

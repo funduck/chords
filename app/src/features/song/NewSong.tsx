@@ -1,4 +1,4 @@
-import { Anchor, Box, Divider, ScrollArea, Text } from "@mantine/core";
+import { Anchor, Box, Grid, ScrollArea, Space, Text } from "@mantine/core";
 import { useEffect, useRef, useState } from "react";
 
 import ChordDisplayManager from "@src/components/ChordDisplayManager";
@@ -49,34 +49,39 @@ function NewSong() {
             flexGrow: 1,
           }}
         >
-          <PageTop
-            title={songTitle ? `Draft` : "New Song"}
-            description={
-              <Text c="dimmed" component="span">
-                {songTitle ? (
-                  <>
-                    {songTitle.title || <Text c="orange">no title</Text>} by{" "}
-                    {songTitle.artist || <Text c="orange">no artist</Text>}
-                  </>
-                ) : (
-                  <>
-                    Create a new chord sheet in{" "}
-                    <Anchor href="https://www.chordpro.org/chordpro/chordpro-introduction/" target="_blank">
-                      ChordPro
-                    </Anchor>{" "}
-                    format.
-                  </>
-                )}
-              </Text>
-            }
-          />
-          <Divider my="md" />
-          <SongDisplaySettings />
-          <Divider my="md" />
-          <Box key="editor" hidden={displayMode != "editor"}>
+          <Grid>
+            <Grid.Col span={{ base: 12, lg: 12 }}>
+              <PageTop
+                title={songTitle ? `Draft` : "New Song"}
+                description={
+                  <Text c="dimmed" component="span">
+                    {songTitle ? (
+                      <>
+                        {songTitle.title || <Text c="orange">no title</Text>}
+                        {songTitle.artist || <Text c="orange">no artist</Text>}
+                      </>
+                    ) : (
+                      <>
+                        Create a new chord sheet in{" "}
+                        <Anchor href="https://www.chordpro.org/chordpro/chordpro-introduction/" target="_blank">
+                          ChordPro
+                        </Anchor>{" "}
+                        format.
+                      </>
+                    )}
+                  </Text>
+                }
+              />
+            </Grid.Col>
+            <Grid.Col span={{ base: 12, lg: 12 }}>
+              <SongDisplaySettings />
+            </Grid.Col>
+          </Grid>
+          <Space h="xl" />
+          <Box key="song_editor" hidden={displayMode != "editor"}>
             <SongEditor currentSong={false} />
           </Box>
-          <Box key="render" hidden={displayMode != "render"}>
+          <Box key="song_viewer" ml="sm" hidden={displayMode != "render"}>
             <ChordProViewer sheet={sheet} transpose={transpose} fontSize={fontSize} active={displayMode == "render"} />
           </Box>
         </ScrollArea>

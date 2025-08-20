@@ -76,9 +76,9 @@ function SearchSongs({ artistId }: { artistId?: number }) {
         placeholder="Search Song by Title or Lyrics"
         entityName="songs"
         afterQueryInput={
-          <Box>
+          <Box ml="sm">
             {/* <Card padding="sm" radius="md" mb="md"> */}
-            <Group gap="lg">
+            <Group gap="lg" wrap={"wrap"}>
               <Group>
                 <Switch
                   label="In my library"
