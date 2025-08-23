@@ -40,7 +40,7 @@ function Account() {
         <Grid.Col span={{ base: 12, md: 6, lg: 4 }}>
           <Card withBorder radius="md" padding="lg" shadow="sm">
             <Group mb="md" align="flex-start">
-              <ThemeIcon size={40} radius="md" color="primary">
+              <ThemeIcon size={40} radius="md" color="var(--mantine-color-dimmed)">
                 <IconUserCircle size={24} />
               </ThemeIcon>
               <Title order={4}>Profile</Title>
@@ -62,7 +62,7 @@ function Account() {
         <Grid.Col span={{ base: 12, md: 6, lg: 4 }}>
           <Card withBorder radius="md" padding="lg" shadow="sm">
             <Group mb="md" align="flex-start">
-              <ThemeIcon size={40} radius="md" color="primary">
+              <ThemeIcon size={40} radius="md" color="var(--mantine-color-dimmed)">
                 <IconKey size={24} />
               </ThemeIcon>
               <Title order={4}>Authentication</Title>
@@ -92,7 +92,7 @@ function Account() {
         <Grid.Col span={{ base: 12, md: 12, lg: 4 }}>
           <Card withBorder radius="md" padding="lg" shadow="sm">
             <Group mb="md" align="flex-start">
-              <ThemeIcon size={40} radius="md" color="primary">
+              <ThemeIcon size={40} radius="md" color="var(--mantine-color-dimmed)">
                 <IconTrash size={24} />
               </ThemeIcon>
               <Title order={4}>Device</Title>

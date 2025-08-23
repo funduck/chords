@@ -15,16 +15,7 @@ import {
   ThemeIcon,
   Title,
 } from "@mantine/core";
-import {
-  IconDeviceMobile,
-  IconEdit,
-  IconHelpCircle,
-  IconMusic,
-  IconMusicPlus,
-  IconPlayerPlayFilled,
-  IconSearch,
-  IconUsersGroup,
-} from "@tabler/icons-react";
+import { IconEdit, IconHelpCircle, IconMusicPlus, IconSearch, IconUsersGroup } from "@tabler/icons-react";
 import { useState } from "react";
 import { useNavigate } from "react-router";
 
@@ -115,44 +106,44 @@ function Features() {
         <FeatureCard
           icon={<IconUsersGroup size={24} />}
           title="Real-time Sync"
-          description="Share your screen with bandmates. Everyone sees the same song and scroll position automatically."
+          description="Share your screen with bandmates. Everyone sees the same song and scroll position."
         />
       </Grid.Col>
-      <Grid.Col key="2" span={{ base: 12, sm: 6, lg: 4 }}>
+      {/* <Grid.Col key="2" span={{ base: 12, sm: 6, lg: 4 }}>
         <FeatureCard
           icon={<IconPlayerPlayFilled size={24} />}
           title="Auto-scroll"
           description="Hands-free playing with adjustable auto-scroll speed. Perfect for performances and practice."
         />
-      </Grid.Col>
+      </Grid.Col> */}
       <Grid.Col key="3" span={{ base: 12, sm: 6, lg: 4 }}>
         <FeatureCard
           icon={<IconEdit size={24} />}
           title="Smart Editor"
-          description="Paste songs from Ultimate Guitar or any source. Auto-format to ChordPro with intelligent parsing."
+          description="Paste songs from an external source. Auto-format to ChordPro (Work In Progress: it may require some manual editing)."
         />
       </Grid.Col>
       <Grid.Col key="4" span={{ base: 12, sm: 6, lg: 4 }}>
         <FeatureCard
           icon={<IconSearch size={24} />}
           title="Full-text Search"
-          description="Find songs by title, artist, or even lyrics. Lightning-fast search through your entire library."
+          description="Find songs by title, artist or lyrics."
         />
       </Grid.Col>
-      <Grid.Col key="5" span={{ base: 12, sm: 6, lg: 4 }}>
+      {/* <Grid.Col key="5" span={{ base: 12, sm: 6, lg: 4 }}>
         <FeatureCard
           icon={<IconMusic size={24} />}
           title="Chord Diagrams"
           description="Interactive chord diagrams with multiple fingering positions. Perfect for learning new songs."
         />
-      </Grid.Col>
-      <Grid.Col key="6" span={{ base: 12, sm: 6, lg: 4 }}>
+      </Grid.Col> */}
+      {/* <Grid.Col key="6" span={{ base: 12, sm: 6, lg: 4 }}>
         <FeatureCard
           icon={<IconDeviceMobile size={24} />}
           title="Mobile Ready"
           description="Works perfectly on phones and tablets. Take your songbook anywhere, no app installation needed."
         />
-      </Grid.Col>
+      </Grid.Col> */}
     </Grid>
   );
 }
@@ -173,7 +164,7 @@ function QuickStartGuide() {
           <Card shadow="sm" padding="lg" radius="md" withBorder h="100%">
             <Title order={4} mb="md" c="primary">
               <IconMusicPlus size={20} style={{ marginRight: "8px" }} />
-              Start Playing Now
+              Start Playing
             </Title>
             <List spacing="sm" size="sm" mb="md">
               <List.Item key="1">Create a new song with the editor</List.Item>
@@ -200,9 +191,9 @@ function QuickStartGuide() {
             </Title>
             <List spacing="sm" size="sm" mb="md">
               <List.Item key="1">Create or join a room</List.Item>
-              <List.Item key="2">Share the room code or link</List.Item>
-              <List.Item key="3">Pick a song from your library</List.Item>
-              <List.Item key="4">Everyone sees the same content in sync</List.Item>
+              <List.Item key="2">Pick a song from your library or open an editor</List.Item>
+              <List.Item key="3">Everyone sees the same content in sync</List.Item>
+              <List.Item key="4">Anybody can scroll or pick the next song</List.Item>
             </List>
             <Button
               fullWidth
@@ -231,13 +222,17 @@ function FAQ() {
         <Accordion.Item value="sync" key="sync">
           <Accordion.Control>How do we sync our screens?</Accordion.Control>
           <Accordion.Panel>
-            Create a room and share its link or code. Anyone who joins sees the same song and scroll position.
+            Create a room and share its link or code.
+            <br />
+            Anyone who joins will have the same song in player and same content in editor.
+            <br />
+            Anybody in the room can scroll or pick the next song, so everyone stays in sync.
           </Accordion.Panel>
         </Accordion.Item>
         <Accordion.Item value="paste" key="paste">
           <Accordion.Control>How do I add my song quickly?</Accordion.Control>
           <Accordion.Panel>
-            Open the editor and paste text (plain or ChordPro). You can play right away—no need to save first.
+            Open the editor and paste text (plain or ChordPro). You can play right away without saving.
           </Accordion.Panel>
         </Accordion.Item>
         <Accordion.Item value="account" key="account">
@@ -246,6 +241,20 @@ function FAQ() {
             No. You can use anonymous login but on another device or browser you won't be able to access your songs.
             <br />
             But if you want to access the app from multiple devices or browsers, you should create an account.
+          </Accordion.Panel>
+        </Accordion.Item>
+        <Accordion.Item value="public_library" key="public_library">
+          <Accordion.Control>Why public library is so small?</Accordion.Control>
+          <Accordion.Panel>
+            For now I'm not sure about making user-generated content public. It may change in the future.
+            <br />
+            So the public library just allows newcomers to get a feel of the app.
+          </Accordion.Panel>
+        </Accordion.Item>
+        <Accordion.Item value="chord_diagrams" key="chord_diagrams">
+          <Accordion.Control>Some chords are not recognised or displayed incorrectly</Accordion.Control>
+          <Accordion.Panel>
+            Yes, for now parsing and visualization of chord diagrams is limited. It will be improved in the future.
           </Accordion.Panel>
         </Accordion.Item>
       </Accordion>
