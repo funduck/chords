@@ -1,4 +1,4 @@
-import { Anchor, Box, Flex, ScrollArea, Space, Text } from "@mantine/core";
+import { Anchor, Box, Flex, Group, ScrollArea, Space, Text } from "@mantine/core";
 import { useEffect, useRef, useState } from "react";
 
 import ChordDisplayManager from "@src/components/ChordDisplayManager";
@@ -55,10 +55,11 @@ function NewSong() {
               description={
                 <Text c="dimmed" component="span">
                   {songTitle ? (
-                    <>
-                      {songTitle.title || <Text c="orange">no title</Text>}
-                      {songTitle.artist || <Text c="orange">no artist</Text>}
-                    </>
+                    <Group>
+                      <Text c="orange">{songTitle.title || "no title"}</Text>
+                      by
+                      <Text c="orange">{songTitle.artist || "no artist"}</Text>
+                    </Group>
                   ) : (
                     <>
                       Create a new chord sheet in{" "}
