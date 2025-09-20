@@ -25,7 +25,8 @@ COPY --from=builder /app/docs /app/docs
 # Copy Caddyfile if you have one, otherwise Caddy will serve files from /usr/share/caddy
 COPY prod.Caddyfile /etc/caddy/Caddyfile
 
-# Expose port 80
 EXPOSE 80
+EXPOSE 443
+EXPOSE 2019
 
 # Caddy runs automatically, no need for CMD
