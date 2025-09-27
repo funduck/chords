@@ -25,31 +25,64 @@ function AutoScrollManager({ viewportRef }: { viewportRef: React.RefObject<HTMLD
   // Track touch state to temporarily disable auto-scroll on mobile
   const [isTouching, setIsTouching] = useState(false);
 
-  // Keyboard event listener for Space key to toggle auto-scroll
+  // Keyboard event listener for Space key to toggle auto-scroll and arrow keys for manual scrolling
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
+      // Check if any input field is focused
+      const activeElement = document.activeElement;
+      const isInputFocused =
+        activeElement &&
+        (activeElement.tagName === "INPUT" ||
+          activeElement.tagName === "TEXTAREA" ||
+          activeElement.tagName === "SELECT" ||
+          (activeElement as HTMLElement).contentEditable === "true" ||
+          activeElement.classList.contains("cm-editor")); // CodeMirror editor
+
+      if (isInputFocused) {
+        return; // Don't interfere with input controls
+      }
+
       // Check if Space key is pressed
       if (event.code === "Space" || event.key === " ") {
-        // Check if any input field is focused
-        const activeElement = document.activeElement;
-        const isInputFocused =
-          activeElement &&
-          (activeElement.tagName === "INPUT" ||
-            activeElement.tagName === "TEXTAREA" ||
-            activeElement.tagName === "SELECT" ||
-            (activeElement as HTMLElement).contentEditable === "true" ||
-            activeElement.classList.contains("cm-editor")); // CodeMirror editor
+        event.preventDefault(); // Prevent default space behavior (page scroll)
 
-        if (!isInputFocused) {
-          event.preventDefault(); // Prevent default space behavior (page scroll)
+        // Toggle auto-scroll
+        updateAutoScrollOptions({
+          enabled: !enabled,
+        });
 
-          // Toggle auto-scroll
-          updateAutoScrollOptions({
-            enabled: !enabled,
-          });
+        console.debug("Auto-scroll toggled via Space key:", !enabled);
+      }
 
-          console.debug("Auto-scroll toggled via Space key:", !enabled);
-        }
+      const isUpPressed = event.code === "ArrowUp" || event.key === "ArrowUp";
+      const isDownPressed = event.code === "ArrowDown" || event.key === "ArrowDown";
+
+      if (viewportRef.current && (isUpPressed || isDownPressed)) {
+        // Handle arrow keys for manual scrolling by 20% of the viewport height
+        event.preventDefault();
+
+        // Calculate 20% of the viewport height and scroll up
+        const scrollAmount = viewportRef.current.clientHeight * 0.2;
+
+        // Prevent emitting scroll events during manual navigation
+        allowScrollEvent.current = false;
+
+        viewportRef.current.scrollBy({
+          top: isUpPressed ? -scrollAmount : scrollAmount,
+          behavior: "smooth",
+        });
+      }
+
+      const ifLeftPressed = event.code === "ArrowLeft" || event.key === "ArrowLeft";
+      const ifRightPressed = event.code === "ArrowRight" || event.key === "ArrowRight";
+
+      if (viewportRef.current && enabled && (ifLeftPressed || ifRightPressed)) {
+        // Handle left/right arrow keys for speed down/up when auto-scroll is enabled
+        event.preventDefault();
+
+        updateAutoScrollOptions({
+          speed: Math.min(100, Math.max(1, speed + (ifRightPressed ? 10 : -10))),
+        });
       }
     };
 
@@ -60,7 +93,7 @@ function AutoScrollManager({ viewportRef }: { viewportRef: React.RefObject<HTMLD
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [enabled, updateAutoScrollOptions]);
+  }, [enabled, updateAutoScrollOptions, viewportRef]);
 
   // Auto scrolling
   useEffect(() => {
