@@ -69,6 +69,12 @@ function Song() {
           <Box key="song_viewer" ml="sm" hidden={displayMode != "render"}>
             <ChordProViewer sheet={sheet} transpose={transpose} fontSize={fontSize} active={displayMode == "render"} />
           </Box>
+          <Box
+            h={
+              (sheet.length * 1000) /
+              ((songViewportRef.current?.clientHeight ?? 0) + (songViewportRef.current?.clientWidth ?? 0) || 1000)
+            }
+          ></Box>
         </ScrollArea>
       </Box>
     </>
