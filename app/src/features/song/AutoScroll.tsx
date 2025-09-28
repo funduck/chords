@@ -59,7 +59,6 @@ function AutoScrollManager({ viewportRef }: { viewportRef: React.RefObject<HTMLD
 
       if (viewportRef.current && (isUpPressed || isDownPressed)) {
         // Handle arrow keys for manual scrolling by 20% of the viewport height
-        event.preventDefault();
 
         // Calculate 20% of the viewport height and scroll up
         const scrollAmount = viewportRef.current.clientHeight * 0.2;
@@ -143,9 +142,7 @@ function AutoScrollManager({ viewportRef }: { viewportRef: React.RefObject<HTMLD
     }
 
     emittingScrollTimeout.current = setTimeout(() => {
-      const scrollPercent =
-        (viewportRef.current!.scrollTop / (viewportRef.current!.scrollHeight - viewportRef.current!.clientHeight)) *
-        100;
+      const scrollPercent = (viewportRef.current!.scrollTop / viewportRef.current!.scrollHeight) * 100;
       updateSongState({
         scrollPosition: scrollPercent,
       });
@@ -223,8 +220,7 @@ function AutoScrollManager({ viewportRef }: { viewportRef: React.RefObject<HTMLD
     }
 
     // songState.applyScrollPosition is a percentage (0-100)
-    const scrollTop =
-      (songState.applyScrollPosition / 100) * (viewportRef.current.scrollHeight - viewportRef.current.clientHeight);
+    const scrollTop = (songState.applyScrollPosition / 100) * viewportRef.current.scrollHeight;
 
     // Prevent emitting scroll events while applying scroll
     allowScrollEvent.current = false;
