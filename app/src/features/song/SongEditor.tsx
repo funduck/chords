@@ -16,7 +16,7 @@ const SongEditor = memo(({ currentSong }: { currentSong?: boolean }) => {
 
   const userId = useSignal(Signals.userId);
 
-  const { songSheet, newSheet, loadedSong, setSongSheet, setSongId } = useSongContext();
+  const { songSheet, newSheet, loadedSong, setSongSheet, setNewSheet, setSongId } = useSongContext();
 
   const [localValue, setLocalValue] = useState("");
 
@@ -50,10 +50,10 @@ const SongEditor = memo(({ currentSong }: { currentSong?: boolean }) => {
       if (currentSong) {
         setSongSheet(value);
       } else {
-        setSongSheet(value);
+        setNewSheet(value);
       }
     },
-    [currentSong, setSongSheet],
+    [currentSong, setSongSheet, setNewSheet],
   );
 
   const [autoSaveInSeconds, setAutoSaveInSeconds] = useState(0);
@@ -114,6 +114,16 @@ const SongEditor = memo(({ currentSong }: { currentSong?: boolean }) => {
 
         // If already saved, return
         if (autoSaveIntervalRef.current == 0) {
+          clearInterval(autoSaveInterval.current!);
+          autoSaveInterval.current = null;
+          return;
+        }
+
+        // If not changed, clear interval
+        if (value == songSheet) {
+          clearInterval(autoSaveInterval.current!);
+          autoSaveInterval.current = null;
+          setAutoSaveInSeconds(0);
           return;
         }
 
@@ -131,7 +141,7 @@ const SongEditor = memo(({ currentSong }: { currentSong?: boolean }) => {
         }
       }, 1000);
     },
-    [storeLocalValue, updateSongSheet],
+    [storeLocalValue, updateSongSheet, songSheet],
   );
 
   // Initializes the editor with the current song sheet or new sheet
