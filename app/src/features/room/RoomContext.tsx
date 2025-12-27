@@ -68,11 +68,9 @@ export function RoomContextProvider({ children }: { children: ReactNode }) {
     console.log("Applying room state:", state);
 
     if (state.song_id) {
-      songContext.updateSongState({
-        songId: state.song_id,
-        songSheet: state.song_sheet || "",
-        newSheet: state.new_sheet || "",
-      });
+      songContext.setSongId(state.song_id);
+      songContext.setSongSheet(state.song_sheet || "");
+      songContext.setNewSheet(state.new_sheet || "");
     }
 
     if (state.song_settings) {

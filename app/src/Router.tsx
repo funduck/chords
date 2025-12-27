@@ -105,8 +105,7 @@ function Router() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const { songState } = useSongContext();
-  const { songId } = songState;
+  const { songId } = useSongContext();
 
   const artist = useSignal(Signals.artist);
 

@@ -3,7 +3,7 @@ import { notifications } from "@mantine/notifications";
 import { useSignal } from "@telegram-apps/sdk-react";
 import { okaidia } from "@uiw/codemirror-theme-okaidia";
 import CodeMirror from "@uiw/react-codemirror";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
 
 import { ChordProService } from "@src/services/chordpro/chordpro";
 import { Signals } from "@src/services/signals-registry";
@@ -11,11 +11,12 @@ import { Signals } from "@src/services/signals-registry";
 import NewSongForm from "./NewSongForm";
 import { useSongContext } from "./SongContext";
 
-function SongEditor({ currentSong }: { currentSong?: boolean }) {
+const SongEditor = memo(({ currentSong }: { currentSong?: boolean }) => {
+  console.debug("rendering SongEditor");
+
   const userId = useSignal(Signals.userId);
 
-  const songContext = useSongContext();
-  const { songState } = songContext;
+  const { songSheet, newSheet, loadedSong, setSongSheet, setSongId } = useSongContext();
 
   const [localValue, setLocalValue] = useState("");
 
@@ -47,20 +48,39 @@ function SongEditor({ currentSong }: { currentSong?: boolean }) {
     (value: string) => {
       console.debug("SongEditor: updateSongSheet", value.length);
       if (currentSong) {
-        songContext.updateSongState({
-          songSheet: value,
-        });
+        setSongSheet(value);
       } else {
-        songContext.updateSongState({
-          newSheet: value,
-        });
+        setSongSheet(value);
       }
     },
-    [currentSong, songContext],
+    [currentSong, setSongSheet],
   );
 
+  const [autoSaveInSeconds, setAutoSaveInSeconds] = useState(0);
+
   // Handle editor changes with debounce
-  const timer = useRef(null as ReturnType<typeof setTimeout> | null);
+  const autoSaveInterval = useRef(null as ReturnType<typeof setInterval> | null);
+  const autoSaveIntervalRef = useRef(0);
+
+  const isKeyPressedRef = useRef(false);
+  useEffect(() => {
+    const handleKeyDown = () => {
+      isKeyPressedRef.current = true;
+    };
+
+    const handleKeyUp = () => {
+      isKeyPressedRef.current = false;
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keyup", handleKeyUp);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keyup", handleKeyUp);
+    };
+  }, []);
+
   const emitSheetChanged = useCallback(
     (
       value: string,
@@ -68,8 +88,11 @@ function SongEditor({ currentSong }: { currentSong?: boolean }) {
     ) => {
       console.debug("SongEditor: emitSheetChanged", value.length, options);
 
-      if (timer.current) {
-        clearTimeout(timer.current);
+      autoSaveIntervalRef.current = options.debounce ? 3 : 0;
+      setAutoSaveInSeconds(autoSaveIntervalRef.current);
+
+      if (autoSaveInterval.current) {
+        clearInterval(autoSaveInterval.current);
       }
 
       if (!options.debounce) {
@@ -77,17 +100,36 @@ function SongEditor({ currentSong }: { currentSong?: boolean }) {
         if (options.updateSongState) {
           updateSongSheet(value);
         }
+        setAutoSaveInSeconds(0);
         return;
       }
 
-      timer.current = setTimeout(() => {
-        storeLocalValue(value);
-        if (options.updateSongState) {
-          updateSongSheet(value);
+      autoSaveInterval.current = setInterval(() => {
+        // If keypressed delay saving
+        if (isKeyPressedRef.current) {
+          autoSaveIntervalRef.current = 3;
+          setAutoSaveInSeconds(autoSaveIntervalRef.current);
+          return;
         }
 
-        timer.current = null;
-      }, 3000); // Debounce changes by 3 seconds
+        // If already saved, return
+        if (autoSaveIntervalRef.current == 0) {
+          return;
+        }
+
+        // Iterate countdown
+        autoSaveIntervalRef.current--;
+        setAutoSaveInSeconds(autoSaveIntervalRef.current);
+
+        // If countdown reached zero, save
+        if (autoSaveIntervalRef.current == 0) {
+          storeLocalValue(value);
+          if (options.updateSongState) {
+            updateSongSheet(value);
+          }
+          return;
+        }
+      }, 1000);
     },
     [storeLocalValue, updateSongSheet],
   );
@@ -100,21 +142,21 @@ function SongEditor({ currentSong }: { currentSong?: boolean }) {
     }
 
     console.debug(
-      `SongEditor: useEffect: ${currentSong} ${songState.songSheet?.length} ${songState.newSheet?.length} ${localValue.length}`,
+      `SongEditor: useEffect: ${currentSong} ${songSheet?.length} ${newSheet?.length} ${localValue.length}`,
     );
 
     if (currentSong) {
-      if (songState.songSheet && songState.songSheet != localValue) {
+      if (songSheet && songSheet != localValue) {
         console.debug("SongEditor: useEffect: songSheet");
-        setEditorValue(songState.songSheet);
-        emitSheetChanged(songState.songSheet, { updateSongState: false, debounce: false });
+        setEditorValue(songSheet);
+        emitSheetChanged(songSheet, { updateSongState: false, debounce: false });
         return;
       }
     } else {
-      if (songState.newSheet && songState.newSheet != localValue) {
+      if (newSheet && newSheet != localValue) {
         console.debug("SongEditor: useEffect: newSheet");
-        setEditorValue(songState.newSheet);
-        emitSheetChanged(songState.newSheet, { updateSongState: false, debounce: false });
+        setEditorValue(newSheet);
+        emitSheetChanged(newSheet, { updateSongState: false, debounce: false });
         return;
       }
     }
@@ -125,7 +167,7 @@ function SongEditor({ currentSong }: { currentSong?: boolean }) {
       setEditorValue(storedSheet);
       emitSheetChanged(storedSheet, { updateSongState: false, debounce: false });
     }
-  }, [setEditorValue, currentSong, loadLocalValue, emitSheetChanged]);
+  }, [currentSong, songSheet, newSheet, setEditorValue, loadLocalValue, emitSheetChanged]);
 
   // // Handles changes to the song sheet from outside the editor
   // useEffect(() => {
@@ -156,13 +198,9 @@ function SongEditor({ currentSong }: { currentSong?: boolean }) {
   const [savedSheet, setSavedSheet] = useState("");
   const saveSheetAction = useCallback(() => {
     setSavedSheet(localValue);
-    songContext.updateSong({
-      id: songState.loadedSong!.id,
-      song: {
-        sheet: localValue,
-      },
-    });
-  }, [songContext, songState.loadedSong, setSavedSheet, localValue]);
+    setSongId(loadedSong!.id);
+    setSongSheet(localValue);
+  }, [setSavedSheet, setSongId, setSongSheet, localValue, loadedSong]);
 
   const formatSheetAction = useCallback(
     (format: "chordpro") => {
@@ -220,7 +258,7 @@ function SongEditor({ currentSong }: { currentSong?: boolean }) {
       <Group mb="md">
         {!currentSong && <NewSongForm sheetValue={localValue || ""} />}
 
-        {currentSong && songState.loadedSong?.owner_id == userId && (
+        {currentSong && loadedSong?.owner_id == userId && (
           <>
             <Button variant="outline" onClick={saveSheetAction} disabled={savedSheet === localValue}>
               Save
@@ -235,11 +273,15 @@ function SongEditor({ currentSong }: { currentSong?: boolean }) {
         <Button variant="outline" onClick={clearSheetAction} disabled={"" === localValue}>
           Clear
         </Button>
+
+        {autoSaveInSeconds > 0 && (
+          <span style={{ color: "orange" }}>Auto-saving in {autoSaveInSeconds} seconds...</span>
+        )}
       </Group>
 
       <CodeMirror value={localValue} onChange={onEditorChange} theme={okaidia} />
     </>
   );
-}
+});
 
 export default SongEditor;

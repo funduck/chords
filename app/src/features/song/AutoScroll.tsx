@@ -7,11 +7,11 @@ import { estimateFontSize } from "@src/utils/font";
 import { useSongContext } from "./SongContext";
 
 function AutoScrollManager({ viewportRef }: { viewportRef: React.RefObject<HTMLDivElement> }) {
-  const { songState, updateSongState, updateAutoScrollOptions } = useSongContext();
+  const { applyScrollPosition, autoScrollOptions, updateAutoScrollOptions, setScrollPosition } = useSongContext();
 
-  const enabled = songState?.autoScrollOptions?.enabled ?? Config.AutoScrollEnabled;
-  const speed = songState?.autoScrollOptions?.speed ?? Config.AutoScrollSpeed;
-  const interval = songState?.autoScrollOptions?.interval ?? Config.AutoScrollInterval;
+  const enabled = autoScrollOptions?.enabled ?? Config.AutoScrollEnabled;
+  const speed = autoScrollOptions?.speed ?? Config.AutoScrollSpeed;
+  const interval = autoScrollOptions?.interval ?? Config.AutoScrollInterval;
 
   // Initialize scroll position management
   useScrollPosition(viewportRef);
@@ -145,9 +145,7 @@ function AutoScrollManager({ viewportRef }: { viewportRef: React.RefObject<HTMLD
       const scrollPercent =
         (viewportRef.current!.scrollTop / (viewportRef.current!.scrollHeight - viewportRef.current!.clientHeight)) *
         100;
-      updateSongState({
-        scrollPosition: scrollPercent,
-      });
+      setScrollPosition(scrollPercent);
       console.debug("Scroll event emitted:", scrollPercent);
       emittingScrollTimeout.current = null;
     }, 50); // Debounce time in milliseconds
@@ -217,19 +215,19 @@ function AutoScrollManager({ viewportRef }: { viewportRef: React.RefObject<HTMLD
       console.debug("Apply scroll: song container not found");
       return;
     }
-    if (songState.applyScrollPosition == null) {
+    if (applyScrollPosition == null) {
       return;
     }
 
     // songState.applyScrollPosition is a percentage (0-100)
     const scrollTop =
-      (songState.applyScrollPosition / 100) * (viewportRef.current.scrollHeight - viewportRef.current.clientHeight);
+      (applyScrollPosition / 100) * (viewportRef.current.scrollHeight - viewportRef.current.clientHeight);
 
     // Prevent emitting scroll events while applying scroll
     allowScrollEvent.current = false;
 
     viewportRef.current.scrollTo({ top: scrollTop, behavior: "smooth" });
-  }, [songState.applyScrollPosition, viewportRef]);
+  }, [applyScrollPosition, viewportRef]);
 
   return <></>;
 }

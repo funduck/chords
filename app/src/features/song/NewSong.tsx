@@ -13,27 +13,29 @@ import SongEditor from "./SongEditor";
 import SongSettings, { SongDisplaySettings } from "./SongSettings";
 
 function NewSong() {
-  const { songState, updateDisplayOptions } = useSongContext();
-  const sheet = songState.newSheet || "";
-  const displayMode = songState.displayOptions?.mode || "render";
-  const transpose = songState.displayOptions?.transpose || 0;
-  const fontSize = songState.displayOptions?.fontSize || 16;
+  console.debug("rendering NewSong");
+
+  const { newSheet, updateDisplayOptions, displayOptions } = useSongContext();
+  const displayMode = displayOptions?.mode || "render";
+  const transpose = displayOptions?.transpose || 0;
+  const fontSize = displayOptions?.fontSize || 16;
 
   const songViewportRef = useRef<HTMLDivElement>(null);
 
   const [songTitle, setSongTitle] = useState<{ title: string; artist: string | null } | null>(null);
   useEffect(() => {
-    if (!sheet || sheet.length === 0) {
+    if (!newSheet || newSheet.length === 0) {
       updateDisplayOptions({ mode: "editor" });
     }
 
-    const song = ChordProService.sheetToSong(sheet, {});
+    const song = ChordProService.sheetToSong(newSheet || "", {});
     if (!song) return;
+
     setSongTitle({
       title: song.title || "",
       artist: (getSongArtist(song) || []).join(", ") || "",
     });
-  }, [sheet]);
+  }, [newSheet]);
 
   return (
     <>
@@ -79,7 +81,12 @@ function NewSong() {
             <SongEditor currentSong={false} />
           </Box>
           <Box key="song_viewer" ml="sm" hidden={displayMode != "render"}>
-            <ChordProViewer sheet={sheet} transpose={transpose} fontSize={fontSize} active={displayMode == "render"} />
+            <ChordProViewer
+              sheet={newSheet || ""}
+              transpose={transpose}
+              fontSize={fontSize}
+              active={displayMode == "render"}
+            />
           </Box>
         </ScrollArea>
       </Box>

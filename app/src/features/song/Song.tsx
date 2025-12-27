@@ -15,21 +15,21 @@ import SongEditor from "./SongEditor";
 import SongSettings, { SongDisplaySettings } from "./SongSettings";
 
 function Song() {
-  const { songState, loadSong } = useSongContext();
+  const { loadedSong, songSheet, displayOptions, loadSong } = useSongContext();
   const songApi = useSongsApi();
-  const song = songState.loadedSong;
-  const sheet = songState.songSheet || song?.sheet || "";
-  const displayMode = songState.displayOptions?.mode || "render";
-  const transpose = songState.displayOptions?.transpose || 0;
-  const fontSize = songState.displayOptions?.fontSize || 16;
+  const song = loadedSong;
+  const sheet = songSheet || song?.sheet || "";
+  const displayMode = displayOptions?.mode || "render";
+  const transpose = displayOptions?.transpose || 0;
+  const fontSize = displayOptions?.fontSize || 16;
 
   // Handle routing
   const { songId } = useParams<{ songId: string }>();
   useEffect(() => {
-    if (songApi && songId && songId !== songState.loadedSong?.id?.toString()) {
+    if (songApi && songId && songId !== loadedSong?.id?.toString()) {
       loadSong(parseInt(songId, 10));
     }
-  }, [songId, songState, loadSong, songApi]);
+  }, [songId, loadedSong, loadSong, songApi]);
 
   const songViewportRef = useRef<HTMLDivElement>(null);
 

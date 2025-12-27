@@ -20,7 +20,8 @@ interface DisplayOptions {
   fontSize?: number; // Font size in pixels
 }
 
-interface SongState {
+interface SongContextType {
+  // STATE
   songId?: number;
   loadedSong?: SongEntity;
   songSheet?: string; // For current song display and editing
@@ -29,14 +30,16 @@ interface SongState {
   autoScrollOptions?: AutoScrollOptions;
   scrollPosition?: number; // Current scroll position in percents
   applyScrollPosition?: number;
-}
-
-interface SongContextType {
-  // STATE
-  songState: SongState;
 
   // BASIC UPDATE
-  updateSongState(updates: Partial<SongState>): void;
+  setSongId: (id: number) => void;
+  setLoadedSong: (song: SongEntity) => void;
+  setSongSheet: (sheet: string) => void;
+  setNewSheet: (sheet: string) => void;
+  setDisplayOptions: (options: DisplayOptions) => void;
+  setAutoScrollOptions: (options: AutoScrollOptions) => void;
+  setScrollPosition: (position: number) => void;
+  setApplyScrollPosition: (position: number) => void;
 
   // OPTIONS
   updateDisplayOptions(options: Partial<DisplayOptions>): void;
@@ -55,18 +58,22 @@ interface SongContextType {
 const SongContext = createContext<SongContextType | undefined>(undefined);
 
 export function SongContextProvider({ children }: { children: ReactNode }) {
-  const [songState, setSongState] = useState<SongState>({
-    autoScrollOptions: {
-      enabled: false,
-      speed: Config.AutoScrollSpeed,
-      interval: Config.AutoScrollInterval,
-    },
-    displayOptions: {
-      mode: "render",
-      transpose: 0,
-      fontSize: Config.SongFontSize,
-    },
+  const [songId, setSongId] = useState<number | undefined>(undefined);
+  const [loadedSong, setLoadedSong] = useState<SongEntity | undefined>(undefined);
+  const [songSheet, setSongSheet] = useState<string | undefined>(undefined);
+  const [newSheet, setNewSheet] = useState<string | undefined>(undefined);
+  const [displayOptions, setDisplayOptions] = useState<DisplayOptions | undefined>({
+    mode: "render",
+    transpose: 0,
+    fontSize: Config.SongFontSize,
   });
+  const [autoScrollOptions, setAutoScrollOptions] = useState<AutoScrollOptions | undefined>({
+    enabled: false,
+    speed: Config.AutoScrollSpeed,
+    interval: Config.AutoScrollInterval,
+  });
+  const [scrollPosition, setScrollPosition] = useState<number | undefined>(undefined);
+  const [applyScrollPosition, setApplyScrollPosition] = useState<number | undefined>(undefined);
 
   const songsApi = useSongsApi();
 
@@ -75,12 +82,41 @@ export function SongContextProvider({ children }: { children: ReactNode }) {
   const loadStateFromLocalStorage = useCallback(() => {
     const savedState = localStorage.getItem("songState");
     if (savedState) {
-      setSongState(JSON.parse(savedState));
+      const {
+        songId,
+        loadedSong,
+        songSheet,
+        newSheet,
+        displayOptions,
+        autoScrollOptions,
+        scrollPosition,
+        applyScrollPosition,
+      } = JSON.parse(savedState);
+      setSongId(songId);
+      setLoadedSong(loadedSong);
+      setSongSheet(songSheet);
+      setNewSheet(newSheet);
+      setDisplayOptions(displayOptions);
+      setAutoScrollOptions(autoScrollOptions);
+      setScrollPosition(scrollPosition);
+      setApplyScrollPosition(applyScrollPosition);
+      console.debug("Loaded song state from localStorage");
     }
   }, []);
+
   const saveStateToLocalStorage = useCallback(() => {
+    const songState = {
+      songId,
+      loadedSong,
+      songSheet,
+      newSheet,
+      displayOptions,
+      autoScrollOptions,
+      scrollPosition,
+      applyScrollPosition,
+    };
     localStorage.setItem("songState", JSON.stringify(songState));
-  }, [songState]);
+  }, [songId, loadedSong, songSheet, newSheet, displayOptions, autoScrollOptions, scrollPosition, applyScrollPosition]);
 
   // Load state from localStorage if available
   // On exit, save state to localStorage
@@ -91,158 +127,160 @@ export function SongContextProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  // BASIC UPDATE
-  function updateSongState(updates: Partial<SongState>) {
-    setSongState((prev) => {
-      const newState: SongState = {
-        ...prev,
-        ...updates,
-        displayOptions: { ...(prev.displayOptions ?? {}), ...(updates.displayOptions ?? {}) },
-        autoScrollOptions: { ...(prev.autoScrollOptions ?? {}), ...(updates.autoScrollOptions ?? {}) },
-      };
-      localStorage.setItem("songState", JSON.stringify(newState));
-      return newState;
-    });
-  }
-
   // OPTIONS
-  function updateDisplayOptions(options: Partial<DisplayOptions>) {
-    updateSongState({ displayOptions: options });
-  }
-  function updateAutoScrollOptions(options: Partial<AutoScrollOptions>) {
-    updateSongState({ autoScrollOptions: options });
-  }
+  const updateDisplayOptions = useCallback((options: Partial<DisplayOptions>) => {
+    setDisplayOptions((prev) => ({ ...prev, ...options }));
+  }, []);
+  const updateAutoScrollOptions = useCallback((options: Partial<AutoScrollOptions>) => {
+    setAutoScrollOptions((prev) => ({ ...prev, ...options }));
+  }, []);
 
   // ACTIONS
-  function openNewEditor() {
-    updateSongState({
-      songId: undefined,
-      loadedSong: undefined,
-      songSheet: undefined,
-      displayOptions: {
-        mode: "editor",
-        transpose: 0,
-      },
-      autoScrollOptions: {
-        enabled: false,
-      },
+  const openNewEditor = useCallback(() => {
+    setSongId(undefined);
+    setLoadedSong(undefined);
+    setSongSheet(undefined);
+    setDisplayOptions({
+      mode: "editor",
+      transpose: 0,
+    });
+    setAutoScrollOptions({
+      enabled: false,
     });
     navigate(RoutesEnum.Editor);
-  }
-  function loadSong(songId: number) {
-    if (!songId) {
-      console.warn("loadSong called with no songId");
-      return;
-    }
-    if (!songsApi) {
-      console.error("loadSong called without SongsApiContext");
-      return;
-    }
-    console.debug("Fetching song with ID:", songId);
-    songsApi
-      .getSongByID({ id: songId })
-      .then((s) => {
-        updateSongState({
-          songId,
-          loadedSong: s,
-          songSheet: s.sheet,
-          displayOptions: {
+  }, [navigate]);
+
+  const loadSong = useCallback(
+    (songId: number) => {
+      if (!songId) {
+        console.warn("loadSong called with no songId");
+        return;
+      }
+      if (!songsApi) {
+        console.error("loadSong called without SongsApiContext");
+        return;
+      }
+      console.debug("Fetching song with ID:", songId);
+      songsApi
+        .getSongByID({ id: songId })
+        .then((s) => {
+          setSongId(songId);
+          setLoadedSong(s);
+          setSongSheet(s.sheet);
+          setDisplayOptions({
             mode: "render",
             transpose: 0,
-          },
-          autoScrollOptions: {
+          });
+          setAutoScrollOptions({
             enabled: false,
-          },
-        });
-        navigate(RoutesEnum.Songs(songId));
-      })
-      .catch(console.error);
-  }
-  function openEditor() {
+          });
+
+          navigate(RoutesEnum.Songs(songId));
+        })
+        .catch(console.error);
+    },
+    [songsApi, navigate],
+  );
+
+  const openEditor = useCallback(() => {
     return () => {
-      updateSongState({
-        displayOptions: {
-          mode: "editor",
-        },
-        autoScrollOptions: {
-          enabled: false,
-        },
+      setDisplayOptions({
+        mode: "editor",
+      });
+      setAutoScrollOptions({
+        enabled: false,
       });
       navigate(RoutesEnum.Editor);
     };
-  }
-  function openSong() {
+  }, [navigate]);
+
+  const openSong = useCallback(() => {
     return () => {
-      updateSongState({
-        displayOptions: {
-          mode: "render",
-        },
+      setDisplayOptions({
+        mode: "render",
       });
-      if (songState.songId) {
-        navigate(RoutesEnum.Songs(songState.songId));
+      if (songId) {
+        navigate(RoutesEnum.Songs(songId));
       } else {
         console.warn("openSong called without songId");
       }
     };
-  }
+  }, [navigate, songId]);
 
-  function createSong(params: CreateSongParams): Promise<SongEntity> {
-    if (!songsApi) {
-      return Promise.reject(new Error("SongsApiContext is not available"));
-    }
-    if (!params.song.lyrics) {
-      params.song.lyrics = ChordProService.extractLyrics(params.song.sheet || "");
-    }
-    return songsApi.createSong(params).then((createdSong) => {
-      // notifications.show({
-      //   title: "Song Created",
-      //   message: `Song "${createdSong.title}" has been successfully created`,
-      //   color: "green",
-      //   position: "top-right",
-      // });
-      updateSongState({
-        songId: createdSong.id,
-        loadedSong: createdSong,
-        songSheet: createdSong.sheet,
-        newSheet: "", // Clear editor sheet
-      });
-      // Clear editor sheet in localStorage
-      localStorage.setItem("editor-sheet", "");
+  const createSong = useCallback(
+    (params: CreateSongParams): Promise<SongEntity> => {
+      if (!songsApi) {
+        return Promise.reject(new Error("SongsApiContext is not available"));
+      }
+      if (!params.song.lyrics) {
+        params.song.lyrics = ChordProService.extractLyrics(params.song.sheet || "");
+      }
+      return songsApi.createSong(params).then((createdSong) => {
+        // notifications.show({
+        //   title: "Song Created",
+        //   message: `Song "${createdSong.title}" has been successfully created`,
+        //   color: "green",
+        //   position: "top-right",
+        // });
+        setSongId(createdSong.id);
+        setLoadedSong(createdSong);
+        setSongSheet(createdSong.sheet);
+        setNewSheet(""); // Clear editor sheet
+        localStorage.setItem("editor-sheet", ""); // Clear editor sheet in localStorage
 
-      navigate(RoutesEnum.Songs(createdSong.id));
-      return createdSong;
-    });
-  }
+        navigate(RoutesEnum.Songs(createdSong.id));
+        return createdSong;
+      });
+    },
+    [songsApi, navigate],
+  );
 
-  function updateSong(params: UpdateSongParams): Promise<SongEntity> {
-    if (!songsApi) {
-      return Promise.reject(new Error("SongsApiContext is not available"));
-    }
-    if (!params.song.lyrics) {
-      params.song.lyrics = ChordProService.extractLyrics(params.song.sheet || "");
-    }
-    return songsApi.updateSong(params).then((updatedSong) => {
-      notifications.show({
-        title: "Song updated",
-        message: `Song "${updatedSong.title}" has been successfully updated`,
-        color: "green",
-        position: "top-right",
+  const updateSong = useCallback(
+    (params: UpdateSongParams): Promise<SongEntity> => {
+      if (!songsApi) {
+        return Promise.reject(new Error("SongsApiContext is not available"));
+      }
+      if (!params.song.lyrics) {
+        params.song.lyrics = ChordProService.extractLyrics(params.song.sheet || "");
+      }
+      return songsApi.updateSong(params).then((updatedSong) => {
+        notifications.show({
+          title: "Song updated",
+          message: `Song "${updatedSong.title}" has been successfully updated`,
+          color: "green",
+          position: "top-right",
+        });
+        setLoadedSong(updatedSong);
+        setSongSheet(updatedSong.sheet);
+        return updatedSong;
       });
-      updateSongState({
-        loadedSong: updatedSong,
-        songSheet: updatedSong.sheet,
-      });
-      return updatedSong;
-    });
-  }
+    },
+    [songsApi],
+  );
 
   return (
     <SongContext.Provider
       value={{
-        songState,
-        updateSongState,
+        songId,
+        loadedSong,
+        songSheet,
+        newSheet,
+        displayOptions,
+        autoScrollOptions,
+        scrollPosition,
+        applyScrollPosition,
+        setSongId,
+        setLoadedSong,
+        setSongSheet,
+        setNewSheet,
+        setDisplayOptions,
+        setAutoScrollOptions,
+        setScrollPosition,
+        setApplyScrollPosition,
+
         updateDisplayOptions,
         updateAutoScrollOptions,
+
         openNewEditor,
         loadSong,
         openSong,

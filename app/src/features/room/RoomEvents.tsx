@@ -94,7 +94,7 @@ export function RoomEventsPublisher() {
 
   const userId = useSignal(Signals.userId);
 
-  const { songState } = useSongContext();
+  const songContext = useSongContext();
   const { roomState, updateRoomState, publishState, applyState, publish } = useRoomContext();
   const room = roomState.room;
 
@@ -120,22 +120,22 @@ export function RoomEventsPublisher() {
     // Construct published event only if something changed
     let events: RoomEvent[] = [];
 
-    if (songState.songId != null && songState.songId != publishedSongId?.value) {
+    if (songContext.songId != null && songContext.songId != publishedSongId?.value) {
       events.push(
         new RoomEvent({
           userId: userId,
           roomId: room.id!,
           type: "song_id",
           data: {
-            songId: songState.songId,
+            songId: songContext.songId,
           },
         }),
       );
-      publish("song_id", songState.songId!);
+      publish("song_id", songContext.songId!);
     }
     if (
-      songState.scrollPosition !== null &&
-      songState.scrollPosition != publishedScroll?.value &&
+      songContext.scrollPosition !== null &&
+      songContext.scrollPosition != publishedScroll?.value &&
       (appliedScroll?.at ?? 0) + 1000 < now // Only publish if the last applied scroll was more than 1 second ago
     ) {
       events.push(
@@ -144,15 +144,15 @@ export function RoomEventsPublisher() {
           roomId: room.id!,
           type: "song_scroll",
           data: {
-            scrollPercent: songState.scrollPosition,
+            scrollPercent: songContext.scrollPosition,
           },
         }),
       );
-      publish("song_scroll", songState.scrollPosition!);
+      publish("song_scroll", songContext.scrollPosition!);
     }
     if (
-      songState.autoScrollOptions &&
-      !isEqual(songState.autoScrollOptions, publishedSettings?.value) &&
+      songContext.autoScrollOptions &&
+      !isEqual(songContext.autoScrollOptions, publishedSettings?.value) &&
       (appliedSettings?.at ?? 0) + 1000 < now // Only publish if the last applied settings was more than 1 second ago
     ) {
       events.push(
@@ -162,19 +162,19 @@ export function RoomEventsPublisher() {
           type: "song_settings",
           data: {
             songSettings: {
-              auto_scroll: songState.autoScrollOptions.enabled,
-              auto_scroll_interval: songState.autoScrollOptions.interval,
-              auto_scroll_speed: songState.autoScrollOptions.speed,
+              auto_scroll: songContext.autoScrollOptions.enabled,
+              auto_scroll_interval: songContext.autoScrollOptions.interval,
+              auto_scroll_speed: songContext.autoScrollOptions.speed,
             },
           },
         }),
       );
-      publish("song_settings", cloneDeep(songState.autoScrollOptions));
+      publish("song_settings", cloneDeep(songContext.autoScrollOptions));
     }
     // For current song editor
     if (
-      songState.songSheet &&
-      !isEqual(songState.songSheet, publishedSheet?.value) &&
+      songContext.songSheet &&
+      !isEqual(songContext.songSheet, publishedSheet?.value) &&
       (appliedSheet?.at ?? 0) + 1000 < now // Only publish if the last applied sheet was more than 1 second ago
     ) {
       events.push(
@@ -183,17 +183,17 @@ export function RoomEventsPublisher() {
           roomId: room.id!,
           type: "song_sheet",
           data: {
-            songId: songState.songId,
-            songSheet: songState.songSheet,
+            songId: songContext.songId,
+            songSheet: songContext.songSheet,
           },
         }),
       );
-      publish("song_sheet", songState.songSheet);
+      publish("song_sheet", songContext.songSheet);
     }
     // For new song editor
     if (
-      songState.newSheet &&
-      !isEqual(songState.newSheet, publishedNewSheet?.value) &&
+      songContext.newSheet &&
+      !isEqual(songContext.newSheet, publishedNewSheet?.value) &&
       (appliedNewSheet?.at ?? 0) + 1000 < now // Only publish if the last applied new sheet was more than 1 second ago
     ) {
       events.push(
@@ -202,11 +202,11 @@ export function RoomEventsPublisher() {
           roomId: room.id!,
           type: "new_sheet",
           data: {
-            newSheet: songState.newSheet,
+            newSheet: songContext.newSheet,
           },
         }),
       );
-      publish("new_sheet", songState.newSheet);
+      publish("new_sheet", songContext.newSheet);
     }
 
     if (events.length) {
@@ -227,14 +227,14 @@ export function RoomEventsPublisher() {
       // Clone the room state to avoid mutating the original object
       const stateDto = cloneDeep((room.state as RoomStateDto) || {});
 
-      stateDto.song_id = songState.songId || stateDto.song_id;
-      stateDto.song_sheet = songState.songSheet || stateDto.song_sheet;
-      stateDto.new_sheet = songState.newSheet || stateDto.new_sheet;
+      stateDto.song_id = songContext.songId || stateDto.song_id;
+      stateDto.song_sheet = songContext.songSheet || stateDto.song_sheet;
+      stateDto.new_sheet = songContext.newSheet || stateDto.new_sheet;
 
       stateDto.song_settings = stateDto.song_settings || {};
-      stateDto.song_settings.auto_scroll = songState.autoScrollOptions?.enabled == true;
-      stateDto.song_settings.auto_scroll_interval = songState.autoScrollOptions?.interval || 100;
-      stateDto.song_settings.auto_scroll_speed = songState.autoScrollOptions?.speed || 0.1;
+      stateDto.song_settings.auto_scroll = songContext.autoScrollOptions?.enabled == true;
+      stateDto.song_settings.auto_scroll_interval = songContext.autoScrollOptions?.interval || 100;
+      stateDto.song_settings.auto_scroll_speed = songContext.autoScrollOptions?.speed || 0.1;
 
       if (!isEqual(stateDto, room.state)) {
         console.debug("Updating room state:", stateDto, "from", room.state);
@@ -258,11 +258,11 @@ export function RoomEventsPublisher() {
     userId,
     room,
     roomState.syncEnabled,
-    songState.scrollPosition,
-    songState.songId,
-    songState.autoScrollOptions,
-    songState.songSheet,
-    songState.newSheet,
+    songContext.scrollPosition,
+    songContext.songId,
+    songContext.autoScrollOptions,
+    songContext.songSheet,
+    songContext.newSheet,
   ]);
 
   return <></>;
@@ -276,7 +276,7 @@ export function RoomEventsConsumer() {
   const { roomState, apply } = useRoomContext();
   const room = roomState.room;
 
-  const { updateSongState } = useSongContext();
+  const songContext = useSongContext();
 
   useEffect(() => {
     // Handling messages only if we are in room and have a userId
@@ -301,43 +301,33 @@ export function RoomEventsConsumer() {
       switch (dto.type) {
         case "song_sheet": {
           apply("song_sheet", dto.data.songSheet);
-          updateSongState({
-            songId: dto.data.songId,
-            songSheet: dto.data.songSheet,
-          });
+          songContext.setSongId(dto.data.songId);
+          songContext.setSongSheet(dto.data.songSheet);
           break;
         }
         case "new_sheet": {
           apply("new_sheet", dto.data.newSheet);
-          updateSongState({
-            newSheet: dto.data.newSheet,
-          });
+          songContext.setNewSheet(dto.data.newSheet);
           break;
         }
         case "song_settings": {
           apply("song_settings", dto.data.songSettings);
           const settingsDto = new SongSettingsDto().fromJson(dto.data.songSettings);
-          updateSongState({
-            autoScrollOptions: {
-              enabled: settingsDto.auto_scroll,
-              interval: settingsDto.auto_scroll_interval,
-              speed: settingsDto.auto_scroll_speed,
-            },
+          songContext.updateAutoScrollOptions({
+            enabled: settingsDto.auto_scroll,
+            interval: settingsDto.auto_scroll_interval,
+            speed: settingsDto.auto_scroll_speed,
           });
           break;
         }
         case "song_scroll": {
           apply("song_scroll", dto.data.scrollPercent);
-          updateSongState({
-            applyScrollPosition: dto.data.scrollPercent, // Had to use separate field to avoid infinite loop
-          });
+          songContext.setApplyScrollPosition(dto.data.scrollPercent);
           break;
         }
         case "song_id": {
           apply("song_id", dto.data.songId);
-          updateSongState({
-            songId: dto.data.songId,
-          });
+          songContext.setSongId(dto.data.songId);
           break;
         }
         default:

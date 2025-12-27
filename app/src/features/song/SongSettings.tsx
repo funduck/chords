@@ -21,9 +21,9 @@ function round5(value) {
 }
 
 function AutoScrollPlayStopSettings() {
-  const { songState, updateAutoScrollOptions } = useSongContext();
-  const enabled = songState.autoScrollOptions?.enabled ?? Config.AutoScrollEnabled;
-  const speed = songState.autoScrollOptions?.speed ?? Config.AutoScrollSpeed;
+  const { autoScrollOptions, updateAutoScrollOptions } = useSongContext();
+  const enabled = autoScrollOptions?.enabled ?? Config.AutoScrollEnabled;
+  const speed = autoScrollOptions?.speed ?? Config.AutoScrollSpeed;
 
   function setAutoScroll(value: boolean) {
     updateAutoScrollOptions({
@@ -54,14 +54,14 @@ function AutoScrollPlayStopSettings() {
             },
           ]}
           label={
-            <Button p={0} variant="subtle" disabled={!songState} onClick={() => setAutoScroll(false)}>
+            <Button p={0} variant="subtle" disabled={false} onClick={() => setAutoScroll(false)}>
               <IconPlayerStopFilled color="var(--mantine-color-text)" />
             </Button>
           }
         />
       ) : null}
       {!enabled && (
-        <Button variant="subtle" disabled={!songState} onClick={() => setAutoScroll(true)}>
+        <Button variant="subtle" disabled={false} onClick={() => setAutoScroll(true)}>
           <IconPlayerPlayFilled color="var(--mantine-color-text)" />
         </Button>
       )}
@@ -80,8 +80,8 @@ function AutoScrollPlayStopSettings() {
 }
 
 export function SongDisplaySettings() {
-  const { songState, updateDisplayOptions } = useSongContext();
-  const displayMode = songState.displayOptions?.mode || "render";
+  const { displayOptions, updateDisplayOptions } = useSongContext();
+  const displayMode = displayOptions?.mode || "render";
 
   const [dropdownOpened, { toggle }] = useDisclosure();
 
@@ -138,9 +138,9 @@ export function SongDisplaySettings() {
 }
 
 function SongKeySettings() {
-  const { songState, updateDisplayOptions } = useSongContext();
-  const transpose = songState.displayOptions?.transpose || 0;
-  const fontSize = songState.displayOptions?.fontSize || 16;
+  const { displayOptions, updateDisplayOptions } = useSongContext();
+  const transpose = displayOptions?.transpose || 0;
+  const fontSize = displayOptions?.fontSize || 16;
 
   return (
     <table>
