@@ -126,6 +126,7 @@ export function AccountProvider({ children }: { children: ReactNode }) {
                 onClick={(e) => {
                   e.preventDefault();
                   navigate(RoutesEnum.Confirm(res.code!));
+                  notifications.clean();
                 }}
                 href={res.link}
                 target="_blank"
