@@ -1,4 +1,4 @@
-check current database
+in room allow view shared artists and songs
 
 for sync of clients server should keep track of active client - the one broadcasting events 
     it should help with feedback loop if clients accidentally emit events while handling events

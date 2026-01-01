@@ -10,7 +10,9 @@ type Artist struct {
 
 type ArtistInfo struct {
 	Artist
-	Cursor string `json:"cursor,omitempty"` // Used for pagination
+	Cursor           string `json:"cursor,omitempty"` // Used for pagination
+	SongCount        int64  `json:"song_count"`
+	CompositionCount int64  `json:"composition_count"`
 }
 
 type ArtistsList struct {

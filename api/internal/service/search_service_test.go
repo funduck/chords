@@ -252,6 +252,101 @@ func TestSearchService_SearchArtists(t *testing.T) {
 			t.Errorf("Expected 1 artists in response, got %d", len(response.Artists))
 		}
 	})
+
+	t.Run("SongCount and CompositionCount", func(t *testing.T) {
+		// Get The Beatles and Metallica artists
+		var beatles, metallica entity.Artist
+		err := db.Where("name = ?", "The Beatles").First(&beatles).Error
+		if err != nil {
+			t.Fatalf("Failed to find The Beatles: %v", err)
+		}
+		err = db.Where("name = ?", "Metallica").First(&metallica).Error
+		if err != nil {
+			t.Fatalf("Failed to find Metallica: %v", err)
+		}
+
+		// Create songs where Beatles is artist and Metallica is composer
+		for i := 0; i < 3; i++ {
+			song := &entity.Song{
+				Title:     "Beatles Song " + string(rune('A'+i)),
+				Artists:   []*entity.Artist{&beatles},
+				Composers: []*entity.Artist{&metallica},
+				Format:    entity.SheetFormat_Chordpro,
+				Sheet:     "Test sheet",
+				Lyrics:    "Test lyrics",
+				OwnerID:   user.ID,
+			}
+			err = db.Create(song).Error
+			if err != nil {
+				t.Fatalf("Failed to create song: %v", err)
+			}
+			err = libraryService.AddSongToLibrary(ctx, pubLib, song)
+			if err != nil {
+				t.Fatalf("Failed to add song to library: %v", err)
+			}
+		}
+
+		// Create songs where Metallica is both artist and composer
+		for i := 0; i < 2; i++ {
+			song := &entity.Song{
+				Title:     "Metallica Song " + string(rune('A'+i)),
+				Artists:   []*entity.Artist{&metallica},
+				Composers: []*entity.Artist{&metallica},
+				Format:    entity.SheetFormat_Chordpro,
+				Sheet:     "Test sheet",
+				Lyrics:    "Test lyrics",
+				OwnerID:   user.ID,
+			}
+			err = db.Create(song).Error
+			if err != nil {
+				t.Fatalf("Failed to create song: %v", err)
+			}
+			err = libraryService.AddSongToLibrary(ctx, pubLib, song)
+			if err != nil {
+				t.Fatalf("Failed to add song to library: %v", err)
+			}
+		}
+
+		// Search for Beatles
+		response, err := service.SearchArtists(ctx, &dto.SearchArtistRequest{
+			Query:       "The Beatles",
+			Limit:       10,
+			ReturnRows:  true,
+			ReturnTotal: true,
+		})
+		if err != nil {
+			t.Fatalf("Expected no error, got %v", err)
+		}
+
+		if len(response.Artists) < 1 {
+			t.Fatalf("Expected at least 1 artist, got %d", len(response.Artists))
+		}
+
+		beatlesInfo := response.Artists[0]
+		assert.Equal(t, "The Beatles", beatlesInfo.Name)
+		assert.Equal(t, int64(3), beatlesInfo.SongCount, "Expected Beatles to have 3 songs")
+		assert.Equal(t, int64(0), beatlesInfo.CompositionCount, "Expected Beatles to have 0 compositions")
+
+		// Search for Metallica
+		response, err = service.SearchArtists(ctx, &dto.SearchArtistRequest{
+			Query:       "Metallica",
+			Limit:       10,
+			ReturnRows:  true,
+			ReturnTotal: true,
+		})
+		if err != nil {
+			t.Fatalf("Expected no error, got %v", err)
+		}
+
+		if len(response.Artists) < 1 {
+			t.Fatalf("Expected at least 1 artist, got %d", len(response.Artists))
+		}
+
+		metallicaInfo := response.Artists[0]
+		assert.Equal(t, "Metallica", metallicaInfo.Name)
+		assert.Equal(t, int64(2), metallicaInfo.SongCount, "Expected Metallica to have 2 songs as artist")
+		assert.Equal(t, int64(5), metallicaInfo.CompositionCount, "Expected Metallica to have 5 compositions (3 Beatles songs + 2 own songs)")
+	})
 }
 
 func TestSearchService_SearchSongs(t *testing.T) {
@@ -273,6 +368,7 @@ func TestSearchService_SearchSongs(t *testing.T) {
 		Title:   "Test Song",
 		Artists: []*entity.Artist{&artist},
 		Format:  "chordpro",
+		Lyrics:  "This is a test song With some lyrics",
 		Sheet: `
         {title: Test Song}
         {artist: Test Artist}
@@ -309,6 +405,7 @@ func TestSearchService_SearchSongs(t *testing.T) {
 	t.Run("Search by lyrics finds some", func(t *testing.T) {
 		res, err := service.SearchSongs(context.Background(), &dto.SearchSongRequest{
 			Query:       "with some lyrics",
+			ByLyrics:    true,
 			Limit:       10,
 			ReturnRows:  true,
 			ReturnTotal: true,

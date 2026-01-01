@@ -5,7 +5,9 @@ clean:
 
 gen-openapi:
 	swag init --parseDependency -g cmd/api/main.go
+	echo "swag init ok"
 	swag fmt -g cmd/api/main.go
+	echo "swag fmt ok"
 
 dev:
 	make gen-openapi

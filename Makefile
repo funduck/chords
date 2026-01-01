@@ -3,7 +3,7 @@ caddy-set-priveleges:
 	sudo setcap cap_net_bind_service=+ep /home/oleg/Downloads/caddy_linux_amd64 
 
 app-codegen:
-	cd app && bash -c './codegen.sh'
+	cd app && make codegen
 
 # Development mode
 caddy-dev:

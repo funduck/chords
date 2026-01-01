@@ -33,19 +33,15 @@ func (s *SearchService) SearchArtists(ctx context.Context, req *dto.SearchArtist
 	if req.LibraryType == "" {
 		req.LibraryType = entity.LibraryType_Public
 	}
-	if req.LibraryType != entity.LibraryType_Public {
-		q = q.Joins("JOIN library_artists la ON la.artist_id = artists.id").
-			Joins("JOIN libraries l ON l.id = la.library_id").
-			Where("l.type = ?", req.LibraryType)
 
-		if req.LibraryType == entity.LibraryType_Private || req.LibraryType == entity.LibraryType_Favorites {
-			accessToken, err := auth.GetAccessToken(ctx)
-			if err != nil {
-				return nil, err
-			}
-			q = q.Where("l.owner_id = ?", accessToken.UserID)
-		}
+	accessToken, err := auth.GetAccessToken(ctx)
+	if err != nil {
+		return nil, err
 	}
+
+	q = q.Joins("JOIN library_artists la ON la.artist_id = artists.id").
+		Joins("JOIN libraries l ON l.id = la.library_id").
+		Where("l.type = ? AND (l.type = 'public' OR l.owner_id = ?)", req.LibraryType, accessToken.UserID)
 
 	if req.Query != "" {
 		normalizedName := s.artistService.normalizeName(req.Query)
@@ -67,7 +63,12 @@ func (s *SearchService) SearchArtists(ctx context.Context, req *dto.SearchArtist
 
 	artistsList := []*entity.ArtistInfo{}
 	if req.ReturnRows {
-		var artists []*entity.Artist
+		type ArtistWithCount struct {
+			entity.Artist
+			SongCount        int64
+			CompositionCount int64
+		}
+		var results []ArtistWithCount
 
 		if req.CursorAfter != "" {
 			// Use cursor for pagination
@@ -80,19 +81,40 @@ func (s *SearchService) SearchArtists(ctx context.Context, req *dto.SearchArtist
 			q = q.Where("name_normalized < ?", normalizedCursor)
 		}
 
-		// Find artists with pagination
+		// Find artists with song count and composition count in a single query
 		err := q.
+			Select(`artists.*, 
+				COALESCE(
+					(SELECT COUNT(DISTINCT song_artists.song_id) FROM song_artists 
+					JOIN library_songs ls ON ls.song_id = song_artists.song_id
+					JOIN libraries l ON l.id = ls.library_id  
+					WHERE artist_id = artists.id
+					AND l.type = ?
+					AND (l.type = 'public' OR l.owner_id = ?)
+				),
+				0) as song_count, 
+				COALESCE(
+					(SELECT COUNT(DISTINCT song_composers.song_id) FROM song_composers
+					JOIN library_songs ls ON ls.song_id = song_composers.song_id
+					JOIN libraries l ON l.id = ls.library_id  
+					WHERE artist_id = artists.id
+					AND l.type = ?
+					AND (l.type = 'public' OR l.owner_id = ?)
+				),
+				0) as composition_count`, req.LibraryType, accessToken.UserID, req.LibraryType, accessToken.UserID).
 			Order("artists.name_normalized ASC").
 			Limit(req.Limit).
-			Find(&artists).Error
+			Scan(&results).Error
 		if err != nil {
 			return nil, err
 		}
 		// Populate cursors for pagination
-		for _, artist := range artists {
+		for _, result := range results {
 			listItem := &entity.ArtistInfo{
-				Artist: *artist,
-				Cursor: artist.NameNormalized,
+				Artist:           result.Artist,
+				Cursor:           result.NameNormalized,
+				SongCount:        result.SongCount,
+				CompositionCount: result.CompositionCount,
 			}
 			artistsList = append(artistsList, listItem)
 		}

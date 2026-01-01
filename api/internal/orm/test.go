@@ -8,6 +8,7 @@ import (
 )
 
 func InitForTest() (*gorm.DB, *sql.DB) {
+	print("Initializing test database...\n")
 	// file := "test.sqlite"
 	// if _, err := os.Stat(file); err == nil {
 	// 	if err := os.Remove(file); err != nil {

@@ -18,10 +18,20 @@ function SearchArtistListItem({ entity }: { entity: ArtistInfoEntity }) {
       href={RoutesEnum.Artists(entity.id)}
     >
       <Flex direction={"row"} align={"center"} gap={"sm"} pl="md">
-        <Text size="lg">{entity.name}</Text>
-        <Text c="dimmed" size="xs">
+        <Text c="dimmed" size="xs" w={40}>
           #{entity.id}
         </Text>
+        <Text size="lg">{entity.name}</Text>
+        {(entity.song_count ?? 0) > 0 && (
+          <Text c="dimmed" size="sm">
+            ({entity.song_count} songs)
+          </Text>
+        )}
+        {(entity.composition_count ?? 0) > 0 && (
+          <Text c="dimmed" size="sm">
+            ({entity.composition_count} compositions)
+          </Text>
+        )}
       </Flex>
     </Anchor>
   );
