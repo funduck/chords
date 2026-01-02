@@ -100,7 +100,7 @@ function AutoScrollManager({ viewportRef }: { viewportRef: React.RefObject<HTMLD
       // Get font size in pixels
       const { height } = estimateFontSize({});
 
-      let scrollSpeed = Math.max(1, speed); // 1-100
+      let scrollSpeed = Math.max(10, speed); // 1-100
       // Convert scroll speed from percentage to pixels
       scrollSpeed = Math.ceil((scrollSpeed * height) / 10);
 

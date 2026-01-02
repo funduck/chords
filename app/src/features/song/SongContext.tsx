@@ -140,10 +140,11 @@ export function SongContextProvider({ children }: { children: ReactNode }) {
     setSongId(undefined);
     setLoadedSong(undefined);
     setSongSheet(undefined);
-    setDisplayOptions({
+    setDisplayOptions((prev) => ({
       mode: "editor",
       transpose: 0,
-    });
+      fontSize: prev?.fontSize || Config.SongFontSize,
+    }));
     setAutoScrollOptions({
       enabled: false,
     });
@@ -167,10 +168,11 @@ export function SongContextProvider({ children }: { children: ReactNode }) {
           setSongId(songId);
           setLoadedSong(s);
           setSongSheet(s.sheet);
-          setDisplayOptions({
+          setDisplayOptions((prev) => ({
             mode: "render",
             transpose: 0,
-          });
+            fontSize: prev?.fontSize || Config.SongFontSize,
+          }));
           setAutoScrollOptions({
             enabled: false,
           });
@@ -184,9 +186,10 @@ export function SongContextProvider({ children }: { children: ReactNode }) {
 
   const openEditor = useCallback(() => {
     return () => {
-      setDisplayOptions({
+      setDisplayOptions((prev) => ({
+        ...prev,
         mode: "editor",
-      });
+      }));
       setAutoScrollOptions({
         enabled: false,
       });
@@ -196,9 +199,10 @@ export function SongContextProvider({ children }: { children: ReactNode }) {
 
   const openSong = useCallback(() => {
     return () => {
-      setDisplayOptions({
+      setDisplayOptions((prev) => ({
+        ...prev,
         mode: "render",
-      });
+      }));
       if (songId) {
         navigate(RoutesEnum.Songs(songId));
       } else {

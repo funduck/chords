@@ -16,7 +16,8 @@ const SongEditor = memo(({ currentSong }: { currentSong?: boolean }) => {
 
   const userId = useSignal(Signals.userId);
 
-  const { songSheet, newSheet, loadedSong, setSongSheet, setNewSheet, setSongId } = useSongContext();
+  const { songSheet, newSheet, loadedSong, displayOptions, setSongSheet, setNewSheet, setSongId } = useSongContext();
+  const fontSize = displayOptions?.fontSize || 16;
 
   const [localValue, setLocalValue] = useState("");
 
@@ -289,7 +290,7 @@ const SongEditor = memo(({ currentSong }: { currentSong?: boolean }) => {
         )}
       </Group>
 
-      <CodeMirror value={localValue} onChange={onEditorChange} theme={okaidia} />
+      <CodeMirror value={localValue} onChange={onEditorChange} theme={okaidia} style={{ fontSize: `${fontSize}px` }} />
     </>
   );
 });

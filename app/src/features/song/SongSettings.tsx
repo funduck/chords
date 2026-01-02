@@ -38,7 +38,7 @@ function AutoScrollPlayStopSettings() {
           p={0}
           c="primary"
           variant="subtle"
-          onClick={() => updateAutoScrollOptions({ speed: round5(speed - 10) })}
+          onClick={() => updateAutoScrollOptions({ speed: round5(speed - 20) })}
         >
           <IconMinus />
         </Button>
@@ -70,7 +70,7 @@ function AutoScrollPlayStopSettings() {
           p={0}
           c="primary"
           variant="subtle"
-          onClick={() => updateAutoScrollOptions({ speed: round5(speed + 10) })}
+          onClick={() => updateAutoScrollOptions({ speed: round5(speed + 20) })}
         >
           <IconPlus />
         </Button>
