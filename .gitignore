@@ -1,8 +1,7 @@
 .idea
 .env
-api.yaml
-prod.env
-prod.api.yaml
+*config.yaml
+*.env
 prod.Caddyfile
 coverage
 dist

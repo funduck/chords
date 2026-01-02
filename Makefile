@@ -31,3 +31,6 @@ dev:
 		"make caddy-dev" \
 		"make app-dev" \
 		"make api-dev"
+
+start:
+	cd deploy && docker compose up

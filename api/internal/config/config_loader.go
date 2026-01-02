@@ -14,9 +14,9 @@ func Init() {
 		return
 	}
 	runtime_viper = viper.New()
-	runtime_viper.SetConfigName("api")  // name of config file (without extension)
-	runtime_viper.SetConfigType("yaml") // or "json", "toml", etc.
-	runtime_viper.AddConfigPath(".")    // path to look for the config file in
+	runtime_viper.SetConfigName("config") // name of config file (without extension)
+	runtime_viper.SetConfigType("yaml")   // or "json", "toml", etc.
+	runtime_viper.AddConfigPath(".")      // path to look for the config file in
 
 	// Enable automatic key mapping
 	runtime_viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))

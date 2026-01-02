@@ -10,7 +10,7 @@ import (
 )
 
 // @title			Chords API
-// @version		1.0
+// @version		1.1.0
 // @description	This is a Chords server.
 func main() {
 	log := logger.New()
