@@ -18,18 +18,11 @@ COPY ./prod.env .env
 # Build the application
 RUN yarn run build
 
-# Production stage - serve static files
-FROM caddy:2.4.5-alpine
+# Production stage - put static files to right place for Caddy
+FROM alpine:latest
 
 # Copy built static files from builder stage
 COPY --from=builder /app/docs /app/docs
+COPY --from=builder /app/index.html /app/index.html
 
-# Copy Caddyfile if you have one, otherwise Caddy will serve files from /usr/share/caddy
-# Override with production environment variables
-COPY ./prod.Caddyfile /etc/caddy/Caddyfile
-
-EXPOSE 80
-EXPOSE 443
-EXPOSE 2019
-
-# Caddy runs automatically, no need for CMD
+CMD ["cp", "-r", "/app", "/public/mychords/app"]
