@@ -16,8 +16,14 @@ import { useIsMobile } from "@src/hooks/isMobile";
 
 import { useSongContext } from "./SongContext";
 
-function round5(value) {
-  return Math.min(Math.max(Math.round(value / 5) * 5, 1), 100);
+const SCROLL_SPEED_STEPS = 8;
+const SCROLL_SPEED_STEP_SIZE = 100 / SCROLL_SPEED_STEPS;
+
+function roundStep(value: number): number {
+  return Math.min(
+    Math.max(Math.round(value / SCROLL_SPEED_STEP_SIZE) * SCROLL_SPEED_STEP_SIZE, SCROLL_SPEED_STEP_SIZE),
+    100,
+  );
 }
 
 function AutoScrollPlayStopSettings() {
@@ -38,7 +44,7 @@ function AutoScrollPlayStopSettings() {
           p={0}
           c="primary"
           variant="subtle"
-          onClick={() => updateAutoScrollOptions({ speed: round5(speed - 20) })}
+          onClick={() => updateAutoScrollOptions({ speed: roundStep(speed - SCROLL_SPEED_STEP_SIZE) })}
         >
           <IconMinus />
         </Button>
@@ -70,7 +76,7 @@ function AutoScrollPlayStopSettings() {
           p={0}
           c="primary"
           variant="subtle"
-          onClick={() => updateAutoScrollOptions({ speed: round5(speed + 20) })}
+          onClick={() => updateAutoScrollOptions({ speed: roundStep(speed + SCROLL_SPEED_STEP_SIZE) })}
         >
           <IconPlus />
         </Button>
