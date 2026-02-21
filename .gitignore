@@ -2,7 +2,6 @@
 .env
 *config.yaml
 *.env
-prod.Caddyfile
 coverage
 dist
 node_modules

@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-FROM golang:1.23-alpine AS build_base
+FROM golang:1.25-alpine AS build_base
 WORKDIR /app
 
 ENV CGO_ENABLED=1
@@ -23,6 +23,8 @@ WORKDIR /app
 
 COPY --from=build_base /app/bin/api ./api
 COPY --from=build_base /app/docs ./docs
-COPY ./prod.config.yaml ./config.yaml
+COPY ./config.yaml ./config.yaml
+
+EXPOSE 80
 
 CMD ["/app/api"]

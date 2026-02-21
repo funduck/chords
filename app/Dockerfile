@@ -12,17 +12,18 @@ RUN yarn install --frozen-lockfile
 # Copy source files
 COPY . .
 
-# Override with production environment variables
-COPY ./prod.env .env
-
 # Build the application
 RUN yarn run build
 
-# Production stage - put static files to right place for Caddy
-FROM alpine:latest
+# Production stage - serve with Caddy
+FROM caddy:2-alpine
 
-# Copy built static files from builder stage
-COPY --from=builder /app/docs /app/docs
-COPY --from=builder /app/index.html /app/index.html
+# Copy built static files from builder stage (docs contains index.html and assets)
+COPY --from=builder /app/docs /srv
 
-CMD ["cp", "-r", "/app", "/public/mychords/app"]
+# Copy Caddyfile
+COPY Caddyfile /etc/caddy/Caddyfile
+
+RUN caddy fmt --overwrite /etc/caddy/Caddyfile
+
+EXPOSE 8080

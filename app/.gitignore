@@ -27,5 +27,3 @@ dist-ssr
 *.sw?
 
 /generated/api
-
-/Caddyfile

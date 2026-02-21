@@ -48,3 +48,33 @@ If you have ideas or want to contribute, feel free to open an issue or a pull re
 For [sheet parser](https://github.com/martijnversluis/ChordSheetJS)  
 For [chord diagrams](https://github.com/techies23/react-chords)  
 For [chords database](https://github.com/tombatossals/react-chords)
+
+## Development
+### Local Development
+To run api and app locally, use Docker Compose:
+
+**Development mode:**
+- `make up` - start development environment (with hot reload)
+- `make down` - stop development environment
+- `make logs` - view logs from all services
+- `make logs-api` - view logs from API only
+- `make logs-app` - view logs from app only
+
+Development mode features:
+- API runs with `air` for hot reload on code changes
+- App runs with `vite dev` for hot module replacement
+- Caddy serves as reverse proxy on `http://localhost:8080`
+- Database stored in `./data/api` directory
+
+**Prerequisites:**
+- Docker and Docker Compose installed
+
+**Production mode (local testing):**
+- `make up-prod` - start production environment
+- `make down-prod` - stop production environment  
+- `make logs-prod` - view logs from production environment
+
+Production mode builds optimized versions:
+- API compiled with Go
+- App built with Vite and served with Caddy
+- Available at `http://localhost:8080`

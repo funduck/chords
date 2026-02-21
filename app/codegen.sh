@@ -1,8 +1,9 @@
 source .env
 
+# In dev mode
 # API
-echo $CODEGEN_API_URI/swagger/doc.json
-curl -sL $CODEGEN_API_URI/swagger/doc.json -o api.json
+echo api-dev:8080/swagger/doc.json
+curl -sL api-dev:8080/swagger/doc.json -o api.json
 
 rm -rf generated/api
 

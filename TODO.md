@@ -1,3 +1,17 @@
+add method "make public" / "remove public"
+
+on song add button
+
+add username
+
+if username is empty assign some mock
+
+add method "set username"
+
+on account add input
+
+display username in public songs
+
 in room allow view shared artists and songs
 
 for sync of clients server should keep track of active client - the one broadcasting events 

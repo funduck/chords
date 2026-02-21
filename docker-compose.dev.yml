@@ -1,0 +1,55 @@
+version: "3.8"
+
+services:
+  api-dev:
+    image: mychords-api-dev
+    build:
+      context: ./api
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./api:/app
+      - ./data/api:/data
+    ports:
+      - "8081:8080"
+    environment:
+      - CGO_ENABLED=1
+    networks:
+      - mychords-network
+
+  app-dev:
+    image: mychords-app-dev
+    build:
+      context: ./app
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./app:/app
+    ports:
+      - "8082:8080"
+    environment:
+      - VITE_PORT=8080
+    networks:
+      - mychords-network
+    depends_on:
+      - api-dev
+
+  caddy-dev:
+    image: caddy:2-alpine
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./app/Caddyfile.dev:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - mychords-network
+    depends_on:
+      - api-dev
+      - app-dev
+
+networks:
+  mychords-network:
+    driver: bridge
+
+volumes:
+  caddy_data:
+  caddy_config:

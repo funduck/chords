@@ -1,19 +1,6 @@
 # Setup
-caddy-set-priveleges:
-	sudo setcap cap_net_bind_service=+ep /home/oleg/Downloads/caddy_linux_amd64 
-
 app-codegen:
 	cd app && make codegen
-
-# Development mode
-caddy-dev:
-	caddy run --config Caddyfile
-
-app-dev:
-	cd app && make dev
-
-api-dev:
-	cd api && make dev
 
 # Test mode
 api-test:
@@ -24,13 +11,36 @@ build-tools:
 	cd api && make build-uploader
 
 overwrite-database:
-	./overwrite-database.sh
+	./scripts/overwrite-database.sh
 
-dev:
-	concurrently \
-		"make caddy-dev" \
-		"make app-dev" \
-		"make api-dev"
+# Development mode (Docker)
+up:
+	docker compose -f docker-compose.dev.yml up --build -d
 
-start:
-	cd deploy && docker compose up
+down:
+	docker compose -f docker-compose.dev.yml down
+
+logs:
+	docker compose -f docker-compose.dev.yml logs -f
+
+logs-api:
+	docker compose -f docker-compose.dev.yml logs -f api
+
+logs-app:
+	docker compose -f docker-compose.dev.yml logs -f app
+
+# Production mode (Docker)
+up-prod:
+	docker compose -f docker-compose.yml up --build -d
+
+down-prod:
+	docker compose -f docker-compose.yml down
+
+logs-prod:
+	docker compose -f docker-compose.yml logs -f
+
+logs-api-prod:
+	docker compose -f docker-compose.yml logs -f api
+
+logs-app-prod:
+	docker compose -f docker-compose.yml logs -f app

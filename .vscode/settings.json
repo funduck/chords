@@ -38,13 +38,13 @@
       "previewLimit": 50,
       "driver": "SQLite",
       "name": "dev",
-      "database": "${workspaceFolder:chords}/data/dev.sqlite"
+      "database": "${workspaceFolder:chords}/data/api/dev.sqlite"
     },
     {
       "previewLimit": 50,
       "driver": "SQLite",
       "name": "prod",
-      "database": "${workspaceFolder:chords}/data/prod.sqlite"
+      "database": "${workspaceFolder:chords}/data/api/prod.sqlite"
     }
   ]
 }
