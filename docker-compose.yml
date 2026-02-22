@@ -1,7 +1,7 @@
 version: "3.8"
 
 services:
-  api:
+  mychords-api:
     image: mychords-api
     build:
       context: ./api
@@ -11,21 +11,21 @@ services:
     expose:
       - "8080"
     networks:
-      - mychords-network
+      - default
 
-  app:
+  mychords-app:
     image: mychords-app
     build:
       context: ./app
       dockerfile: Dockerfile
     ports:
       - "8080:8080"
-      - "2019:2019" # Caddy admin port
     networks:
-      - mychords-network
+      - default
     depends_on:
-      - api
+      - mychords-api
 
 networks:
-  mychords-network:
+  default:
     driver: bridge
+    name: serva4ok_network

@@ -1,14 +1,14 @@
-port: 9000
-sqlite_file: ../data/dev.sqlite
+port: 8080
+sqlite_file: ../data/prod.sqlite
 secret: topsecret
 access_token_expires_in_seconds: 86400
-confirmation_link: "https://chords.net/confirm/{code}"
+confirmation_link: "http://localhost:8080/confirm/{code}"
 
 # dev | prod
-logger_env: prod
+logger_env: dev
 
 # debug | info | warn | error
-logger_level: info
+logger_level: debug
 logger_levels:
-  db: info
+  db: debug
   client: debug
