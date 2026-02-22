@@ -44,3 +44,6 @@ logs-api-prod:
 
 logs-app-prod:
 	docker compose -f docker-compose.yml logs -f app
+
+ci:
+	cd deploy && ./CI.sh
