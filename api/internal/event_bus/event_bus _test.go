@@ -20,7 +20,7 @@ func TestEventBus(t *testing.T) {
 			Type: "test_event",
 			Data: "test_data",
 		}
-		bus.Broadcast(&event)
+		bus.SendToClients([]uint{client.ID}, &event)
 
 		select {
 		case got := <-client.SendChan:
@@ -42,7 +42,7 @@ func TestEventBus(t *testing.T) {
 			Type: "test_event",
 			Data: "test_data",
 		}
-		bus.Broadcast(&event)
+		bus.SendToClients([]uint{client.ID}, &event)
 
 		select {
 		case <-client.SendChan:

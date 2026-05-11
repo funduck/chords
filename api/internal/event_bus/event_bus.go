@@ -6,26 +6,10 @@ import (
 	"chords.com/api/internal/logger"
 )
 
-type Event struct {
-	Origin  uint        `json:"origin"`            // ID of the client that originated the event
-	Context string      `json:"context,omitempty"` // Optional context for the event, client specific
-	Type    string      `json:"type"`              // Client specific event type
-	Data    interface{} `json:"data"`              // Client specific event data
-}
-
-type Client struct {
-	ID        uint
-	SendChan  chan *Event
-	Listeners map[string]func(*Event) // Optional: for handling events
-}
-
-func NewClient(id uint) *Client {
-	return &Client{
-		ID:       uint(id),
-		SendChan: make(chan *Event, 8), // Buffered channel to prevent blocking
-	}
-}
-
+/*
+EventBus is an internal event router.
+It enables several patterns: fan-out,
+*/
 type EventBus struct {
 	clients map[uint]*Client
 	mu      sync.Mutex
@@ -75,50 +59,10 @@ func (bus *EventBus) Unregister(client *Client) {
 	delete(bus.clients, client.ID)
 }
 
-func (bus *EventBus) Broadcast(event *Event) {
-	if event == nil {
-		return
-	}
-	bus.mu.Lock()
-	defer bus.mu.Unlock()
-	for clientID := range bus.clients {
-		if event.Origin == clientID {
-			continue // Avoid sending the event back to the origin
-		}
-		bus.log.Debugw("Broadcasting event to client",
-			"clientID", clientID,
-			"event", event,
-		)
-		select {
-		case bus.clients[clientID].SendChan <- event:
-		default:
-			// Drop if buffer is full
-		}
-	}
-}
-
-func (bus *EventBus) SendToClient(clientID uint, event *Event) {
-	if event == nil {
-		return
-	}
-	if event.Origin == clientID {
-		return // Avoid sending the event back to the origin
-	}
-	bus.mu.Lock()
-	defer bus.mu.Unlock()
-	if client, exists := bus.clients[clientID]; exists {
-		bus.log.Debugw("Sending event to client",
-			"clientID", clientID,
-			"event", event,
-		)
-		select {
-		case client.SendChan <- event:
-		default:
-			// Drop if buffer is full
-		}
-	}
-}
-
+/*
+SendToClients sends event to particular clients if they are connected right now.
+Origin client is skipped.
+*/
 func (bus *EventBus) SendToClients(clientIDs []uint, event *Event) {
 	if event == nil {
 		return
@@ -144,27 +88,35 @@ func (bus *EventBus) SendToClients(clientIDs []uint, event *Event) {
 	}
 }
 
-func (bus *EventBus) AddClientListener(clientID uint, name string, listener func(*Event)) {
+/*
+Adds listener to events emitted by particular client.
+So this listener() will be invoked on every event from the client.
+Listener key is required for removing the listener.
+*/
+func (bus *EventBus) AddClientListener(clientID uint, listenerKey string, listener func(*Event)) {
 	bus.mu.Lock()
 	defer bus.mu.Unlock()
 	if client, exists := bus.clients[clientID]; exists {
 		if client.Listeners == nil {
 			client.Listeners = make(map[string]func(*Event))
 		}
-		client.Listeners[name] = listener // Use a default listener key
+		client.Listeners[listenerKey] = listener // Use a default listener key
 		bus.log.Debugw("Added listener for client",
 			"clientID", clientID,
-			"listenerName", name,
+			"listenerKey", listenerKey,
 			"listenersCount", len(client.Listeners),
 		)
 	} else {
 		bus.log.Infow("Client not found for adding listener",
 			"clientID", clientID,
-			"listenerName", name,
+			"listenerKey", listenerKey,
 		)
 	}
 }
 
+/*
+RemoveClientListener removes particular listener from client.
+*/
 func (bus *EventBus) RemoveClientListener(clientID uint, listenerKey string) {
 	bus.mu.Lock()
 	defer bus.mu.Unlock()
@@ -180,6 +132,9 @@ func (bus *EventBus) RemoveClientListener(clientID uint, listenerKey string) {
 	}
 }
 
+/*
+OnClientEvent pushes event to all client listeners.
+*/
 func (bus *EventBus) OnClientEvent(clientID uint, event *Event) {
 	if event == nil {
 		return

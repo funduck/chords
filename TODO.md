@@ -1,3 +1,10 @@
+# Improve event bus design
+Refactor EventBus to
+1. EventsSender allows SendToClients(client ids)
+2. EventsObserver allows to attach listeners to client events
+
+
+# Backlog
 add method "make public" / "remove public"
 
 on song add button
