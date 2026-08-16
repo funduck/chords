@@ -11,6 +11,7 @@ type App struct {
 	artistService     *service.ArtistService
 	libraryService    *service.LibraryService
 	roomService       *service.RoomService
+	shareService      *service.ShareService
 	songService       *service.SongService
 	createSongUseCase *usecase.CreateSongUseCase
 }
@@ -21,6 +22,7 @@ func NewApp() *App {
 		artistService:     service.NewArtistService(),
 		libraryService:    service.NewLibraryService(),
 		roomService:       service.NewRoomService(),
+		shareService:      service.NewShareService(),
 		songService:       service.NewSongService(),
 		createSongUseCase: usecase.NewCreateSongUseCase(),
 	}

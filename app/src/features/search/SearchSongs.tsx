@@ -1,9 +1,10 @@
-import { Box, Group, Switch } from "@mantine/core";
+import { Box, Group, Select, Switch } from "@mantine/core";
 import { useCallback, useEffect, useState } from "react";
 
 import { SearchSongsRequest } from "@generated/api";
 
 import PageTop from "@src/components/PageTop";
+import { useAccountContext } from "@src/features/account/AccountContext";
 import { useSongsApi } from "@src/hooks/Api";
 import { useScrollPosition } from "@src/hooks/useScrollPosition";
 
@@ -12,9 +13,13 @@ import { useSearchSongsContext } from "./SearchContext";
 import SearchEntities from "./SearchEntities";
 import SearchResetArtist from "./SearchResetArtist";
 import SearchSongListItem from "./SearchSongListItem";
+import { deriveLibraryFilter, useLibraryOptions } from "./libraryFilter";
+
+const LIBRARY_PREF_KEY = "search-songs-preferences-library";
 
 function SearchSongs({ artistId }: { artistId?: number }) {
   const songsApi = useSongsApi();
+  const { collections } = useAccountContext();
 
   // Initialize scroll position management
   useScrollPosition();
@@ -32,14 +37,19 @@ function SearchSongs({ artistId }: { artistId?: number }) {
     });
   }, [songsApi]);
 
-  const [inPrivateLibs, setInPrivateLibs] = useState(() => {
-    const saved = localStorage.getItem("search-songs-preferences-inPrivateLibs");
-    return saved !== null ? JSON.parse(saved) : true;
-  });
+  const [librarySel, setLibrarySel] = useState<string>(
+    () => localStorage.getItem(LIBRARY_PREF_KEY) || "my",
+  );
   const [byLyrics, setByLyrics] = useState(() => {
     const saved = localStorage.getItem("search-songs-preferences-byLyrics");
     return saved !== null ? JSON.parse(saved) : true;
   });
+
+  const libraryOptions = useLibraryOptions(collections);
+  // Fall back to "my" if the selected shared collection was revoked.
+  const effectiveSel =
+    collections === null || libraryOptions.some((o) => o.value === librarySel) ? librarySel : "my";
+  const { libraryType, ownerId } = deriveLibraryFilter(effectiveSel);
 
   const searchMethod = useCallback(
     (params: SearchSongsRequest) =>
@@ -47,11 +57,12 @@ function SearchSongs({ artistId }: { artistId?: number }) {
         request: {
           ...params.request,
           artist_id: artistId || undefined,
-          library_type: inPrivateLibs ? "private" : undefined,
+          library_type: libraryType,
+          owner_id: ownerId,
           by_lyrics: byLyrics,
         },
       }),
-    [songsApi, artistId, inPrivateLibs, byLyrics],
+    [songsApi, artistId, libraryType, ownerId, byLyrics],
   );
 
   if (!songsApi) {
@@ -73,19 +84,22 @@ function SearchSongs({ artistId }: { artistId?: number }) {
         entityName="songs"
         afterQueryInput={
           <Box ml="sm">
-            {/* <Card padding="sm" radius="md" mb="md"> */}
             <Group gap="lg" wrap={"wrap"}>
               <Group>
-                <Switch
-                  label="In my library"
-                  checked={inPrivateLibs}
-                  onChange={(e) => {
-                    const newValue = e.currentTarget.checked;
-                    setInPrivateLibs(newValue);
-                    localStorage.setItem("search-songs-preferences-inPrivateLibs", JSON.stringify(newValue));
+                <Select
+                  label="Library"
+                  data={libraryOptions}
+                  value={effectiveSel}
+                  onChange={(value) => {
+                    const newValue = value || "my";
+                    setLibrarySel(newValue);
+                    localStorage.setItem(LIBRARY_PREF_KEY, newValue);
                   }}
+                  allowDeselect={false}
+                  comboboxProps={{ withinPortal: true }}
+                  w={220}
                 />
-                {!inPrivateLibs && <PublicSearchDisclaimer />}
+                {effectiveSel === "public" && <PublicSearchDisclaimer />}
               </Group>
               <Switch
                 label="By lyrics"
@@ -97,7 +111,6 @@ function SearchSongs({ artistId }: { artistId?: number }) {
                 }}
               />
             </Group>
-            {/* </Card> */}
           </Box>
         }
       />

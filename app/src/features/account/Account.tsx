@@ -1,5 +1,5 @@
 import { Box, Button, Card, Grid, Group, Space, Stack, Text, ThemeIcon, Title } from "@mantine/core";
-import { IconKey, IconLogout, IconTrash, IconUserCircle } from "@tabler/icons-react";
+import { IconKey, IconLink, IconLogout, IconTrash, IconUserCircle } from "@tabler/icons-react";
 import { useEffect } from "react";
 
 import ClearBrowser from "@src/components/ClearBrowser";
@@ -9,6 +9,7 @@ import { useUserApi } from "@src/hooks/Api";
 import { useHeader } from "@src/hooks/Header";
 
 import Login from "./Login";
+import Sharing from "./Sharing";
 
 function Account() {
   const userApi = useUserApi();
@@ -102,6 +103,20 @@ function Account() {
               Clear cached app data on this device.
             </Text>
             <ClearBrowser />
+          </Card>
+        </Grid.Col>
+
+        {/* Sharing */}
+        <Grid.Col span={{ base: 12, md: 6, lg: 4 }}>
+          <Card withBorder radius="md" padding="lg" shadow="sm">
+            <Group mb="md" align="flex-start">
+              <ThemeIcon size={40} radius="md" color="var(--mantine-color-dimmed)">
+                <IconLink size={24} />
+              </ThemeIcon>
+              <Title order={4}>Sharing</Title>
+            </Group>
+
+            <Sharing />
           </Card>
         </Grid.Col>
       </Grid>

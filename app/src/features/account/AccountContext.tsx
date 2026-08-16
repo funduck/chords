@@ -3,20 +3,24 @@ import { notifications } from "@mantine/notifications";
 import { ReactNode, createContext, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 
-import { InternalAppLoginResponse } from "@generated/api";
+import { ChordsComApiInternalDtoSharedCollection, InternalAppLoginResponse } from "@generated/api";
 
 import { RoutesEnum } from "@src/Router";
-import { AuthEntity, useAuthApi, useUserApi } from "@src/hooks/Api";
+import { AuthEntity, useAuthApi, useSharesApi, useUserApi } from "@src/hooks/Api";
 import { Signals } from "@src/services/signals-registry";
+
+export type SharedCollection = ChordsComApiInternalDtoSharedCollection;
 
 interface AccountContextType {
   accessToken?: string | null;
   auths?: AuthEntity[] | null;
   userId?: number | null;
+  collections?: SharedCollection[] | null;
   loginAnonymous: () => Promise<void>;
   loginByEmail: (email: string) => Promise<void>;
   confirmAuth: (code: string) => Promise<void>;
   getAuths: () => Promise<void>;
+  getCollections: () => Promise<void>;
   logout: () => void;
 }
 
@@ -25,12 +29,14 @@ const AccountContext = createContext<AccountContextType | undefined>(undefined);
 export function AccountProvider({ children }: { children: ReactNode }) {
   const authApi = useAuthApi();
   const userApi = useUserApi();
+  const sharesApi = useSharesApi();
 
   const navigate = useNavigate();
 
   const [userId, setUserId] = useState<number | null>(null);
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [auths, setAuths] = useState<AuthEntity[] | null>(null);
+  const [collections, setCollections] = useState<SharedCollection[] | null>(null);
 
   function handleTokens(response: InternalAppLoginResponse) {
     if (response.access_token) {
@@ -170,6 +176,20 @@ export function AccountProvider({ children }: { children: ReactNode }) {
     });
   };
 
+  const getCollections = async () => {
+    return sharesApi?.listSharedCollections().then((response) => {
+      setCollections(response);
+    });
+  };
+
+  // Load shared collections once the user is authenticated so the search
+  // filters can offer them.
+  useEffect(() => {
+    if (accessToken && sharesApi) {
+      getCollections();
+    }
+  }, [accessToken, sharesApi]);
+
   const logout = (): void => {
     // Clear tokens from localStorage
     localStorage.removeItem("access_token");
@@ -181,6 +201,7 @@ export function AccountProvider({ children }: { children: ReactNode }) {
 
     setUserId(null);
     setAccessToken(null);
+    setCollections(null);
 
     console.log("Logged out successfully");
 
@@ -198,10 +219,12 @@ export function AccountProvider({ children }: { children: ReactNode }) {
         accessToken,
         auths,
         userId,
+        collections,
         loginAnonymous,
         loginByEmail,
         confirmAuth,
         getAuths,
+        getCollections,
         logout,
       }}
     >

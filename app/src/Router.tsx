@@ -24,6 +24,7 @@ import Confirm from "./features/account/Confirm";
 import Artist from "./features/artist/Artist";
 import Room from "./features/room/Room";
 import Search from "./features/search/Search";
+import RedeemShare from "./features/share/RedeemShare";
 import NewSong from "./features/song/NewSong";
 import Song from "./features/song/Song";
 import { useSongContext } from "./features/song/SongContext";
@@ -52,6 +53,9 @@ class RoutesEnum {
   static Account = "/account";
   static Confirm = function (code: string): string {
     return "/confirm/" + code;
+  };
+  static Share = function (code: string): string {
+    return "/share/" + code;
   };
   static About = "/about";
 }
@@ -325,6 +329,7 @@ function Router() {
           <Route path="editor" element={<NewSong />} />
           <Route path="room" element={<Room />} />
           <Route path="room/join/:roomCode" element={<Room />} />
+          <Route path="share/:code" element={<RedeemShare />} />
           <Route path="search/artists" element={<Artist />} />
           <Route path="search/songs" element={<Search />} />
           <Route path="songs/:songId" element={<Song />} />

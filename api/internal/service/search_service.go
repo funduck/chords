@@ -12,12 +12,28 @@ import (
 
 type SearchService struct {
 	artistService *ArtistService
+	shareService  *ShareService
 }
 
 func NewSearchService() *SearchService {
 	return &SearchService{
 		artistService: NewArtistService(),
+		shareService:  NewShareService(),
 	}
+}
+
+// effectiveOwnerID resolves whose collection to filter by. When reqOwnerID
+// refers to another user, it verifies the current user was granted access via a
+// share link and restricts the search to that owner's private library.
+func (s *SearchService) effectiveOwnerID(ctx context.Context, currentUserID uint, libraryType *entity.LibraryType, reqOwnerID uint) (uint, error) {
+	if reqOwnerID == 0 || reqOwnerID == currentUserID {
+		return currentUserID, nil
+	}
+	if !s.shareService.HasAccess(ctx, currentUserID, reqOwnerID) {
+		return 0, ErrShareAccessDenied
+	}
+	*libraryType = entity.LibraryType_Private
+	return reqOwnerID, nil
 }
 
 func (s *SearchService) SearchArtists(ctx context.Context, req *dto.SearchArtistRequest) (*entity.ArtistsList, error) {
@@ -39,9 +55,14 @@ func (s *SearchService) SearchArtists(ctx context.Context, req *dto.SearchArtist
 		return nil, err
 	}
 
+	ownerID, err := s.effectiveOwnerID(ctx, accessToken.UserID, &req.LibraryType, req.OwnerID)
+	if err != nil {
+		return nil, err
+	}
+
 	q = q.Joins("JOIN library_artists la ON la.artist_id = artists.id").
 		Joins("JOIN libraries l ON l.id = la.library_id").
-		Where("l.type = ? AND (l.type = 'public' OR l.owner_id = ?)", req.LibraryType, accessToken.UserID)
+		Where("l.type = ? AND (l.type = 'public' OR l.owner_id = ?)", req.LibraryType, ownerID)
 
 	if req.Query != "" {
 		normalizedName := s.artistService.normalizeName(req.Query)
@@ -101,7 +122,7 @@ func (s *SearchService) SearchArtists(ctx context.Context, req *dto.SearchArtist
 					AND l.type = ?
 					AND (l.type = 'public' OR l.owner_id = ?)
 				),
-				0) as composition_count`, req.LibraryType, accessToken.UserID, req.LibraryType, accessToken.UserID).
+				0) as composition_count`, req.LibraryType, ownerID, req.LibraryType, ownerID).
 			Order("artists.name_normalized ASC").
 			Limit(req.Limit).
 			Scan(&results).Error
@@ -140,15 +161,23 @@ func (s *SearchService) SearchSongs(ctx context.Context, req *dto.SearchSongRequ
 	if req.LibraryType == "" {
 		req.LibraryType = entity.LibraryType_Public
 	}
-	if req.LibraryType != "" {
-		q = q.Where("libraries.type = ?", req.LibraryType)
-		if req.LibraryType == entity.LibraryType_Private || req.LibraryType == entity.LibraryType_Favorites {
-			accessToken, err := auth.GetAccessToken(ctx)
-			if err != nil {
-				return nil, err
-			}
-			q = q.Where("libraries.owner_id = ?", accessToken.UserID)
+
+	// Only owner-scoped searches (private/favorites, or browsing a shared
+	// collection) require an authenticated user; public search is open.
+	var ownerID uint
+	if req.LibraryType == entity.LibraryType_Private || req.LibraryType == entity.LibraryType_Favorites || req.OwnerID != 0 {
+		accessToken, err := auth.GetAccessToken(ctx)
+		if err != nil {
+			return nil, err
 		}
+		if ownerID, err = s.effectiveOwnerID(ctx, accessToken.UserID, &req.LibraryType, req.OwnerID); err != nil {
+			return nil, err
+		}
+	}
+
+	q = q.Where("libraries.type = ?", req.LibraryType)
+	if req.LibraryType == entity.LibraryType_Private || req.LibraryType == entity.LibraryType_Favorites {
+		q = q.Where("libraries.owner_id = ?", ownerID)
 	}
 
 	if req.ArtistID != 0 {

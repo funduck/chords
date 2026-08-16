@@ -7,6 +7,8 @@ var entities = []interface{}{
 	entity.Auth{},
 	entity.Library{},
 	entity.Room{},
+	entity.ShareLink{},
+	entity.ShareGrant{},
 	entity.Song{},
 	entity.User{},
 }

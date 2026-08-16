@@ -5,6 +5,7 @@ import "chords.com/api/internal/entity"
 type SearchSongRequest struct {
 	LibraryID    uint               `json:"library_id"`
 	LibraryType  entity.LibraryType `json:"library_type"`
+	OwnerID      uint               `json:"owner_id"`
 	ArtistID     uint               `json:"artist_id"`
 	ByLyrics     bool               `json:"by_lyrics"`
 	Query        string             `json:"query"`

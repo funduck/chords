@@ -11,6 +11,7 @@ import {
   ChordsComApiInternalEntitySongInfo,
   Configuration,
   RoomsApi,
+  SharesApi,
   SongsApi,
   UserApi,
 } from "@generated/api";
@@ -30,12 +31,14 @@ interface PrivateApiContextType {
   artistsApi: ArtistsApi | null;
   songsApi: SongsApi | null;
   userApi: UserApi | null;
+  sharesApi: SharesApi | null;
 }
 const PrivateApiContext = createContext<PrivateApiContextType>({
   roomsApi: null,
   artistsApi: null,
   songsApi: null,
   userApi: null,
+  sharesApi: null,
 });
 
 export type AuthEntity = ChordsComApiInternalEntityAuth;
@@ -53,6 +56,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
   const [artistsApi, setArtistsApi] = useState<ArtistsApi | null>(null);
   const [songsApi, setSongsApi] = useState<SongsApi | null>(null);
   const [userApi, setUserApi] = useState<UserApi | null>(null);
+  const [sharesApi, setSharesApi] = useState<SharesApi | null>(null);
 
   const accessToken = useSignal(Signals.accessToken);
 
@@ -127,6 +131,8 @@ export function ApiProvider({ children }: { children: ReactNode }) {
     setSongsApi(songsAPI);
     const userAPI = new UserApi(conf);
     setUserApi(userAPI);
+    const sharesAPI = new SharesApi(conf);
+    setSharesApi(sharesAPI);
 
     Logger.log("Private API connected");
 
@@ -136,12 +142,13 @@ export function ApiProvider({ children }: { children: ReactNode }) {
       setArtistsApi(null);
       setSongsApi(null);
       setUserApi(null);
+      setSharesApi(null);
     };
   }, [accessToken]);
 
   return (
     <PublicApiContext.Provider value={{ authApi }}>
-      <PrivateApiContext.Provider value={{ roomsApi, artistsApi, songsApi, userApi }}>
+      <PrivateApiContext.Provider value={{ roomsApi, artistsApi, songsApi, userApi, sharesApi }}>
         {children}
       </PrivateApiContext.Provider>
     </PublicApiContext.Provider>
@@ -185,5 +192,10 @@ export function useUserApi() {
   // if (!api) {
   //   throw new Error("User API is not available. Make sure to wrap your component with ApiProvider.");
   // }
+  return api;
+}
+
+export function useSharesApi() {
+  const { sharesApi: api } = useContext(PrivateApiContext);
   return api;
 }

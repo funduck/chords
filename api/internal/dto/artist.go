@@ -5,6 +5,7 @@ import "chords.com/api/internal/entity"
 type SearchArtistRequest struct {
 	Query        string             `json:"query"`
 	LibraryType  entity.LibraryType `json:"library_type"`
+	OwnerID      uint               `json:"owner_id"`
 	CursorAfter  string             `json:"cursor_after"`
 	CursorBefore string             `json:"cursor_before"`
 	Limit        int                `json:"limit" validate:"min=1,max=100"`
