@@ -3,16 +3,19 @@ import { useDisclosure } from "@mantine/hooks";
 import {
   IconEdit,
   IconEye,
+  IconLock,
   IconMinus,
   IconPlayerPlayFilled,
   IconPlayerStopFilled,
   IconPlus,
 } from "@tabler/icons-react";
+import { useSignal } from "@telegram-apps/sdk-react";
 import { useEffect } from "react";
 
 import { Config } from "@src/config";
 import { useHeader } from "@src/hooks/Header";
 import { useIsMobile } from "@src/hooks/isMobile";
+import { Signals } from "@src/services/signals-registry";
 
 import { useSongContext } from "./SongContext";
 
@@ -86,12 +89,26 @@ function AutoScrollPlayStopSettings() {
 }
 
 export function SongDisplaySettings() {
-  const { displayOptions, updateDisplayOptions } = useSongContext();
+  const { loadedSong, displayOptions, updateDisplayOptions } = useSongContext();
   const displayMode = displayOptions?.mode || "render";
 
   const [dropdownOpened, { toggle }] = useDisclosure();
 
   const isMobile = useIsMobile();
+
+  const userId = useSignal(Signals.userId);
+  // A new song (no loadedSong) or one the user owns is editable; songs browsed
+  // from a public or shared collection are read-only.
+  const canEdit = !loadedSong || loadedSong.owner_id === userId;
+
+  if (!canEdit) {
+    return (
+      <Group gap="xs" c="dimmed">
+        <IconLock size={18} />
+        <Text size="sm">Read-only</Text>
+      </Group>
+    );
+  }
 
   const switchBtn =
     displayMode == "editor" ? (

@@ -84,10 +84,9 @@ function SearchSongs({ artistId }: { artistId?: number }) {
         entityName="songs"
         afterQueryInput={
           <Box ml="sm">
-            <Group gap="lg" wrap={"wrap"}>
-              <Group>
+            <Group gap="xl" align="flex-end" wrap={"wrap"}>
+              <Group align="flex-end" gap="sm">
                 <Select
-                  label="Library"
                   data={libraryOptions}
                   value={effectiveSel}
                   onChange={(value) => {
@@ -102,6 +101,7 @@ function SearchSongs({ artistId }: { artistId?: number }) {
                 {effectiveSel === "public" && <PublicSearchDisclaimer />}
               </Group>
               <Switch
+                mb={6}
                 label="By lyrics"
                 checked={byLyrics}
                 onChange={(e) => {

@@ -64,9 +64,8 @@ function SearchArtists() {
         placeholder="Search Artist by Name"
         entityName="artists"
         afterQueryInput={
-          <Group ml="sm">
+          <Group ml="sm" align="flex-end" gap="sm">
             <Select
-              label="Library"
               data={libraryOptions}
               value={effectiveSel}
               onChange={(value) => {
