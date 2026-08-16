@@ -1,51 +1,27 @@
 import { Box, Loader, Stack, Text } from "@mantine/core";
-import { notifications } from "@mantine/notifications";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useNavigate, useParams } from "react-router";
 
 import { RoutesEnum } from "@src/Router";
-import { useAccountContext } from "@src/features/account/AccountContext";
-import { useSharesApi } from "@src/hooks/Api";
+import { PENDING_SHARE_CODE_KEY, useAccountContext } from "@src/features/account/AccountContext";
 
 function RedeemShare() {
-  const sharesApi = useSharesApi();
-  const { accessToken, getCollections } = useAccountContext();
+  const { redeemPendingShare } = useAccountContext();
   const navigate = useNavigate();
   const params = useParams<{ code: string }>();
   const code = params.code;
 
-  const [redeeming, setRedeeming] = useState(false);
-
   useEffect(() => {
-    // Wait until authenticated so the redeem request carries a token.
-    if (!code || !sharesApi || !accessToken || redeeming) {
+    if (!code) {
       return;
     }
-    setRedeeming(true);
-
-    sharesApi
-      .redeemShare({ code })
-      .then(async (res) => {
-        await getCollections();
-        notifications.show({
-          title: "Collection added",
-          message: `You can now browse ${res.label}'s collection from the library filter.`,
-          color: "green",
-          position: "top-right",
-        });
-        navigate(RoutesEnum.Songs());
-      })
-      .catch((err) => {
-        console.error("Failed to redeem share link:", err);
-        notifications.show({
-          title: "Invalid link",
-          message: "This share link is invalid or has been revoked.",
-          color: "red",
-          position: "top-right",
-        });
-        navigate(RoutesEnum.Songs());
-      });
-  }, [code, sharesApi, accessToken, redeeming, getCollections, navigate]);
+    // Persist the code so it survives the login/registration flow, then try to
+    // redeem right away (works if already authenticated). If not yet logged in,
+    // AccountContext redeems it once the account becomes active.
+    localStorage.setItem(PENDING_SHARE_CODE_KEY, code);
+    redeemPendingShare();
+    navigate(RoutesEnum.Songs());
+  }, [code]);
 
   return (
     <Box mt="xl">

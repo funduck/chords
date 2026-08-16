@@ -21,8 +21,13 @@ interface AccountContextType {
   confirmAuth: (code: string) => Promise<void>;
   getAuths: () => Promise<void>;
   getCollections: () => Promise<void>;
+  redeemPendingShare: () => Promise<void>;
   logout: () => void;
 }
+
+// A share code the user opened before authenticating. Persisted so it survives
+// the login/registration flow and is redeemed once the account is active.
+export const PENDING_SHARE_CODE_KEY = "pending_share_code";
 
 const AccountContext = createContext<AccountContextType | undefined>(undefined);
 
@@ -190,6 +195,40 @@ export function AccountProvider({ children }: { children: ReactNode }) {
     }
   }, [accessToken, sharesApi]);
 
+  // Redeem a share code the user opened while unauthenticated. This runs both
+  // when opening a /share link (already logged in) and after registration
+  // completes and the token/API become available.
+  const redeemPendingShare = async () => {
+    const code = localStorage.getItem(PENDING_SHARE_CODE_KEY);
+    if (!code || !accessToken || !sharesApi) {
+      return;
+    }
+    try {
+      const res = await sharesApi.redeemShare({ code });
+      localStorage.removeItem(PENDING_SHARE_CODE_KEY);
+      await getCollections();
+      notifications.show({
+        title: "Collection added",
+        message: `You can now browse ${res.label}'s collection from the library filter.`,
+        color: "green",
+        position: "top-right",
+      });
+    } catch (err) {
+      console.error("Failed to redeem pending share link:", err);
+      localStorage.removeItem(PENDING_SHARE_CODE_KEY);
+      notifications.show({
+        title: "Invalid link",
+        message: "The share link is invalid or has been revoked.",
+        color: "red",
+        position: "top-right",
+      });
+    }
+  };
+
+  useEffect(() => {
+    redeemPendingShare();
+  }, [accessToken, sharesApi]);
+
   const logout = (): void => {
     // Clear tokens from localStorage
     localStorage.removeItem("access_token");
@@ -225,6 +264,7 @@ export function AccountProvider({ children }: { children: ReactNode }) {
         confirmAuth,
         getAuths,
         getCollections,
+        redeemPendingShare,
         logout,
       }}
     >
