@@ -54,11 +54,18 @@ For [chords database](https://github.com/tombatossals/react-chords)
 To run api and app locally, use Docker Compose:
 
 **Development mode:**
-- `make up` - start development environment (with hot reload)
+- `make dev` - **start everything with one command**: regenerate the OpenAPI spec, regenerate the TypeScript API client from it, then start api + app + caddy (with hot reload)
+- `make up` - start the stack only (use when the client is already generated)
 - `make down` - stop development environment
 - `make logs` - view logs from all services
 - `make logs-api` - view logs from API only
 - `make logs-app` - view logs from app only
+
+The client pipeline: Go annotations → `swag init` → `api/docs/swagger.json` → openapi-generator (`typescript-fetch`) → `app/generated/api` (imported via `@generated/api`). Rerun after changing API annotations:
+- `make api-openapi` - regenerate `api/docs/swagger.json` from the Go handlers (runs `swag` inside the api container)
+- `make app-codegen` - regenerate the TS client in `app/generated/api` from the on-disk spec
+
+Both `api/docs` and `app/generated/api` are gitignored, so run `make dev` (or the two regen steps) after a fresh checkout. Only Docker is required on the host.
 
 Development mode features:
 - API runs with `air` for hot reload on code changes

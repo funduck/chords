@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-FROM golang:1.25-alpine AS build_base
+FROM golang:1.26-alpine AS build_base
 WORKDIR /app
 
 ENV CGO_ENABLED=1
