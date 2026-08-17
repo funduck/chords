@@ -1,4 +1,4 @@
-import { Stack, Text, Title } from "@mantine/core";
+import { MantineSpacing, Stack, Text, Title } from "@mantine/core";
 import React from "react";
 
 interface PageTopProps {
@@ -6,15 +6,16 @@ interface PageTopProps {
   description?: React.ReactNode;
   order?: 1 | 2 | 3 | 4 | 5 | 6;
   titleMb?: number | string;
+  ml?: MantineSpacing;
   children?: React.ReactNode;
 }
 
 /**
  * A reusable page header component with centered title and description
  */
-export default function PageTop({ title, description, order = 2, titleMb = 0, children }: PageTopProps) {
+export default function PageTop({ title, description, order = 2, titleMb = 0, ml = "md", children }: PageTopProps) {
   return (
-    <Stack ta="start" ml="md" mb="md">
+    <Stack ta="start" ml={ml} mb="md">
       <Title order={order} c="primary" mb={titleMb}>
         {title}
       </Title>

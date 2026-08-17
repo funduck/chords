@@ -13,7 +13,7 @@ function SearchSongListItem({ entity }: { entity: SongInfoEntity }) {
   const title = stringToTitleCase(entity.title);
 
   return (
-    <Flex direction={"row"} align={"center"} gap={"sm"} pl="md">
+    <Flex direction={"row"} align={"center"} gap={"sm"}>
       <Anchor
         c="primary"
         onClick={(e) => {

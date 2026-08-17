@@ -50,7 +50,7 @@ function SearchArtists() {
 
   return (
     <Box mt="xl">
-      <PageTop title="Search Artists" />
+      <PageTop title="Search Artists" ml={0} />
 
       <SearchEntities
         useSearchContext={useSearchArtistsContext}
@@ -64,7 +64,7 @@ function SearchArtists() {
         placeholder="Search Artist by Name"
         entityName="artists"
         afterQueryInput={
-          <Group ml="sm" align="flex-end" gap="sm">
+          <Group align="flex-end" gap="sm">
             <Select
               data={libraryOptions}
               value={effectiveSel}

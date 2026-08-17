@@ -71,7 +71,7 @@ function SearchSongs({ artistId }: { artistId?: number }) {
 
   return (
     <Box mt="xl">
-      <PageTop title="Search Songs" />
+      <PageTop title="Search Songs" ml={0} />
 
       <SearchResetArtist />
 
@@ -83,7 +83,7 @@ function SearchSongs({ artistId }: { artistId?: number }) {
         placeholder="Search Song by Title or Lyrics"
         entityName="songs"
         afterQueryInput={
-          <Box ml="sm">
+          <Box>
             <Group gap="xl" align="flex-end" wrap={"wrap"}>
               <Group align="flex-end" gap="sm">
                 <Select
