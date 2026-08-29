@@ -6,10 +6,12 @@ import {
   AuthApi,
   ChordsComApiInternalEntityArtistInfo,
   ChordsComApiInternalEntityAuth,
+  ChordsComApiInternalEntityPlaylistInfo,
   ChordsComApiInternalEntityRoom,
   ChordsComApiInternalEntitySong,
   ChordsComApiInternalEntitySongInfo,
   Configuration,
+  PlaylistsApi,
   RoomsApi,
   SharesApi,
   SongsApi,
@@ -32,6 +34,7 @@ interface PrivateApiContextType {
   songsApi: SongsApi | null;
   userApi: UserApi | null;
   sharesApi: SharesApi | null;
+  playlistsApi: PlaylistsApi | null;
 }
 const PrivateApiContext = createContext<PrivateApiContextType>({
   roomsApi: null,
@@ -39,6 +42,7 @@ const PrivateApiContext = createContext<PrivateApiContextType>({
   songsApi: null,
   userApi: null,
   sharesApi: null,
+  playlistsApi: null,
 });
 
 export type AuthEntity = ChordsComApiInternalEntityAuth;
@@ -46,6 +50,7 @@ export type RoomEntity = ChordsComApiInternalEntityRoom;
 export type SongEntity = ChordsComApiInternalEntitySong;
 export type SongInfoEntity = ChordsComApiInternalEntitySongInfo;
 export type ArtistInfoEntity = ChordsComApiInternalEntityArtistInfo;
+export type PlaylistEntity = ChordsComApiInternalEntityPlaylistInfo;
 
 export type CreateSongParams = Parameters<SongsApi["createSong"]>[0];
 export type UpdateSongParams = Parameters<SongsApi["updateSong"]>[0];
@@ -57,6 +62,7 @@ export function ApiProvider({ children }: { children: ReactNode }) {
   const [songsApi, setSongsApi] = useState<SongsApi | null>(null);
   const [userApi, setUserApi] = useState<UserApi | null>(null);
   const [sharesApi, setSharesApi] = useState<SharesApi | null>(null);
+  const [playlistsApi, setPlaylistsApi] = useState<PlaylistsApi | null>(null);
 
   const accessToken = useSignal(Signals.accessToken);
 
@@ -133,6 +139,8 @@ export function ApiProvider({ children }: { children: ReactNode }) {
     setUserApi(userAPI);
     const sharesAPI = new SharesApi(conf);
     setSharesApi(sharesAPI);
+    const playlistsAPI = new PlaylistsApi(conf);
+    setPlaylistsApi(playlistsAPI);
 
     Logger.log("Private API connected");
 
@@ -143,12 +151,13 @@ export function ApiProvider({ children }: { children: ReactNode }) {
       setSongsApi(null);
       setUserApi(null);
       setSharesApi(null);
+      setPlaylistsApi(null);
     };
   }, [accessToken]);
 
   return (
     <PublicApiContext.Provider value={{ authApi }}>
-      <PrivateApiContext.Provider value={{ roomsApi, artistsApi, songsApi, userApi, sharesApi }}>
+      <PrivateApiContext.Provider value={{ roomsApi, artistsApi, songsApi, userApi, sharesApi, playlistsApi }}>
         {children}
       </PrivateApiContext.Provider>
     </PublicApiContext.Provider>
@@ -197,5 +206,10 @@ export function useUserApi() {
 
 export function useSharesApi() {
   const { sharesApi: api } = useContext(PrivateApiContext);
+  return api;
+}
+
+export function usePlaylistsApi() {
+  const { playlistsApi: api } = useContext(PrivateApiContext);
   return api;
 }

@@ -6,6 +6,8 @@ var entities = []interface{}{
 	entity.Artist{},
 	entity.Auth{},
 	entity.Library{},
+	entity.Playlist{},
+	entity.PlaylistSong{},
 	entity.Room{},
 	entity.ShareLink{},
 	entity.ShareGrant{},

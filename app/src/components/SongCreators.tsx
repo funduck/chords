@@ -3,6 +3,7 @@ import { IconUsers } from "@tabler/icons-react";
 import { useNavigate } from "react-router";
 
 import { RoutesEnum } from "@src/Router";
+import { useEditModeLink } from "@src/features/playlist/playlistEditMode";
 import { SongEntity } from "@src/hooks/Api";
 
 export default function SongCreators({
@@ -15,6 +16,7 @@ export default function SongCreators({
   inGroup?: boolean;
 }) {
   const navigate = useNavigate();
+  const editLink = useEditModeLink();
 
   const artistRefs =
     song?.artists?.map((a) => (
@@ -23,9 +25,9 @@ export default function SongCreators({
         key={a.id}
         onClick={(e) => {
           e.preventDefault();
-          navigate(RoutesEnum.Artists(a.id));
+          navigate(editLink(RoutesEnum.Artists(a.id)));
         }}
-        href={RoutesEnum.Artists(a.id)}
+        href={editLink(RoutesEnum.Artists(a.id))}
       >
         {a.name}
       </Anchor>
@@ -38,9 +40,9 @@ export default function SongCreators({
         key={a.id}
         onClick={(e) => {
           e.preventDefault();
-          navigate(RoutesEnum.Artists(a.id));
+          navigate(editLink(RoutesEnum.Artists(a.id)));
         }}
-        href={RoutesEnum.Artists(a.id)}
+        href={editLink(RoutesEnum.Artists(a.id))}
       >
         {a.name}
       </Anchor>

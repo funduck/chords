@@ -77,6 +77,12 @@ func NewHttpRouter(a *App) *chi.Mux {
 				r.Patch("/rooms/{id}", a.UpdateRoom)
 				r.Post("/rooms/{id}/leave", a.LeaveRoom)
 
+				r.Get("/playlists", a.ListPlaylists)
+				r.Post("/playlists", a.CreatePlaylist)
+				r.Delete("/playlists/{id}", a.DeletePlaylist)
+				r.Post("/playlists/{id}/songs/{songId}", a.AddSongToPlaylist)
+				r.Delete("/playlists/{id}/songs/{songId}", a.RemoveSongFromPlaylist)
+
 				r.Post("/shares", a.CreateShareLink)
 				r.Get("/shares", a.ListShareLinks)
 				r.Delete("/shares/{id}", a.RevokeShareLink)

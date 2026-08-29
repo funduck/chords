@@ -8,6 +8,7 @@ import { BrowserRouter } from "react-router";
 import Router from "./Router";
 import { AccountProvider } from "./features/account/AccountContext";
 import Login from "./features/account/Login";
+import { PlaylistProvider } from "./features/playlist/PlaylistContext";
 import { RoomContextProvider } from "./features/room/RoomContext";
 import { RoomEventsConsumer, RoomEventsPublisher } from "./features/room/RoomEvents";
 import { SearchProvider } from "./features/search/SearchContext";
@@ -29,12 +30,14 @@ function App() {
               <SongContextProvider>
                 <RoomContextProvider>
                   <HeaderProvider>
-                    <SearchProvider>
-                      <RoomEventsPublisher />
-                      <RoomEventsConsumer />
-                      <Login />
-                      <Router />
-                    </SearchProvider>
+                    <PlaylistProvider>
+                      <SearchProvider>
+                        <RoomEventsPublisher />
+                        <RoomEventsConsumer />
+                        <Login />
+                        <Router />
+                      </SearchProvider>
+                    </PlaylistProvider>
                   </HeaderProvider>
                 </RoomContextProvider>
               </SongContextProvider>

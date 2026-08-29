@@ -13,13 +13,13 @@ export interface LibraryOption {
 export function useLibraryOptions(collections?: SharedCollection[] | null): LibraryOption[] {
   return useMemo(
     () => [
-      { value: "my", label: "My library" },
-      { value: "public", label: "Public" },
+      { value: "my", label: "my" },
+      { value: "public", label: "public" },
       ...(collections || []).map((c) => ({
         value: `user:${c.owner_id}`,
-        label: c.label || `User #${c.owner_id}`,
+        label: c.label || `user #${c.owner_id}`,
       })),
-    ],
+      ],
     [collections],
   );
 }

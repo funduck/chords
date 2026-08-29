@@ -10,6 +10,7 @@ type App struct {
 	logger            logger.Logger
 	artistService     *service.ArtistService
 	libraryService    *service.LibraryService
+	playlistService   *service.PlaylistService
 	roomService       *service.RoomService
 	shareService      *service.ShareService
 	songService       *service.SongService
@@ -21,6 +22,7 @@ func NewApp() *App {
 		logger:            logger.NewLogger("app"),
 		artistService:     service.NewArtistService(),
 		libraryService:    service.NewLibraryService(),
+		playlistService:   service.NewPlaylistService(),
 		roomService:       service.NewRoomService(),
 		shareService:      service.NewShareService(),
 		songService:       service.NewSongService(),

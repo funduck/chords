@@ -1,6 +1,7 @@
 package app
 
 import (
+	"errors"
 	"net/http"
 
 	"chords.com/api/internal/dto"
@@ -123,6 +124,10 @@ func (a *App) SearchSongs(w http.ResponseWriter, r *http.Request) {
 	search := service.NewSearchService()
 	res, err := search.SearchSongs(r.Context(), &req)
 	if err != nil {
+		if errors.Is(err, service.ErrShareAccessDenied) {
+			a.respondError(w, http.StatusForbidden, err)
+			return
+		}
 		a.respondError(w, http.StatusInternalServerError, err)
 		return
 	}

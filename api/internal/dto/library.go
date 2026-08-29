@@ -7,6 +7,7 @@ type SearchSongRequest struct {
 	LibraryType  entity.LibraryType `json:"library_type"`
 	OwnerID      uint               `json:"owner_id"`
 	ArtistID     uint               `json:"artist_id"`
+	PlaylistID   uint               `json:"playlist_id"`
 	ByLyrics     bool               `json:"by_lyrics"`
 	Query        string             `json:"query"`
 	CursorAfter  string             `json:"cursor_after"`

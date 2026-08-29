@@ -11,14 +11,16 @@ import (
 )
 
 type SearchService struct {
-	artistService *ArtistService
-	shareService  *ShareService
+	artistService   *ArtistService
+	playlistService *PlaylistService
+	shareService    *ShareService
 }
 
 func NewSearchService() *SearchService {
 	return &SearchService{
-		artistService: NewArtistService(),
-		shareService:  NewShareService(),
+		artistService:   NewArtistService(),
+		playlistService: NewPlaylistService(),
+		shareService:    NewShareService(),
 	}
 }
 
@@ -151,33 +153,50 @@ func (s *SearchService) SearchSongs(ctx context.Context, req *dto.SearchSongRequ
 		req.Limit = -1 // Default to no limit
 	}
 
-	q := tx.Model(&entity.Song{}).
-		Joins("JOIN library_songs ON library_songs.song_id = songs.id").
-		Joins("JOIN libraries ON libraries.id = library_songs.library_id")
+	q := tx.Model(&entity.Song{})
 
-	if req.LibraryID != 0 {
-		q = q.Where("libraries.id = ?", req.LibraryID)
-	}
-	if req.LibraryType == "" {
-		req.LibraryType = entity.LibraryType_Public
-	}
-
-	// Only owner-scoped searches (private/favorites, or browsing a shared
-	// collection) require an authenticated user; public search is open.
-	var ownerID uint
-	if req.LibraryType == entity.LibraryType_Private || req.LibraryType == entity.LibraryType_Favorites || req.OwnerID != 0 {
+	if req.PlaylistID != 0 {
+		// A playlist is a self-contained set, so it replaces the library filter
+		// rather than intersecting with it: it always shows exactly the songs it
+		// holds, whichever library they came from. Membership of the playlist is
+		// the only thing to authorise.
 		accessToken, err := auth.GetAccessToken(ctx)
 		if err != nil {
 			return nil, err
 		}
-		if ownerID, err = s.effectiveOwnerID(ctx, accessToken.UserID, &req.LibraryType, req.OwnerID); err != nil {
+		if err := s.playlistService.CheckReadAccess(ctx, accessToken.UserID, req.PlaylistID); err != nil {
 			return nil, err
 		}
-	}
+		q = q.Joins("JOIN playlist_songs ps ON ps.song_id = songs.id").
+			Where("ps.playlist_id = ?", req.PlaylistID)
+	} else {
+		q = q.Joins("JOIN library_songs ON library_songs.song_id = songs.id").
+			Joins("JOIN libraries ON libraries.id = library_songs.library_id")
 
-	q = q.Where("libraries.type = ?", req.LibraryType)
-	if req.LibraryType == entity.LibraryType_Private || req.LibraryType == entity.LibraryType_Favorites {
-		q = q.Where("libraries.owner_id = ?", ownerID)
+		if req.LibraryID != 0 {
+			q = q.Where("libraries.id = ?", req.LibraryID)
+		}
+		if req.LibraryType == "" {
+			req.LibraryType = entity.LibraryType_Public
+		}
+
+		// Only owner-scoped searches (private/favorites, or browsing a shared
+		// collection) require an authenticated user; public search is open.
+		var ownerID uint
+		if req.LibraryType == entity.LibraryType_Private || req.LibraryType == entity.LibraryType_Favorites || req.OwnerID != 0 {
+			accessToken, err := auth.GetAccessToken(ctx)
+			if err != nil {
+				return nil, err
+			}
+			if ownerID, err = s.effectiveOwnerID(ctx, accessToken.UserID, &req.LibraryType, req.OwnerID); err != nil {
+				return nil, err
+			}
+		}
+
+		q = q.Where("libraries.type = ?", req.LibraryType)
+		if req.LibraryType == entity.LibraryType_Private || req.LibraryType == entity.LibraryType_Favorites {
+			q = q.Where("libraries.owner_id = ?", ownerID)
+		}
 	}
 
 	if req.ArtistID != 0 {

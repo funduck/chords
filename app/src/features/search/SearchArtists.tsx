@@ -66,6 +66,7 @@ function SearchArtists() {
         afterQueryInput={
           <Group align="flex-end" gap="sm">
             <Select
+              label="Library"
               data={libraryOptions}
               value={effectiveSel}
               onChange={(value) => {

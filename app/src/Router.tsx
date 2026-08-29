@@ -5,6 +5,7 @@ import {
   IconMusic,
   IconMusicPlus,
   IconMusicSearch,
+  IconPlaylist,
   IconSettings,
   IconSettingsFilled,
   IconUser,
@@ -22,6 +23,9 @@ import About, { Beta } from "./features/about/About";
 import Account from "./features/account/Account";
 import Confirm from "./features/account/Confirm";
 import Artist from "./features/artist/Artist";
+import PlaylistEditBanner from "./features/playlist/PlaylistEditBanner";
+import Playlists from "./features/playlist/Playlists";
+import { useEditModeLink } from "./features/playlist/playlistEditMode";
 import Room from "./features/room/Room";
 import Search from "./features/search/Search";
 import RedeemShare from "./features/share/RedeemShare";
@@ -48,6 +52,13 @@ class RoutesEnum {
       return "/search/songs";
     }
     return "/songs/" + songId;
+  };
+  static Playlists = "/playlists";
+  static PlaylistAdd = function (id: number): string {
+    return `/search/songs?playlist=${id}&mode=add`;
+  };
+  static PlaylistRemove = function (id: number): string {
+    return `/search/songs?playlist=${id}&mode=remove`;
   };
   static Editor = "/editor";
   static Account = "/account";
@@ -113,6 +124,10 @@ function Router() {
 
   const artist = useSignal(Signals.artist);
 
+  // Songs and Artists stay inside an active playlist edit flow; every other tab
+  // is a deliberate way out of it.
+  const editLink = useEditModeLink();
+
   const tabs: {
     groupText: string;
     tabs: {
@@ -154,13 +169,19 @@ function Router() {
           id: "songs",
           text: "Songs",
           icon: <IconMusicSearch />,
-          link: RoutesEnum.Songs(),
+          link: editLink(RoutesEnum.Songs()),
         },
         {
           id: "artists",
           text: "Artists",
           icon: <IconUserSearch />,
-          link: RoutesEnum.Artists(artist?.id),
+          link: editLink(RoutesEnum.Artists(artist?.id)),
+        },
+        {
+          id: "playlists",
+          text: "Playlists",
+          icon: <IconPlaylist />,
+          link: RoutesEnum.Playlists,
         },
       ],
     },
@@ -185,7 +206,9 @@ function Router() {
   ];
 
   // Function to check if a tab is active
-  const isTabActive = (link: string) => {
+  const isTabActive = (fullLink: string) => {
+    // Links can carry playlist edit-mode params; compare paths only.
+    const link = fullLink.split("?")[0];
     const currentPath = location.pathname;
     return currentPath === link || (link.endsWith("/") && currentPath.startsWith(link));
   };
@@ -321,12 +344,15 @@ function Router() {
       {/* <AppShell.Aside>Aside</AppShell.Aside> */}
 
       <AppShell.Main id="appshellmain" style={{ display: "flex", flex: 1, flexDirection: "column" }}>
+        <PlaylistEditBanner />
+
         <Routes>
           <Route index element={<Index />} />
           <Route path="account" element={<Account />} />
           <Route path="artists/:artistId" element={<Artist />} />
           <Route path="confirm/:code" element={<Confirm />} />
           <Route path="editor" element={<NewSong />} />
+          <Route path="playlists" element={<Playlists />} />
           <Route path="room" element={<Room />} />
           <Route path="room/join/:roomCode" element={<Room />} />
           <Route path="share/:code" element={<RedeemShare />} />
