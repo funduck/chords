@@ -15,7 +15,8 @@ import SongEditor from "./SongEditor";
 import SongSettings, { SongDisplaySettings } from "./SongSettings";
 
 function Song() {
-  const { loadedSong, songSheet, displayOptions, loadSong } = useSongContext();
+  const { loadedSong, songSheet, displayOptions, loadSong, scrollPosition, setApplyScrollPosition } =
+    useSongContext();
   const songApi = useSongsApi();
   const song = loadedSong;
   const sheet = songSheet || song?.sheet || "";
@@ -32,6 +33,28 @@ function Song() {
   }, [songId, loadedSong, loadSong, songApi]);
 
   const songViewportRef = useRef<HTMLDivElement>(null);
+
+  // Restore where the user left off. Captured on the first render only, and only when
+  // the song already on screen is the one the position belongs to — that is true after
+  // a refresh (state is restored synchronously) but not when opening a song afresh,
+  // where the position would belong to the song being navigated away from.
+  const pendingScrollRef = useRef<number | undefined>(
+    songId && loadedSong?.id?.toString() === songId ? scrollPosition : undefined,
+  );
+  useEffect(() => {
+    const target = pendingScrollRef.current;
+    if (target == null || !songId || loadedSong?.id?.toString() !== songId) {
+      return;
+    }
+    // Deferred so the sheet is laid out and scrollHeight is final; a percentage
+    // applied too early resolves against a near-empty page. Consumed only once the
+    // timer actually fires, so a re-render in the meantime re-arms instead of losing it.
+    const timer = setTimeout(() => {
+      pendingScrollRef.current = undefined;
+      setApplyScrollPosition(target);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [songId, loadedSong, setApplyScrollPosition]);
 
   useScrollPosition();
 

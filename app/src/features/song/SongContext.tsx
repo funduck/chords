@@ -7,6 +7,9 @@ import { Config } from "@src/config";
 import { CreateSongParams, SongEntity, UpdateSongParams, useSongsApi } from "@src/hooks/Api";
 import { ChordProService } from "@src/services/chordpro/chordpro";
 
+import { loadSongState, saveSongState } from "./songState";
+import { loadSongViewSettings, saveSongViewSettings } from "./viewSettings";
+
 export interface AutoScrollOptions {
   enabled?: boolean;
   speed?: number; // Speed in percents (1-100)
@@ -58,74 +61,50 @@ interface SongContextType {
 const SongContext = createContext<SongContextType | undefined>(undefined);
 
 export function SongContextProvider({ children }: { children: ReactNode }) {
-  const [songId, setSongId] = useState<number | undefined>(undefined);
-  const [loadedSong, setLoadedSong] = useState<SongEntity | undefined>(undefined);
-  const [songSheet, setSongSheet] = useState<string | undefined>(undefined);
-  const [newSheet, setNewSheet] = useState<string | undefined>(undefined);
+  const [restoredState] = useState(loadSongState);
+  const [songId, setSongId] = useState<number | undefined>(restoredState.songId);
+  const [loadedSong, setLoadedSong] = useState<SongEntity | undefined>(restoredState.loadedSong);
+  const [songSheet, setSongSheet] = useState<string | undefined>(restoredState.songSheet);
+  const [newSheet, setNewSheet] = useState<string | undefined>(restoredState.newSheet);
+  const [initialViewSettings] = useState(loadSongViewSettings);
   const [displayOptions, setDisplayOptions] = useState<DisplayOptions | undefined>({
     mode: "render",
     transpose: 0,
-    fontSize: Config.SongFontSize,
+    fontSize: initialViewSettings.fontSize,
   });
   const [autoScrollOptions, setAutoScrollOptions] = useState<AutoScrollOptions | undefined>({
     enabled: false,
-    speed: Config.AutoScrollSpeed,
+    speed: initialViewSettings.autoScrollSpeed,
     interval: Config.AutoScrollInterval,
   });
-  const [scrollPosition, setScrollPosition] = useState<number | undefined>(undefined);
+  const [scrollPosition, setScrollPosition] = useState<number | undefined>(restoredState.scrollPosition);
+  // applyScrollPosition is a one-shot command, not state worth persisting.
   const [applyScrollPosition, setApplyScrollPosition] = useState<number | undefined>(undefined);
 
   const songsApi = useSongsApi();
 
   const navigate = useNavigate();
 
-  const loadStateFromLocalStorage = useCallback(() => {
-    const savedState = localStorage.getItem("songState");
-    if (savedState) {
-      const {
-        songId,
-        loadedSong,
-        songSheet,
-        newSheet,
-        displayOptions,
-        autoScrollOptions,
-        scrollPosition,
-        applyScrollPosition,
-      } = JSON.parse(savedState);
-      setSongId(songId);
-      setLoadedSong(loadedSong);
-      setSongSheet(songSheet);
-      setNewSheet(newSheet);
-      setDisplayOptions(displayOptions);
-      setAutoScrollOptions(autoScrollOptions);
-      setScrollPosition(scrollPosition);
-      setApplyScrollPosition(applyScrollPosition);
-      console.debug("Loaded song state from localStorage");
-    }
-  }, []);
-
   const saveStateToLocalStorage = useCallback(() => {
-    const songState = {
-      songId,
-      loadedSong,
-      songSheet,
-      newSheet,
-      displayOptions,
-      autoScrollOptions,
-      scrollPosition,
-      applyScrollPosition,
-    };
-    localStorage.setItem("songState", JSON.stringify(songState));
-  }, [songId, loadedSong, songSheet, newSheet, displayOptions, autoScrollOptions, scrollPosition, applyScrollPosition]);
+    saveSongState({ songId, loadedSong, songSheet, newSheet, scrollPosition });
+  }, [songId, loadedSong, songSheet, newSheet, scrollPosition]);
 
-  // Load state from localStorage if available
-  // On exit, save state to localStorage
+  // Saved on change rather than on unmount: this provider never unmounts, and a page
+  // refresh does not run React cleanups, so an unmount-time save would never fire.
+  // Debounced because scrolling updates scrollPosition continuously and the blob
+  // carries the whole sheet.
   useEffect(() => {
-    loadStateFromLocalStorage();
-    return () => {
-      saveStateToLocalStorage();
-    };
-  }, []);
+    const timer = setTimeout(saveStateToLocalStorage, 500);
+    return () => clearTimeout(timer);
+  }, [saveStateToLocalStorage]);
+
+  // Written on every change, for the same reason as above.
+  useEffect(() => {
+    saveSongViewSettings({
+      fontSize: displayOptions?.fontSize ?? Config.SongFontSize,
+      autoScrollSpeed: autoScrollOptions?.speed ?? Config.AutoScrollSpeed,
+    });
+  }, [displayOptions?.fontSize, autoScrollOptions?.speed]);
 
   // OPTIONS
   const updateDisplayOptions = useCallback((options: Partial<DisplayOptions>) => {
@@ -145,9 +124,10 @@ export function SongContextProvider({ children }: { children: ReactNode }) {
       transpose: 0,
       fontSize: prev?.fontSize || Config.SongFontSize,
     }));
-    setAutoScrollOptions({
+    setAutoScrollOptions((prev) => ({
+      ...prev,
       enabled: false,
-    });
+    }));
     navigate(RoutesEnum.Editor);
   }, [navigate]);
 
@@ -168,14 +148,18 @@ export function SongContextProvider({ children }: { children: ReactNode }) {
           setSongId(songId);
           setLoadedSong(s);
           setSongSheet(s.sheet);
+          // Belongs to the song we just navigated away from.
+          setScrollPosition(undefined);
+          setApplyScrollPosition(undefined);
           setDisplayOptions((prev) => ({
             mode: "render",
             transpose: 0,
             fontSize: prev?.fontSize || Config.SongFontSize,
           }));
-          setAutoScrollOptions({
+          setAutoScrollOptions((prev) => ({
+            ...prev,
             enabled: false,
-          });
+          }));
 
           navigate(RoutesEnum.Songs(songId));
         })
@@ -190,9 +174,10 @@ export function SongContextProvider({ children }: { children: ReactNode }) {
         ...prev,
         mode: "editor",
       }));
-      setAutoScrollOptions({
+      setAutoScrollOptions((prev) => ({
+        ...prev,
         enabled: false,
-      });
+      }));
       navigate(RoutesEnum.Editor);
     };
   }, [navigate]);
